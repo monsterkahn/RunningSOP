@@ -19,6 +19,7 @@ test('fresh extension install is private by default and About shows release iden
     '--no-default-browser-check'
   ];
   const launchOptions = {
+    channel: 'chromium',
     headless: true,
     args: browserArgs
   };
@@ -126,8 +127,11 @@ test('standalone demo dashboard opens and shows synthetic workflow', {timeout:30
     const page=await browser.newPage();
     const errors=[];page.on('pageerror',e=>errors.push(e.message));
     await page.goto(require('node:url').pathToFileURL(path.join(root,'dist/dashboard.html')).href);
-    await page.waitForTimeout(300);
-    assert.match(await page.locator('body').innerText(),/演示|内容库/);
+    await page.locator('#sop-rows .sop-name').first().waitFor({state:'attached'});
+    const expected=await page.evaluate(()=>JSON.parse(document.getElementById('dashboard-data').textContent).catalog.workflows);
+    assert.equal(await page.locator('#kpi-count').textContent(),String(expected.length));
+    assert.equal(await page.locator('#sop-rows .sop-name').first().textContent(),expected[0].title);
+    assert.equal(await page.locator('#status').evaluate(n=>n.classList.contains('error')),false);
     assert.deepEqual(errors,[]);
   }finally{await browser.close();}
 });
@@ -137,7 +141,7 @@ test('screenshot iframe isolates image bytes from work pages and saves annotatio
  const m=JSON.parse(fs.readFileSync(path.join(staged,'manifest.json')));m.host_permissions.push('https://example.test/*');fs.writeFileSync(path.join(staged,'manifest.json'),JSON.stringify(m));
  let context;
  try{
-  context=await chromium.launchPersistentContext(path.join(temp,'profile'),{headless:true,...(process.env.RUNTIME_SOP_CHROME?{executablePath:process.env.RUNTIME_SOP_CHROME}:{}),args:[`--disable-extensions-except=${staged}`,`--load-extension=${staged}`]});
+  context=await chromium.launchPersistentContext(path.join(temp,'profile'),{channel:'chromium',headless:true,...(process.env.RUNTIME_SOP_CHROME?{executablePath:process.env.RUNTIME_SOP_CHROME}:{}),args:[`--disable-extensions-except=${staged}`,`--load-extension=${staged}`]});
   const worker=context.serviceWorkers()[0]||await context.waitForEvent('serviceworker'),id=new URL(worker.url()).host;
   await context.route('https://example.test/**',r=>r.fulfill({contentType:'text/html',body:'<title>Synthetic page</title><p>Work page</p>'}));
   const work=await context.newPage();await work.goto('https://example.test/work');
@@ -193,7 +197,7 @@ test('guided recording edits STEP 1, advances explicitly and preserves approval 
  const m=JSON.parse(fs.readFileSync(path.join(staged,'manifest.json')));m.host_permissions.push('https://example.test/*');fs.writeFileSync(path.join(staged,'manifest.json'),JSON.stringify(m));
  let context;
  try{
-  context=await chromium.launchPersistentContext(path.join(temp,'profile'),{headless:true,...(process.env.RUNTIME_SOP_CHROME?{executablePath:process.env.RUNTIME_SOP_CHROME}:{}),args:[`--disable-extensions-except=${staged}`,`--load-extension=${staged}`]});
+  context=await chromium.launchPersistentContext(path.join(temp,'profile'),{channel:'chromium',headless:true,...(process.env.RUNTIME_SOP_CHROME?{executablePath:process.env.RUNTIME_SOP_CHROME}:{}),args:[`--disable-extensions-except=${staged}`,`--load-extension=${staged}`]});
   const worker=context.serviceWorkers()[0]||await context.waitForEvent('serviceworker');const id=new URL(worker.url()).host;
   await context.route('https://example.test/**',route=>route.fulfill({contentType:'text/html',body:'<title>Synthetic work</title><button id="work">Prepare report</button>'}));
   const work=await context.newPage();await work.goto('https://example.test/work');
@@ -261,7 +265,7 @@ test('guided recording edits STEP 1, advances explicitly and preserves approval 
 test('annotation results stay with their original step when sidebar selection changes', {timeout:60000},async()=>{
  const profile=fs.mkdtempSync(path.join(os.tmpdir(),'runtime-target-marks-'));let context;
  try{
-  context=await chromium.launchPersistentContext(profile,{headless:true,...(process.env.RUNTIME_SOP_CHROME?{executablePath:process.env.RUNTIME_SOP_CHROME}:{}),args:[`--disable-extensions-except=${extension}`,`--load-extension=${extension}`]});
+  context=await chromium.launchPersistentContext(profile,{channel:'chromium',headless:true,...(process.env.RUNTIME_SOP_CHROME?{executablePath:process.env.RUNTIME_SOP_CHROME}:{}),args:[`--disable-extensions-except=${extension}`,`--load-extension=${extension}`]});
   const worker=context.serviceWorkers()[0]||await context.waitForEvent('serviceworker'),id=new URL(worker.url()).host;
   const page=await context.newPage();await page.goto(`chrome-extension://${id}/workspace.html`);await page.waitForFunction(()=>document.documentElement.dataset.workspaceReady==='true');
   const image='data:image/jpeg;base64,'+fs.readFileSync(path.join(root,'examples/illustrations/demo-step.jpg')).toString('base64');

@@ -23,6 +23,7 @@ test('folder selection reads native persisted handles without writing and keeps 
   let context;
   try {
     context = await chromium.launchPersistentContext(profile, {
+      channel: 'chromium',
       headless: true,
       ...(process.env.RUNTIME_SOP_CHROME ? { executablePath: process.env.RUNTIME_SOP_CHROME } : {}),
       args: [`--disable-extensions-except=${extension}`, `--load-extension=${extension}`, '--no-first-run', '--no-default-browser-check']

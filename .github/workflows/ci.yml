@@ -4,10 +4,10 @@ permissions:
   contents: read
 jobs:
   verify:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: '22'
           cache: npm
@@ -19,7 +19,7 @@ jobs:
       - run: npm run test:qr-browser
       - run: npm run test:folder-browser
       - run: npm run test:dashboard-languages
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: running-sop-packages
           path: |
@@ -29,15 +29,18 @@ jobs:
   release:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: verify
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: write
     concurrency:
       group: running-sop-release
       cancel-in-progress: false
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@v8
         with:
           name: running-sop-packages
           path: dist
@@ -49,11 +52,27 @@ jobs:
           set -euo pipefail
           release_version=$(node -p "require('./package.json').version")
           release_tag="v${release_version}"
-          if gh release view "$release_tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            echo "Release already exists; keep existing version and assets unchanged."
-            exit 0
-          fi
           (cd dist && sha256sum --check SHA256SUMS.txt)
-          gh release create "$release_tag" dist/running-sop-*.zip dist/SHA256SUMS.txt \
-            --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-            --title "Running SOP ${release_tag}" --notes-file docs/GITHUB-RELEASE.md
+          if release_state=$(gh release view "$release_tag" --repo "$GITHUB_REPOSITORY" --json isDraft,targetCommitish); then
+            if [[ $(jq -r '.isDraft' <<< "$release_state") == false ]]; then
+              echo "Release already published; keep existing version and assets unchanged."
+              exit 0
+            fi
+            if [[ $(jq -r '.targetCommitish' <<< "$release_state") != "$GITHUB_SHA" ]]; then
+              echo "Existing draft targets a different commit; refusing to replace it."
+              exit 1
+            fi
+          else
+            gh release create "$release_tag" --draft \
+              --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+              --title "Running SOP ${release_tag}" --notes-file docs/GITHUB-RELEASE.md
+          fi
+          gh release upload "$release_tag" dist/running-sop-*.zip dist/SHA256SUMS.txt \
+            --repo "$GITHUB_REPOSITORY" --clobber
+          verification_dir=$(mktemp -d)
+          trap 'rm -rf "$verification_dir"' EXIT
+          gh release download "$release_tag" --repo "$GITHUB_REPOSITORY" \
+            --dir "$verification_dir" --pattern 'running-sop-*.zip' --pattern SHA256SUMS.txt
+          cmp dist/SHA256SUMS.txt "$verification_dir/SHA256SUMS.txt"
+          (cd "$verification_dir" && sha256sum --check SHA256SUMS.txt)
+          gh release edit "$release_tag" --repo "$GITHUB_REPOSITORY" --draft=false
