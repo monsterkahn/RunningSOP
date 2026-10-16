@@ -1,0 +1,31 @@
+{
+  "name": "runtime-sop",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Local-first Chrome workflow recorder and shared SOP reader",
+  "author": {
+    "name": "don Kimxote",
+    "email": "gwangphug@gmail.com"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node tools/test.cjs",
+    "test:browser": "node --test tests/public-browser.cjs",
+    "scan": "node tools/scan-public.cjs",
+    "build:example": "node tools/build-example.cjs",
+    "build:demo": "node tools/build-example.cjs && node tools/build-dashboard.cjs",
+    "demo:server": "node tools/demo-server.cjs",
+    "build": "node tools/build-example.cjs && node tools/build-dashboard.cjs && node tools/build-mobile-reader.cjs && node tools/scan-public.cjs && node tools/package.cjs",
+    "build:mobile": "node tools/build-mobile-reader.cjs",
+    "qr": "node tools/generate-qr.cjs",
+    "test:qr-browser": "node --test tests/qr-browser.cjs",
+    "test:folder-browser": "node --test tests/folder-browser.cjs",
+    "test:dashboard-languages": "node --test tests/dashboard-language-browser.cjs"
+  },
+  "devDependencies": {
+    "playwright": "1.62.1"
+  }
+}

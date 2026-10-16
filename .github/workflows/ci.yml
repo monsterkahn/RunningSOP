@@ -1,0 +1,59 @@
+name: Verify and package Running SOP
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:browser
+      - run: npm run test:qr-browser
+      - run: npm run test:folder-browser
+      - run: npm run test:dashboard-languages
+      - uses: actions/upload-artifact@v4
+        with:
+          name: running-sop-packages
+          path: |
+            dist/running-sop-*.zip
+            dist/SHA256SUMS.txt
+          if-no-files-found: error
+  release:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    concurrency:
+      group: running-sop-release
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: running-sop-packages
+          path: dist
+      - name: Publish the version once
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          release_version=$(node -p "require('./package.json').version")
+          release_tag="v${release_version}"
+          if gh release view "$release_tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Release already exists; keep existing version and assets unchanged."
+            exit 0
+          fi
+          (cd dist && sha256sum --check SHA256SUMS.txt)
+          gh release create "$release_tag" dist/running-sop-*.zip dist/SHA256SUMS.txt \
+            --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+            --title "Running SOP ${release_tag}" --notes-file docs/GITHUB-RELEASE.md

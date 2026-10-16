@@ -1,0 +1,26 @@
+node_modules/
+dist/
+coverage/
+playwright-report/
+test-results/
+.DS_Store
+Thumbs.db
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crx
+*.zip
+*.log
+# Local work, captures and real shared business data are never source assets.
+local/
+private/
+recordings/
+user-data/
+chrome-profile*/
+examples/storage/statistics/
+examples/storage/publication-history/
+examples/storage/category-history/
+tests/*-report.json
+tests/*.png

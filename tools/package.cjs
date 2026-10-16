@@ -1,0 +1,19 @@
+'use strict';
+const fs=require('node:fs'),path=require('node:path'),zlib=require('node:zlib'),crypto=require('node:crypto');
+const root=path.resolve(__dirname,'..'),dist=path.join(root,'dist');fs.mkdirSync(dist,{recursive:true});
+const manifest=JSON.parse(fs.readFileSync(path.join(root,'extension/manifest.json'),'utf8'));
+const version=manifest.version;
+const sourceRoots=['.github','docs','examples','extension','tests','tools'];
+const rootFiles=['AGENTS.md','.gitignore','CHANGELOG.md','CONTRIBUTING.md','LICENSE','PRIVACY.md','README.md','PROJECT-HANDOFF.md','NEXT-PROJECT-PROMPT.md','SECURITY.md','package.json','package-lock.json'];
+const ignored=new Set(['node_modules','dist','.git','.DS_Store','reports','test-results','playwright-report']);
+const table=Array.from({length:256},(_,n)=>{for(let k=0;k<8;k++)n=n&1?0xedb88320^(n>>>1):n>>>1;return n>>>0;});
+function crc(b){let c=0xffffffff;for(const v of b)c=table[(c^v)&255]^(c>>>8);return(c^0xffffffff)>>>0;}
+function files(dir){return fs.readdirSync(dir,{withFileTypes:true}).sort((a,b)=>a.name.localeCompare(b.name,'en')).flatMap(e=>{if(ignored.has(e.name))return [];const p=path.join(dir,e.name);if(e.isSymbolicLink())throw Error('Symlink not allowed: '+path.relative(root,p));return e.isDirectory()?files(p):[p];});}
+function zip(name,list,stripRoot=''){const parts=[],entries=[];let offset=0;for(const file of list){const raw=fs.readFileSync(file),data=zlib.deflateRawSync(raw),label=Buffer.from((stripRoot?path.relative(path.join(root,stripRoot),file):path.relative(root,file)).split(path.sep).join('/')),sum=crc(raw);if(!label.length||label.toString().startsWith('../'))throw Error('Unsafe ZIP entry: '+label.toString());const local=Buffer.alloc(30);local.writeUInt32LE(0x04034b50);local.writeUInt16LE(20,4);local.writeUInt16LE(0x800,6);local.writeUInt16LE(8,8);local.writeUInt16LE(0x21,12);local.writeUInt32LE(sum,14);local.writeUInt32LE(data.length,18);local.writeUInt32LE(raw.length,22);local.writeUInt16LE(label.length,26);const central=Buffer.alloc(46);central.writeUInt32LE(0x02014b50);central.writeUInt16LE(20,4);central.writeUInt16LE(20,6);central.writeUInt16LE(0x800,8);central.writeUInt16LE(8,10);central.writeUInt16LE(0x21,14);central.writeUInt32LE(sum,16);central.writeUInt32LE(data.length,20);central.writeUInt32LE(raw.length,24);central.writeUInt16LE(label.length,28);central.writeUInt32LE(offset,42);parts.push(local,label,data);entries.push(central,label);offset+=local.length+label.length+data.length;}const central=Buffer.concat(entries),end=Buffer.alloc(22);end.writeUInt32LE(0x06054b50);end.writeUInt16LE(list.length,8);end.writeUInt16LE(list.length,10);end.writeUInt32LE(central.length,12);end.writeUInt32LE(offset,16);const result=Buffer.concat([...parts,central,end]);fs.writeFileSync(path.join(dist,name),result);return crypto.createHash('sha256').update(result).digest('hex')+'  '+name;}
+function collect(rootList){return rootList.flatMap(item=>{const p=path.join(root,item);if(!fs.existsSync(p))throw Error('Missing packaging input: '+item);if(fs.lstatSync(p).isSymbolicLink())throw Error('Symlink not allowed: '+item);return fs.statSync(p).isDirectory()?files(p):[p];}).sort((a,b)=>path.relative(root,a).localeCompare(path.relative(root,b),'en'));}
+const extensionFiles=files(path.join(root,'extension'));
+const extensionPackage=[...extensionFiles,...['LICENSE','PRIVACY.md','docs/INSTALL.md'].map(item=>path.join(root,item))];
+const sourcePackage=collect([...sourceRoots,...rootFiles]);
+const sums=[zip(`running-sop-extension-v${version}.zip`,extensionPackage),zip(`running-sop-github-v${version}.zip`,sourcePackage),zip(`running-sop-webstore-v${version}.zip`,extensionFiles,'extension')];
+fs.writeFileSync(path.join(dist,'SHA256SUMS.txt'),sums.join('\n')+'\n');
+console.log(sums.join('\n'));

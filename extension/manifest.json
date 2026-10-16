@@ -1,0 +1,58 @@
+{
+  "manifest_version": 3,
+  "name": "Running SOP",
+  "version": "1.0.0",
+  "description": "按页面匹配 存储器 SOP，录制操作、添加截图和编号箭头标记，导出图文流程。",
+  "minimum_chrome_version": "116",
+  "permissions": [
+    "sidePanel",
+    "tabs",
+    "storage",
+    "alarms",
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "file:///*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "icons": {
+    "16": "assets/icons/icon-16.png",
+    "32": "assets/icons/icon-32.png",
+    "48": "assets/icons/icon-48.png",
+    "128": "assets/icons/icon-128.png"
+  },
+  "action": {
+    "default_title": "打开 Running SOP",
+    "default_icon": {
+      "16": "assets/icons/icon-16.png",
+      "24": "assets/icons/icon-24.png",
+      "32": "assets/icons/icon-32.png",
+      "48": "assets/icons/icon-48.png"
+    }
+  },
+  "side_panel": {
+    "default_path": "workspace.html"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'none'; connect-src 'self' file:"
+  },
+  "optional_host_permissions": [
+    "https://*/*",
+    "http://*/*"
+  ],
+  "options_page": "options.html",
+  "short_name": "Running SOP",
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "screenshot-viewer.html"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ]
+}

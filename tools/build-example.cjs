@@ -1,0 +1,22 @@
+ 'use strict';
+const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
+const E=require('../extension/catalog-engine.js'),A=require('../extension/sop-assets.js'),C=require('../extension/category-engine.js');
+const root=path.resolve(__dirname,'../examples/storage');
+const write=(name,data)=>{const dest=path.join(root,name);fs.mkdirSync(path.dirname(dest),{recursive:true});fs.writeFileSync(dest,data);};
+(async()=>{
+const url='http://localhost:8080/demo-work-page.html';
+const image='data:image/jpeg;base64,'+fs.readFileSync(path.resolve(__dirname,'../examples/illustrations/demo-step.jpg')).toString('base64');
+const guide={format:'runtime-sop-guide',schemaVersion:1,workflowId:'demo-work',title:'演示：记录一次工作',version:'1.0.0',notice:'纯演示流程与合成示意图，不含真实业务资料。',steps:[{id:'fill-name',title:'填写本次工作名称',where:'演示工作页的名称输入框',workUrl:url,actions:['在本次工作名称输入框填写“我的演示任务”。','需要帮助时点击图片，参考编号 1 的位置。'],expected:'输入框显示你填写的工作名称。',trouble:'没有输入框时，请确认当前打开的是本项目演示工作页。',acceptance:['工作名称非空，并与本次演示一致。'],image,imageMode:'thumbnail'},{id:'finish-work',title:'完成并核对结果',where:'名称输入框下方',workUrl:url,actions:['点击“完成演示”。','核对页面下方显示的完成提示。'],expected:'页面显示“已完成：我的演示任务”。',trouble:'提示请先填写名称时，返回上一步填写后重试。',acceptance:['提示中的名称与输入内容一致。']}]};
+E.validateGuide(guide);
+const workflow={id:'demo-work',title:guide.title,summary:'在本机演示页面验证匹配、阅读和图解。',status:'sample',viewer:'guide',rules:[{hosts:['localhost'],origins:['http://localhost:8080'],pathEquals:['/demo-work-page.html'],priority:20,label:'本机演示工作页'}]};
+const packed=await A.pack(guide,workflow,crypto.webcrypto);
+for(const asset of packed.assets)write(asset.file,asset.bytes);
+const body=JSON.stringify(packed.document,null,2)+'\n';
+workflow.sha256=crypto.createHash('sha256').update(body).digest('hex');
+workflow.file='workflows/demo-work/versions/'+workflow.sha256+'.json';
+write(workflow.file,body);
+const catalog={format:'runtime-sop-catalog',schemaVersion:1,version:'1.0.0',workflows:[workflow]};
+write('categories.json',JSON.stringify(C.empty(),null,2)+'\n');
+E.validateCatalog(catalog);write('catalog.json',JSON.stringify(catalog,null,2)+'\n');
+console.log('Synthetic example catalog generated.');
+})().catch(e=>{console.error(e.message);process.exitCode=1;});

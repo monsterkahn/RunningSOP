@@ -1,0 +1,31 @@
+{
+  "format": "runtime-sop-catalog",
+  "schemaVersion": 1,
+  "version": "1.0.0",
+  "workflows": [
+    {
+      "id": "demo-work",
+      "title": "演示：记录一次工作",
+      "summary": "在本机演示页面验证匹配、阅读和图解。",
+      "status": "sample",
+      "viewer": "guide",
+      "rules": [
+        {
+          "hosts": [
+            "localhost"
+          ],
+          "origins": [
+            "http://localhost:8080"
+          ],
+          "pathEquals": [
+            "/demo-work-page.html"
+          ],
+          "priority": 20,
+          "label": "本机演示工作页"
+        }
+      ],
+      "sha256": "d413947b5a41ac11af0868fd347cbfedd6f3567807b6c3d6b0b9ef0caf3e4308",
+      "file": "workflows/demo-work/versions/d413947b5a41ac11af0868fd347cbfedd6f3567807b6c3d6b0b9ef0caf3e4308.json"
+    }
+  ]
+}
