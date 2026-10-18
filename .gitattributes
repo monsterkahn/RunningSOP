@@ -1,0 +1,7 @@
+# Shared documents are verified byte-for-byte. Keep text identical on every OS.
+* text=auto eol=lf
+*.png -text
+*.jpg -text
+*.jpeg -text
+*.ico -text
+*.zip -text

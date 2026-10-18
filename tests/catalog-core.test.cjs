@@ -100,6 +100,18 @@ test('private IPv4, IPv6, localhost and intranet domains support exact protocol 
  }
 });
 
+test('Windows drive and UNC file URLs preserve encoded names and exact library scope',()=>{
+ const paths=['file:///C:/Team%20SOP/%E6%93%8D%E4%BD%9C.html?mode=edit#step','file://files.example/Team%20SOP/%E6%93%8D%E4%BD%9C.html?mode=edit#step'];
+ const c=catalog(paths.map((file,i)=>workflow('windows-'+i,'example.com',{rules:[{hosts:[],fileUrls:[file],priority:10,label:'Synthetic Windows file'}]})));
+ for(const [i,file] of paths.entries()){
+  assert.equal(E.matchPage(file,c).candidates[0].workflow.id,'windows-'+i);
+  assert.equal(E.matchPage(file.replace('mode=edit','mode=other'),c).state,'none');
+  assert.equal(LocalSOP.same(file,file),true);
+ }
+ assert.equal(E.matchPage(paths[0].replace('C:/','D:/'),c).state,'none');
+ assert.equal(E.matchPage(paths[1].replace('files.example','other.example'),c).state,'none');
+});
+
 test('bounded catalog supports 500 entries and rejects a 501st',()=>{const rows=Array.from({length:500},(_,i)=>workflow('flow-'+i,'company.local'));assert.equal(catalog(rows).workflows.length,500);assert.throws(()=>catalog([...rows,workflow('flow-500','company.local')]));});
 
 

@@ -8,7 +8,7 @@ const Engine = require('../extension/catalog-engine.js');
 function fileHandle(initial = '', onClose) {
   let value = initial;
   return {
-    async getFile() { return { text: async () => typeof value==='string'?value:new TextDecoder().decode(value), arrayBuffer: async () => typeof value==='string'?new TextEncoder().encode(value).buffer:value.slice().buffer }; },
+    async getFile() { return { size: typeof value==='string'?new TextEncoder().encode(value).length:value.length, text: async () => typeof value==='string'?value:new TextDecoder().decode(value), arrayBuffer: async () => typeof value==='string'?new TextEncoder().encode(value).buffer:value.slice().buffer }; },
     async createWritable() {
       let next = '';
       return {
@@ -193,6 +193,35 @@ test('rejects aggregate content beyond 4 MB before writing any release', async (
   await assert.rejects(publisher.publish(huge), /超过 4 MB/);
   assert.equal(root.files.get('catalog.json').value, before);
   assert.equal(releaseDir.files.size, fileCount);
+});
+
+test('rejects oversized catalog and existing document before allocating their contents',async()=>{
+ for(const target of ['catalog','document']){
+  const seed=await seeded(),{publisher,root,catalogHandle}=await fixture(seed),before=catalogHandle.value;
+  const existing=seed.catalog.workflows.find(item=>item.id==='existing-flow');
+  const handle=target==='catalog'?catalogHandle:root.dirs.get('catalog-releases').files.get(existing.file.split('/').at(-1));
+  let reads=0;handle.getFile=async()=>({size:(target==='catalog'?512*1024:Publisher.MAX_TOTAL)+1,async arrayBuffer(){reads++;throw Error('must not allocate');},async text(){reads++;throw Error('must not allocate');}});
+  await assert.rejects(publisher.publish(guide('existing-flow'),{expectedSha:existing.sha256}),/读取上限/);
+  assert.equal(reads,0);assert.equal(catalogHandle.value,before);assert.equal(root.dirs.has('workflows'),false);
+ }
+});
+
+test('checks actual catalog bytes even when reported size is smaller',async()=>{
+ const {publisher,root,catalogHandle}=await fixture(),before=catalogHandle.value;
+ catalogHandle.getFile=async()=>({size:1,async arrayBuffer(){return new Uint8Array(512*1024+1).buffer;}});
+ await assert.rejects(publisher.publish(guide()),/读取上限/);
+ assert.equal(catalogHandle.value,before);assert.equal(root.dirs.size,0);
+});
+
+test('rejects oversized existing image before allocating bytes or updating catalog',async()=>{
+ const {publisher,root,catalogHandle}=await fixture();const input=guide('bounded-image');
+ input.steps[0].image='data:image/jpeg;base64,/9j/AAECAwQ=';input.steps[0].imageAt='2026-10-14T00:00:00Z';
+ const first=await publisher.publish(input),before=catalogHandle.value;
+ const imageDir=root.dirs.get('workflows').dirs.get(input.workflowId).dirs.get('images');
+ const handle=[...imageDir.files.values()][0];let reads=0;
+ handle.getFile=async()=>({size:Publisher.MAX_TOTAL+1,async arrayBuffer(){reads++;throw Error('must not allocate');}});
+ input.title='Changed title';await assert.rejects(publisher.publish(input,{expectedSha:first.sha256}),/读取上限/);
+ assert.equal(reads,0);assert.equal(catalogHandle.value,before);
 });
 
 test('requests permission only during publish and exposes missing picker fallback', async () => {

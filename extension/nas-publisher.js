@@ -23,20 +23,25 @@
   function parse(raw, label) {
     try { return JSON.parse(raw); } catch (_) { fail(label + ' JSON 无效。'); }
   }
+  async function boundedBytes(file, limit) {
+    if (!Number.isSafeInteger(file.size) || file.size < 0 || file.size > limit) fail('文件超过读取上限。');
+    const content = typeof file.arrayBuffer === 'function' ? new Uint8Array(await file.arrayBuffer()) : bytes(await file.text());
+    if (content.length > limit) fail('文件超过读取上限。');
+    return content;
+  }
   async function readText(directory, path) {
     const parts = path.split('/');
     let dir = directory;
     for (const part of parts.slice(0, -1)) dir = await dir.getDirectoryHandle(part);
     const handle = await dir.getFileHandle(parts[parts.length - 1]);
     const file = await handle.getFile();
-    return await file.text();
+    return new TextDecoder('utf-8', { fatal: true }).decode(await boundedBytes(file, path === 'catalog.json' ? MAX_CATALOG : MAX_TOTAL));
   }
   async function readBinary(directory, path) {
     const parts=path.split('/');let dir=directory;
     for(const part of parts.slice(0,-1))dir=await dir.getDirectoryHandle(part);
     const file=await (await dir.getFileHandle(parts.at(-1))).getFile();
-    if(typeof file.arrayBuffer==='function')return new Uint8Array(await file.arrayBuffer());
-    return bytes(await file.text());
+    return boundedBytes(file, MAX_TOTAL);
   }
   async function writeNew(directory, path, raw) {
     const parts = path.split('/');
