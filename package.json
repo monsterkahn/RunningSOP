@@ -27,7 +27,8 @@
     "test:release-browser": "node --test --test-concurrency=1 tests/public-browser.cjs tests/folder-browser.cjs tests/qr-browser.cjs tests/dashboard-language-browser.cjs",
     "test:server": "node server/tools/test.cjs",
     "test:team-scale": "node server/tools/scale.cjs",
-    "test:team-browser": "node --test --test-concurrency=1 tests/team-workspace-browser.cjs tests/team-library-browser.cjs"
+    "test:team-browser": "node --test --test-concurrency=1 tests/team-workspace-browser.cjs tests/team-library-browser.cjs",
+    "build:team-service": "node tools/build-team-service.cjs"
   },
   "devDependencies": {
     "playwright": "1.62.1"

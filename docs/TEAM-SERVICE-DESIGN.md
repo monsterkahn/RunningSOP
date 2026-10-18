@@ -39,14 +39,14 @@ Classification is metadata, separate from stable SOP identity and work-address m
 | 500-person organization, 75-reader planning burst | Separate-process requests with 75 independent identities and sockets; retain prior 500-client stress evidence | 75-reader text/image workloads pass with bounded read retries; field concurrency unmeasured |
 | Reliable editing lock | Competing clients, expiry/takeover, stale release, lost-response retry and restart tests | Foundation tests |
 | Mixed client versions | Protocol negotiation, unsupported-version failures and data migration tests | Foundation tests |
-| Chrome 116 and current | Real extension connection, reading, editing, publication and recovery in both browsers | Pending integration |
-| Windows/macOS/Linux | Service tests and actual packaged extension flows on OS matrix | macOS Node 24/26 verified; new OS/container CI defined but not run |
+| Chrome 116 and current | Real extension connection, reading, editing, publication and recovery in both browsers | Real HTTP workspace/library scenarios pass in both; native prompts remain outstanding |
+| Windows/macOS/Linux | Service tests and actual packaged extension flows on OS matrix | Six service combinations, three OS team browsers and container startup passed remote run 39127823019; later changes require final run |
 | Classification at scale | Category CRUD, movement, stable IDs and indexed filters | Store/API and real-service library UI verified; aggregate counts and bulk operations remain optional evaluation |
 | UI understandable | Compact settings, owner/busy status, reconnect and preserved drafts; seven UI languages | In progress |
 | Storage efficiency | Separate assets, immutable revisions, integrity checks, measured large-image memory | Pending |
 | Recovery | Consistent backup/restore, migration rollback, interrupted publication and process termination | Verified snapshot/restore, live WAL and killed-process tests; browser recovery in progress |
 | Installation | Versioned service artifacts, container/desktop instructions, clean-start and upgrade tests | In progress |
-| Existing folder mode | Existing core/browser tests remain green with team mode disabled | 144 core tests and 12 browser scenarios each on current Chromium and Chrome 116 pass |
+| Existing folder mode | Existing core/browser tests remain green with team mode disabled | 145 core tests and 10 existing plus 3 team scenarios per browser passed before the latest account/package additions |
 | Privacy/security | Least privilege, bounded input/cache, trusted origins, sessions, no remote execution or vendor telemetry | In progress |
 | Real deployments | Native permission dialogs, representative hardware, HTTPS/NAS/SMB and two-device checks | Not yet verified |
 
@@ -114,3 +114,11 @@ Added the opt-in team library described in `TEAM-LIBRARY.md`. It keeps sidebar r
 Long-guide thumbnail decoding is deferred with IntersectionObserver and a two-job queue, with a lightweight immediate-queue fallback. This does not yet solve whole-guide wire payloads. Account changes abort requests and clear old metadata, guide content and any open screenshot dialog. Private uncertain publications now have count/byte bounds and exact-draft cleanup after confirmed local deletion; no potentially racy automatic orphan sweep was added.
 
 See `tests/team-library-browser.cjs` and `tests/team-workspace-browser.cjs` for real HTTP scenarios. The new OS/container workflow is being prepared for execution on the isolated development branch; do not treat its definition as passing evidence.
+
+## Account isolation and portable distribution continuation
+
+A review found a cross-account create-publication race: the request could finish after a settings switch and be tagged with the replacement account. Publication now captures the starting target, client, token, draft and pending key; it verifies persisted identity before sending and after completion. A changed target preserves the original uncertain request instead of clearing another account's pending key. A real HTTP regression commits the create, holds its response, changes accounts, and verifies both isolated recovery records and the absence of an incorrectly attributed draft link. Reading, copying and lock acquisition also check their starting target across awaits. Settings UI reads use a generation guard; a deterministic VM test resolves newer and older IndexedDB reads out of order. Workspace settings loads in the same generation are coalesced, allowing ordinary tab refresh and explicit draft opening to complete together.
+
+The optional experimental service ZIP has an explicit source allowlist and its own checksum; it excludes configuration, databases, browser data and development fixtures. It does not bundle a runtime, install a service automatically, configure HTTPS or establish production readiness.
+
+The clean source-ZIP startup scenario passes locally on Node 24 and Node 26, including database/configuration creation and trusted-parent IPC shutdown. The service test suite now contains 44 passing tests; the core suite contains 148. Updated remote package-startup results must be recorded before claiming Windows extraction acceptance.

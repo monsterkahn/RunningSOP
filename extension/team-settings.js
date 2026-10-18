@@ -71,7 +71,7 @@
   function instance() { return singleton || (singleton = create()); }
   async function initialize() {
     const doc = root.document, form = doc?.getElementById('team-connect-form'); if (!form) return;
-    const get = id => doc.getElementById(id); let record = {enabled:false}, state = 'idle';
+    const get = id => doc.getElementById(id); let record = {enabled:false}, state = 'idle', readGeneration = 0;
     function render() {
       const words = strings[root.WorkspaceI18n?.getLanguage()] || strings.en;
       doc.querySelectorAll('[data-team-text]').forEach(node => { node.textContent = words[Number(node.dataset.teamText)]; });
@@ -81,18 +81,34 @@
       let url; try { url = new URL(get('team-endpoint').value); } catch (_) {}
       get('team-http-warning').hidden = !url || url.protocol !== 'http:' || ['localhost','127.0.0.1','[::1]'].includes(url.hostname);
     }
+    async function refreshRecord(populate = false) {
+      const generation = ++readGeneration;
+      try {
+        const value = await instance().read();
+        if (generation !== readGeneration) return;
+        record = value;
+        if (populate && record.enabled) {
+          get('team-endpoint').value = record.endpoint;
+          get('team-display-name').value = record.actor?.name || '';
+        }
+        render();
+      } catch (_) {
+        if (generation !== readGeneration) return;
+        state = 'error'; render();
+      }
+    }
     form.addEventListener('submit', async event => {
       event.preventDefault(); if (!form.reportValidity() || state === 'busy') return;
       const pending = instance().connect({endpoint:get('team-endpoint').value,joinCode:get('team-join-code').value,displayName:get('team-display-name').value});
+      const generation = ++readGeneration;
       state = 'busy'; render();
-      try { record = await pending; state = 'idle'; } catch (_) { state = 'error'; }
-      finally { get('team-join-code').value = ''; render(); }
+      try { const next = await pending; if (generation === readGeneration) record = next; state = 'idle'; } catch (_) { state = 'error'; }
+      finally { get('team-join-code').value = ''; render(); await refreshRecord(); }
     });
-    get('team-disconnect').addEventListener('click',async () => { if (state === 'busy') return; state = 'busy'; render(); try { await instance().clear(); record = {enabled:false}; state = 'idle'; } catch (_) { state = 'error'; } render(); });
+    get('team-disconnect').addEventListener('click',async () => { if (state === 'busy') return; const generation = ++readGeneration; state = 'busy'; render(); try { await instance().clear(); if (generation === readGeneration) record = {enabled:false}; state = 'idle'; } catch (_) { state = 'error'; } render(); await refreshRecord(); });
     get('team-endpoint').addEventListener('input',render);
-    root.chrome?.storage?.onChanged?.addListener(async (changes,area) => { if (area === 'local' && changes[KEY]) record = await instance().read(); render(); });
-    try { record = await instance().read(); if (record.enabled) { get('team-endpoint').value = record.endpoint; get('team-display-name').value = record.actor?.name || ''; } } catch (_) { state = 'error'; }
-    render();
+    root.chrome?.storage?.onChanged?.addListener((changes,area) => { if (area === 'local' && changes[KEY]) refreshRecord(); });
+    await refreshRecord(true);
   }
   if (root.document) { if (root.document.readyState === 'loading') root.document.addEventListener('DOMContentLoaded',initialize,{once:true}); else initialize(); }
   return Object.freeze({KEY,create,read:() => instance().read(),clear:() => instance().clear(),connect:input => instance().connect(input)});
