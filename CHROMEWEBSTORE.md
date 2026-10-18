@@ -1,6 +1,6 @@
 # Chrome Web Store Listing — Running SOP
 
-> Last updated: 2026-10-18. Local review of version 1.1.0; not a store submission or approval.
+> Last updated: 2026-10-18. Local review of version 1.1.1; not a store submission or approval.
 
 ## Store listing
 
@@ -90,6 +90,7 @@ Privacy policy source: PRIVACY.md. Public repository link: https://github.com/mo
 
 | Version | Date | Changes | Status |
 | --- | --- | --- | --- |
+| 1.1.1 | 2026-10-18 | Case-insensitive library discovery, bounded shared reads, Windows package verification | GitHub update; not submitted to the Chrome Web Store |
 | 1.1.0 | 2026-10-18 | Lightweight finite folder guidance, Chrome 116 directory parser correction, confirmed local draft cleanup, specification/privacy review | Official GitHub release; not submitted to the Chrome Web Store |
 | 1.0.0 | 2026-10-17 | First public-version submission | Submitted for review per user; approval not independently checked |
 

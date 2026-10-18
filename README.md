@@ -1,6 +1,6 @@
 # Running SOP
 
-**Current official release: v1.1.0** · [Download](https://github.com/monsterkahn/RunningSOP/releases/latest)
+**Current official release: v1.1.1** · [Download](https://github.com/monsterkahn/RunningSOP/releases/latest)
 
 Running SOP brings step-by-step operating procedures to the webpage where you work. Follow instructions beside your task, create visual SOPs as you work, and publish reviewed procedures to a folder you choose.
 

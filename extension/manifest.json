@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Running SOP",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "按工作页面匹配 SOP，录制操作、编辑截图标记，并发布到用户选择的文件夹。",
   "minimum_chrome_version": "116",
   "permissions": [

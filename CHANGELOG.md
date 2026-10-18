@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.1 · 2026-10-18
+
+- Fixed false multiple-library errors when SOP and sop refer to the same native directory.
+- Preserved hashed text bytes across Windows Git checkouts.
+- Bounded shared publication reads and immutable-file verification before allocating content.
+- Added Windows Server 2022/2025 package verification; Windows and Linux checks now gate GitHub publication.
+- Chrome 116 remains the minimum. Native permission prompts, old hardware and real two-device NAS acceptance remain outstanding. This is not a new Chrome Web Store submission.
+
 ## 1.1.0 · 2026-10-18 — Published on GitHub
 
 - Added a finite breathing ring to the SOP folder-selection icon; it stops when connected.
