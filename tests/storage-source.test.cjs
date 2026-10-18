@@ -18,6 +18,23 @@ test('folder selection immediately opens a read-only picker and binds reading an
 test('a catalog file alone never activates a library and only its matching folder can finish selection',async()=>{
  const e=env(),a=library('A'),b=library('B');e.file(a.catalog);const chosen=await e.source.chooseFile();assert.equal(chosen.handle,a.catalog);assert.equal((await e.source.info()).selected,false);e.choose(b.root);await assert.rejects(e.source.chooseDirectory({expectedFile:chosen.handle}),/不包含/);assert.equal((await e.source.info()).selected,false);e.choose(a.root);await e.source.chooseDirectory({expectedFile:chosen.handle});assert.equal((await e.source.info()).name,'A');
 });
+test('selection requests read permission before accessing files and denied access preserves the connection',async()=>{
+ const e=env(),original=library('Original');e.choose(original.root);const previous=await e.source.chooseDirectory();
+ for(const result of ['granted','denied']){
+  const lib=library(result),events=[];lib.root.permission='prompt';
+  lib.root.requestPermission=async options=>{events.push(['permission',options]);lib.root.permission=result;return result;};
+  const getFile=lib.root.getFileHandle;lib.root.getFileHandle=async function(key){events.push(['file',key]);return getFile.call(this,key);};
+  e.choose(lib.root);
+  if(result==='denied'){
+   await assert.rejects(e.source.chooseDirectory(),/重新授权/);assert.deepEqual(events,[['permission',{mode:'read'}]]);
+   assert.equal((await e.source.info()).endpoint,previous.endpoint);
+  }else{
+   const selected=await e.source.chooseDirectory();assert.deepEqual(events[0],['permission',{mode:'read'}]);assert.equal(await e.source.read(selected.endpoint),catalog);
+   // Restore the original connection for the denial case.
+   e.choose(original.root);const restored=await e.source.chooseDirectory();previous.endpoint=restored.endpoint;
+  }
+ }
+});
 test('cancellation, malformed catalog, ambiguous libraries and mismatched files preserve the previous connection',async()=>{
  const e=env(),a=library('Original');e.choose(a.root);const chosen=await e.source.chooseDirectory();
  e.choose(Object.assign(Error('cancel'),{name:'AbortError'}));await assert.rejects(e.source.chooseDirectory(),{name:'AbortError'});
@@ -37,4 +54,39 @@ test('metadata write failure restores both the selected handle and source identi
 
 test('permitted Unicode filenames round-trip through an internal resource URL without escaping the chosen folder',async()=>{
  const e=env(),lib=library();const root=folder('SOP',{'catalog.json':lib.catalog,'说明 文件.json':file('说明 文件.json','{}')});e.choose(root);const chosen=await e.source.chooseDirectory();assert.equal(await e.source.read(Source.resolve(chosen.endpoint,'说明 文件.json')),'{}');
+});
+test('missing catalog is initialized only after write permission and can be read as an empty library',async()=>{
+ const e=env(),events=[];let stored=null;
+ const dir=folder('Empty');dir.requestPermission=async options=>{events.push(options.mode);return 'granted';};
+ dir.getFileHandle=async(name,options)=>{
+  assert.equal(name,'catalog.json');if(stored)return stored;
+  if(!options?.create)throw notFound();
+  let raw='';stored={...file(name,''),async getFile(){const data=Buffer.from(raw);return {size:data.length,async arrayBuffer(){return Uint8Array.from(data).buffer;}};},async createWritable(options){assert.equal(options.mode,'exclusive');let pending='';return {async write(value){pending=value;},async close(){raw=pending;},async abort(){}};}};
+  return stored;
+ };
+ e.choose(dir);const chosen=await e.source.chooseDirectory();assert.equal(chosen.workflowCount,0);
+ assert.deepEqual(events,['read','readwrite']);assert.deepEqual(JSON.parse(await e.source.read(chosen.endpoint)).workflows,[]);
+ await e.source.chooseDirectory();assert.deepEqual(events,['read','readwrite','read']);
+});
+test('denying initialization does not create a catalog or replace the previous connection',async()=>{
+ const e=env(),original=library();e.choose(original.root);const before=await e.source.chooseDirectory();
+ const dir=folder('Empty');const getFile=dir.getFileHandle;
+ dir.requestPermission=async({mode})=>mode==='read'?'granted':'denied';
+ dir.getFileHandle=async function(name,options){assert.ok(!options?.create);return getFile.call(this,name);};
+ e.choose(dir);await assert.rejects(e.source.chooseDirectory(),/允许写入/);assert.equal((await e.source.info()).endpoint,before.endpoint);
+});
+test('folder display settings stay local, survive reselection, and do not follow another folder',async()=>{
+ const e=env(),lib=library('Actual folder');e.choose(lib.root);const first=await e.source.chooseDirectory();
+ await e.source.saveAppearance({endpoint:first.endpoint,name:'  Team SOP  ',icon:'storage'});
+ assert.equal((await e.source.info()).displayName,'Team SOP');assert.equal(lib.root.name,'Actual folder');assert.equal(await e.source.read(first.endpoint),catalog);
+ await e.source.chooseDirectory();assert.equal((await e.source.info()).displayName,'Team SOP');assert.equal((await e.source.info()).icon,'storage');
+ await assert.rejects(e.source.saveAppearance({endpoint:first.endpoint,name:'stale',icon:'folder'}),/连接已变化/);
+ const current=(await e.source.info()).endpoint;
+ for(const values of [{name:'x'.repeat(81),icon:'folder'},{name:'safe',icon:'javascript:bad'},{name:'bad\nname',icon:'folder'}])await assert.rejects(e.source.saveAppearance({endpoint:current,...values}),/显示设置无效/);
+ e.choose(library('Other').root);await e.source.chooseDirectory();assert.equal((await e.source.info()).displayName,'');assert.equal((await e.source.info()).icon,'folder');
+});
+test('internal identifiers reject credentials, queries and encoded traversal before reading files',async()=>{
+ const e=env(),lib=library();e.choose(lib.root);const {endpoint}=await e.source.chooseDirectory();
+ for(const bad of [endpoint+'?x',endpoint+'#x',endpoint.replace('://','://user:pass@'),endpoint.replace('/catalog.json','/%2e%2e/secret'),endpoint.replace('/catalog.json','/%2Fsecret'),endpoint.replace('/catalog.json','/%'),endpoint.replace('/catalog.json','/bad%00name')])await assert.rejects(e.source.read(bad));
+ assert.equal(await e.source.read(endpoint),catalog);
 });

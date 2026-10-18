@@ -2,7 +2,7 @@
 
 请接手当前 Running SOP 项目。先阅读 AGENTS.md、PROJECT-HANDOFF.md、README.md 和 docs/RELEASE-REVIEW-2.5.13.md，再检查实际代码。
 
-当前基线是 2.5.16 候选发布版（居中的双端连接布局），新增文件夹优先的内容库连接（见 PROJECT-HANDOFF.md 第 10 节）；保留 2.5.14 手机功能（增加每份 SOP 的手机二维码及只读阅读页，见 docs/MOBILE-QR.md），Chrome Manifest V3、原生 HTML/CSS/JavaScript、MIT。品牌 Running SOP，作者 don Kimxote。已完成截图隔离与标记保存、录制下一步、共享发布完整性、目录并发、多语言和窄屏布局修复。迁移前 68 项核心测试及 5 组隔离浏览器流程通过；请区分历史结果与本次实测。
+当前工作分支为 codex/v1.1.0，1.0.0 已由用户提交商店审核；先阅读 docs/RELEASE-REVIEW-1.1.0.md 和 CHROMEWEBSTORE.md。设置已精简为语言、文件夹、关于，新增文件夹光圈和草稿容量整理；保留 2.5.14 手机功能（增加每份 SOP 的手机二维码及只读阅读页，见 docs/MOBILE-QR.md），Chrome Manifest V3、原生 HTML/CSS/JavaScript、MIT。品牌 Running SOP，作者 don Kimxote。已完成截图隔离与标记保存、录制下一步、共享发布完整性、目录并发、多语言和窄屏布局修复。迁移前 68 项核心测试及 5 组隔离浏览器流程通过；请区分历史结果与本次实测。
 
 先验证开发环境和测试，再围绕我提出的新需求继续；保留现有紧凑布局及文档中的产品决定。用合成数据和隔离浏览器测试，不写入真实业务 SOP，不改动日常 Chrome 配置。原生截图授权、文件夹授权、保留本机数据升级和真实双机共享仍需人工验收。不要把文件共享描述为强一致事务，也不要宣称已上架。
 

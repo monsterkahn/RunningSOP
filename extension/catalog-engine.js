@@ -106,7 +106,7 @@
     keys(input, ['format','schemaVersion','version','workflows'], '目录');
     if (input.format !== 'runtime-sop-catalog' || input.schemaVersion !== 1) fail('目录格式或版本无效。');
     const version = string(input.version, '目录版本', 64);
-    if (!Array.isArray(input.workflows) || input.workflows.length < 1 || input.workflows.length > 500) fail('目录工作流数量无效。');
+    if (!Array.isArray(input.workflows) || input.workflows.length > 500) fail('目录工作流数量无效。');
     const ids = new Set(), files = new Set();
     const workflows = input.workflows.map(w => {
       keys(w, ['id','title','summary','status','viewer','file','sha256','rules'], '工作流');

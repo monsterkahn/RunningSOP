@@ -15,7 +15,8 @@ const ratingKeys = ['非常不满意', '不满意', '一般', '满意', '非常�
 
 test('standalone dashboard translates six languages and preserves authored SOP content', { timeout: 90000 }, async () => {
   const browser = await chromium.launch({
-    headless: true,
+    headless: !process.env.RUNTIME_SOP_CHROME,
+    args: process.env.RUNTIME_SOP_CHROME ? ['--headless=new'] : [],
     ...(process.env.RUNTIME_SOP_CHROME ? { executablePath: process.env.RUNTIME_SOP_CHROME } : {})
   });
   const errors = [];

@@ -8,11 +8,12 @@ const path = require('node:path');
 const { chromium } = require(process.env.RUNTIME_SOP_PLAYWRIGHT || 'playwright');
 
 const root = path.resolve(__dirname, '..');
-const extension = path.join(root, 'extension');
+const extension = process.env.RUNTIME_SOP_EXTENSION || path.join(root, 'extension');
 
 test('fresh extension install is private by default and About shows release identity', { timeout: 60000 }, async () => {
   const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'runtime-sop-public-'));
   const browserArgs = [
+    ...(process.env.RUNTIME_SOP_CHROME?['--headless=new']:[]),
     `--disable-extensions-except=${extension}`,
     `--load-extension=${extension}`,
     '--no-first-run',
@@ -20,7 +21,7 @@ test('fresh extension install is private by default and About shows release iden
   ];
   const launchOptions = {
     channel: 'chromium',
-    headless: true,
+    headless: !process.env.RUNTIME_SOP_CHROME,
     args: browserArgs
   };
   if (process.env.RUNTIME_SOP_CHROME) launchOptions.executablePath = process.env.RUNTIME_SOP_CHROME;
@@ -30,6 +31,13 @@ test('fresh extension install is private by default and About shows release iden
     context = await chromium.launchPersistentContext(profile, launchOptions);
     const worker = context.serviceWorkers()[0] || await context.waitForEvent('serviceworker');
     const extensionId = new URL(worker.url()).host;
+    let onboarding;
+    for(let attempt=0;attempt<100;attempt++){
+      onboarding=context.pages().find(page=>page.url()===`chrome-extension://${extensionId}/options.html`);
+      if(onboarding)break;
+      await new Promise(resolve=>setTimeout(resolve,50));
+    }
+    assert.ok(onboarding,'first installation automatically opens settings');
     const config = await worker.evaluate(async () => ({
       settings: await CatalogSync.getSettings(),
       manifest: chrome.runtime.getManifest()
@@ -42,28 +50,23 @@ test('fresh extension install is private by default and About shows release iden
     const page = await context.newPage();
     await page.goto(`chrome-extension://${extensionId}/options.html`);
     assert.match(await page.title(),/Running SOP/);
-    for(const id of ['section-general','section-nas','section-statistics'])assert.equal(await page.locator('#'+id).isVisible(),true);
+    for(const id of ['section-general','section-nas','section-about'])assert.equal(await page.locator('#'+id).isVisible(),true);
     assert.equal(await page.locator('.sidebar,#language').count(),0);
-    assert.equal(await page.locator('#source-other').evaluate(n=>n.open),false);
-    assert.equal(await page.locator('#legacy-source').evaluate(n=>n.open),false);
     assert.equal(await page.locator('#choose-sop-folder').isVisible(),true);
-    assert.equal(await page.locator('#catalog-url').isVisible(),false);
+    assert.equal(await page.locator('#section-statistics,#source-other,#auto-sync,#check-catalog').count(),0);
     assert.equal(await page.locator('[data-i18n="SOP存储地址"]').textContent(),'SOP存储地址');
-    assert.equal(await page.locator('[data-i18n="局域网存储"]').textContent(),'局域网存储');
+    assert.equal(await page.locator('#login-url,#source-kind').count(),0);
     await page.locator('#language-en').click();
     await page.waitForFunction(()=>document.documentElement.lang==='en'&&document.querySelector('#language-en').getAttribute('aria-pressed')==='true');
-    assert.equal(await page.locator('#language-en').textContent(),'English 🇬🇧');
+    assert.equal(await page.locator('#language-en').textContent(),'🇬🇧English');
     assert.equal(await page.locator('[data-i18n="SOP存储地址"]').textContent(),'SOP storage address');
-    assert.equal(await page.locator('[data-i18n="局域网存储"]').textContent(),'Local network storage');
+    assert.equal(await page.locator('#login-url,#source-kind').count(),0);
     await page.reload();await page.waitForFunction(()=>document.documentElement.lang==='en');
     await page.locator('#language-zh').click();await page.waitForFunction(()=>document.documentElement.lang==='zh-CN');
     const tables=require('../extension/locale-data.js');
     for(const code of ['es','ru','ko','ja']){
       await page.locator('#language-'+code).click();await page.waitForFunction(c=>document.documentElement.lang===c,code);
       assert.equal(await page.locator('[data-i18n="SOP存储地址"]').textContent(),tables[code]['SOP存储地址']);
-      assert.equal(await page.locator('[data-i18n="关于"]').textContent(),tables[code]['关于']);
-      await page.waitForFunction(expected=>document.getElementById('statistics-status').textContent===expected,tables[code]['统计暂存本机，尚未连接 存储器。']);
-      assert.equal(await page.locator('#catalog-status').textContent(),tables[code]['尚未设置存储器目录，可先录制本机 SOP。']);
     }
     await page.locator('#language-auto').click();await page.waitForFunction(()=>document.querySelector('#language-auto').getAttribute('aria-pressed')==='true');
     const autoState=await page.evaluate(()=>({actual:document.documentElement.lang,resolved:WorkspaceI18n.resolveLanguage('auto')}));
@@ -71,7 +74,8 @@ test('fresh extension install is private by default and About shows release iden
     await page.locator('#language-zh').click();await page.waitForFunction(()=>document.documentElement.lang==='zh-CN');
 
 
-    assert.equal(await page.locator('#section-about').evaluate(e=>e.open),true);
+    assert.equal(await page.locator('#section-about').evaluate(e=>e.tagName),'SECTION');
+    assert.equal(await page.locator('#section-about>summary').count(),0);
     await assert.doesNotReject(page.locator('#section-about').waitFor({ state: 'visible' }));
     assert.equal(await page.locator('#about-author-name').textContent(), 'don Kimxote');
     assert.equal(await page.locator('#about-author-email').getAttribute('href'), 'mailto:gwangphug@gmail.com');
@@ -89,7 +93,8 @@ test('fresh extension install is private by default and About shows release iden
     const image='data:image/jpeg;base64,'+fs.readFileSync(path.join(root,'examples/illustrations/demo-step.jpg')).toString('base64');
     const draft={id:'shot-regression',title:'Screenshot regression',status:'draft',origin:'https://example.com',createdAt:'',updatedAt:'',steps:[{id:'step-one',type:'manual',title:'Annotated step',url:'https://example.com/work',workUrl:'https://example.com/work',where:'Demo',action:'Demo',expected:'',acceptance:'',trouble:'',at:'',image}]};
     await page.goto(`chrome-extension://${extensionId}/workspace.html`);
-    await page.locator('#backup-file').setInputFiles({name:'synthetic-draft.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify({format:'runtime-sop-recording',schemaVersion:1,draft}))});
+  await page.waitForFunction(()=>window.WorkspaceApp?.openDraft);
+  await page.evaluate(async draft=>{const response=await chrome.runtime.sendMessage({type:'recorder-import',backup:{format:'runtime-sop-recording',schemaVersion:1,draft}});if(response.error)throw Error(response.error);await WorkspaceApp.refresh();await WorkspaceApp.openDraft(response.data.drafts.find(d=>d.title===draft.title).id);},draft);
     await page.locator('#annotate-shot').waitFor({state:'visible'});
     await page.locator('#annotate-shot').click();
     await page.locator('#marks-dialog').waitFor({state:'visible'});
@@ -100,7 +105,7 @@ test('fresh extension install is private by default and About shows release iden
     await page.locator('#edit-action').fill('Submit the work summary.');
     await page.locator('#point-approval').click();
     await page.locator('#edit-point-note').fill('Team lead approves before proceeding.');
-    await page.locator('#save-draft').click();
+    await page.locator('#next-step').click();
 
     await page.waitForFunction(async()=>{const s=(await chrome.storage.local.get('runtime-sop-recorder-v1'))['runtime-sop-recorder-v1'];return s?.drafts?.[0]?.steps?.[0]?.imageMarks?.length===1;});
     await page.reload();
@@ -112,6 +117,18 @@ test('fresh extension install is private by default and About shows release iden
     await page.evaluate(shot=>ScreenshotEditor.view(shot,'Persisted screenshot'),persisted);
     await page.locator('#image-dialog').waitFor({state:'visible'});
     assert.equal(await page.locator('#large-picture .image-marks-overlay svg').count(),1);
+    await page.locator('#close-image').click();
+    await page.evaluate(async()=>{const state=(await chrome.storage.local.get('runtime-sop-recorder-v1'))['runtime-sop-recorder-v1'];await WorkspaceApp.openDraft(state.drafts[0].id);});
+    await page.locator('#edit-steps button').nth(1).click();await page.locator('#edit-action').fill('Keep the other step.');
+    await page.locator('#edit-steps button').first().click();await page.locator('#clear-step').click();
+    await page.waitForFunction(async()=>{const state=(await chrome.storage.local.get('runtime-sop-recorder-v1'))['runtime-sop-recorder-v1'];return state.drafts[0].steps[0].action==='';});
+    const cleared=await page.evaluate(async()=> (await chrome.storage.local.get('runtime-sop-recorder-v1'))['runtime-sop-recorder-v1'].drafts[0]);
+    assert.equal(cleared.steps.length,2);assert.equal(cleared.steps[0].workUrl,draft.steps[0].workUrl);
+    assert.equal(cleared.steps[0].image,undefined);assert.equal(cleared.steps[0].pointType,'normal');assert.deepEqual(cleared.steps[0].issues,[]);
+    assert.equal(cleared.steps[1].action,'Keep the other step.');
+    assert.equal(await page.locator('#backup-editor,#backup-file,#export-guide,#save-draft').count(),0);
+    assert.equal(await page.locator('#preview-publish').evaluate(e=>getComputedStyle(e).backgroundColor),'rgb(33, 134, 93)');
+
     assert.match(await page.locator('#large-picture .image-marks-overlay').innerHTML(),/>1<\/text>/);
 
   } finally {
@@ -122,7 +139,7 @@ test('fresh extension install is private by default and About shows release iden
 
 
 test('standalone demo dashboard opens and shows synthetic workflow', {timeout:30000}, async()=>{
-  const browser=await chromium.launch({headless:true,...(process.env.RUNTIME_SOP_CHROME?{executablePath:process.env.RUNTIME_SOP_CHROME}:{})});
+  const browser=await chromium.launch({headless:!process.env.RUNTIME_SOP_CHROME,args:process.env.RUNTIME_SOP_CHROME?['--headless=new']:[],...(process.env.RUNTIME_SOP_CHROME?{executablePath:process.env.RUNTIME_SOP_CHROME}:{})});
   try {
     const page=await browser.newPage();
     const errors=[];page.on('pageerror',e=>errors.push(e.message));
@@ -141,7 +158,7 @@ test('screenshot iframe isolates image bytes from work pages and saves annotatio
  const m=JSON.parse(fs.readFileSync(path.join(staged,'manifest.json')));m.host_permissions.push('https://example.test/*');fs.writeFileSync(path.join(staged,'manifest.json'),JSON.stringify(m));
  let context;
  try{
-  context=await chromium.launchPersistentContext(path.join(temp,'profile'),{channel:'chromium',headless:true,...(process.env.RUNTIME_SOP_CHROME?{executablePath:process.env.RUNTIME_SOP_CHROME}:{}),args:[`--disable-extensions-except=${staged}`,`--load-extension=${staged}`]});
+  context=await chromium.launchPersistentContext(path.join(temp,'profile'),{channel:'chromium',headless:!process.env.RUNTIME_SOP_CHROME,...(process.env.RUNTIME_SOP_CHROME?{executablePath:process.env.RUNTIME_SOP_CHROME}:{}),args:[...(process.env.RUNTIME_SOP_CHROME?['--headless=new']:[]),`--disable-extensions-except=${staged}`,`--load-extension=${staged}`]});
   const worker=context.serviceWorkers()[0]||await context.waitForEvent('serviceworker'),id=new URL(worker.url()).host;
   await context.route('https://example.test/**',r=>r.fulfill({contentType:'text/html',body:'<title>Synthetic page</title><p>Work page</p>'}));
   const work=await context.newPage();await work.goto('https://example.test/work');
@@ -157,7 +174,14 @@ test('screenshot iframe isolates image bytes from work pages and saves annotatio
   const visibility=await work.evaluate(()=>({closed:document.getElementById('sop-image-overlay-host').shadowRoot===null,leaked:document.documentElement.outerHTML.includes('data:image/jpeg;base64,')}));
   assert.deepEqual(visibility,{closed:true,leaked:false});
   assert.equal(await work.evaluate(()=>{try{return Boolean(window.frames[0].document);}catch(e){return false;}}),false);
-  const box=await frame.locator('#picture').boundingBox();await work.mouse.click(box.x+60,box.y+60);
+  // The image intentionally has pointer-events:none; the canvas handles input.
+  // Wait until marks and fit-to-window layout have initialized before measuring.
+  await frame.waitForFunction(()=>document.getElementById('marks-count').textContent.startsWith('2 / 40'));
+  const box=await frame.locator('#picture').boundingBox(),canvas=await frame.locator('#viewport').boundingBox();
+  await frame.evaluate(()=>document.addEventListener('pointerdown',e=>{window.lastCanvasPointer={x:e.clientX,y:e.clientY,target:e.target.id,button:e.button};},{once:true}));
+  await frame.locator('#viewport').click({position:{x:box.x-canvas.x+60,y:box.y-canvas.y+60}});
+  try{await frame.waitForFunction(()=>document.getElementById('marks-count').textContent.startsWith('3 / 40'),null,{timeout:3000});}
+  catch(error){console.error('Canvas click diagnostic:',await frame.evaluate(()=>({pointer:window.lastCanvasPointer,count:document.getElementById('marks-count').textContent,image:document.getElementById('picture').getBoundingClientRect().toJSON(),viewport:document.getElementById('viewport').getBoundingClientRect().toJSON()})));throw error;}
   await frame.locator('#save').click();const saved=await panel.evaluate(()=>window.editorResult);
   assert.equal(saved.length,3);assert.deepEqual(saved.map(x=>x.type),['arrow','rect','number']);
   await work.waitForFunction(()=>!document.getElementById('sop-image-overlay-host'));
@@ -197,7 +221,7 @@ test('guided recording edits STEP 1, advances explicitly and preserves approval 
  const m=JSON.parse(fs.readFileSync(path.join(staged,'manifest.json')));m.host_permissions.push('https://example.test/*');fs.writeFileSync(path.join(staged,'manifest.json'),JSON.stringify(m));
  let context;
  try{
-  context=await chromium.launchPersistentContext(path.join(temp,'profile'),{channel:'chromium',headless:true,...(process.env.RUNTIME_SOP_CHROME?{executablePath:process.env.RUNTIME_SOP_CHROME}:{}),args:[`--disable-extensions-except=${staged}`,`--load-extension=${staged}`]});
+  context=await chromium.launchPersistentContext(path.join(temp,'profile'),{channel:'chromium',headless:!process.env.RUNTIME_SOP_CHROME,...(process.env.RUNTIME_SOP_CHROME?{executablePath:process.env.RUNTIME_SOP_CHROME}:{}),args:[...(process.env.RUNTIME_SOP_CHROME?['--headless=new']:[]),`--disable-extensions-except=${staged}`,`--load-extension=${staged}`]});
   const worker=context.serviceWorkers()[0]||await context.waitForEvent('serviceworker');const id=new URL(worker.url()).host;
   await context.route('https://example.test/**',route=>route.fulfill({contentType:'text/html',body:'<title>Synthetic work</title><button id="work">Prepare report</button>'}));
   const work=await context.newPage();await work.goto('https://example.test/work');
@@ -265,13 +289,14 @@ test('guided recording edits STEP 1, advances explicitly and preserves approval 
 test('annotation results stay with their original step when sidebar selection changes', {timeout:60000},async()=>{
  const profile=fs.mkdtempSync(path.join(os.tmpdir(),'runtime-target-marks-'));let context;
  try{
-  context=await chromium.launchPersistentContext(profile,{channel:'chromium',headless:true,...(process.env.RUNTIME_SOP_CHROME?{executablePath:process.env.RUNTIME_SOP_CHROME}:{}),args:[`--disable-extensions-except=${extension}`,`--load-extension=${extension}`]});
+  context=await chromium.launchPersistentContext(profile,{channel:'chromium',headless:!process.env.RUNTIME_SOP_CHROME,...(process.env.RUNTIME_SOP_CHROME?{executablePath:process.env.RUNTIME_SOP_CHROME}:{}),args:[...(process.env.RUNTIME_SOP_CHROME?['--headless=new']:[]),`--disable-extensions-except=${extension}`,`--load-extension=${extension}`]});
   const worker=context.serviceWorkers()[0]||await context.waitForEvent('serviceworker'),id=new URL(worker.url()).host;
   const page=await context.newPage();await page.goto(`chrome-extension://${id}/workspace.html`);await page.waitForFunction(()=>document.documentElement.dataset.workspaceReady==='true');
   const image='data:image/jpeg;base64,'+fs.readFileSync(path.join(root,'examples/illustrations/demo-step.jpg')).toString('base64');
   const base={type:'manual',title:'',url:'https://example.test/work',workUrl:'https://example.test/work',where:'Page',action:'Do the work',expected:'',acceptance:'',trouble:'',at:'',image,imageAt:'2026-10-16T00:00:00.000Z'};
   const draft={id:'target-test',title:'Target test',status:'draft',origin:'https://example.test',createdAt:'',updatedAt:'',steps:[{...base,id:'step-a'},{...base,id:'step-b'}]};
-  await page.locator('#backup-file').setInputFiles({name:'test.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify({format:'runtime-sop-recording',schemaVersion:1,draft}))});
+  await page.waitForFunction(()=>window.WorkspaceApp?.openDraft);
+  await page.evaluate(async draft=>{const response=await chrome.runtime.sendMessage({type:'recorder-import',backup:{format:'runtime-sop-recording',schemaVersion:1,draft}});if(response.error)throw Error(response.error);await WorkspaceApp.refresh();await WorkspaceApp.openDraft(response.data.drafts.find(d=>d.title===draft.title).id);},draft);
   await page.locator('#annotate-shot').waitFor({state:'visible'});
   await page.evaluate(()=>{ScreenshotEditor.open=()=>new Promise(resolve=>window.finishTestMarks=resolve);});
   await page.locator('#annotate-shot').click();await page.waitForFunction(()=>Boolean(window.finishTestMarks));
@@ -281,4 +306,43 @@ test('annotation results stay with their original step when sidebar selection ch
   const steps=await worker.evaluate(async()=>(await chrome.storage.local.get('runtime-sop-recorder-v1'))['runtime-sop-recorder-v1'].drafts[0].steps);
   assert.equal(steps[0].imageMarks.length,1);assert.equal(steps[1].imageMarks,undefined);
  }finally{if(context)await context.close();fs.rmSync(profile,{recursive:true,force:true});}
+});
+
+test('full local drafts offer confirmed cleanup and allow another recording without changing shared settings',{timeout:60000},async()=>{
+ const temp=fs.mkdtempSync(path.join(os.tmpdir(),'runtime-draft-capacity-')),staged=path.join(temp,'extension');fs.cpSync(extension,staged,{recursive:true});
+ const manifest=JSON.parse(fs.readFileSync(path.join(staged,'manifest.json')));manifest.host_permissions.push('https://example.test/*');fs.writeFileSync(path.join(staged,'manifest.json'),JSON.stringify(manifest));
+ let context;
+ try{
+  context=await chromium.launchPersistentContext(path.join(temp,'profile'),{channel:'chromium',headless:!process.env.RUNTIME_SOP_CHROME,...(process.env.RUNTIME_SOP_CHROME?{executablePath:process.env.RUNTIME_SOP_CHROME}:{}),args:[...(process.env.RUNTIME_SOP_CHROME?['--headless=new']:[]),`--disable-extensions-except=${staged}`,`--load-extension=${staged}`]});
+  const worker=context.serviceWorkers()[0]||await context.waitForEvent('serviceworker'),id=new URL(worker.url()).host;
+  await context.route('https://example.test/**',r=>r.fulfill({contentType:'text/html',body:'<title>Capacity test</title><button>Work</button>'}));
+  const work=await context.newPage();await work.goto('https://example.test/work');
+  const panel=await context.newPage();await panel.goto(`chrome-extension://${id}/workspace.html`);await panel.waitForFunction(()=>document.documentElement.dataset.workspaceReady==='true');
+  await panel.evaluate(async()=>{for(let i=0;i<10;i++){const r=await chrome.runtime.sendMessage({type:'recorder-create',title:'Draft <'+i+'>',workUrl:'https://example.test/work'});if(r.error)throw Error(r.error);}});
+  await panel.reload();await panel.waitForFunction(()=>document.documentElement.dataset.workspaceReady==='true');
+  await panel.locator('#draft-maintenance').waitFor({state:'visible'});await panel.locator('#draft-maintenance summary').click();
+  assert.equal(await panel.locator('.draft-maintenance-row').count(),10);
+  assert.equal(await panel.locator('.draft-maintenance-row span>*').count(),0,'draft titles remain text');
+  await panel.setViewportSize({width:320,height:900});
+  for(const code of ['zh','zh-TW','en','es','ru','ko','ja']){
+   await panel.evaluate(code=>chrome.storage.local.set({'runtime-sop-workspace-preferences-v1':{language:code,guided:false}}),code);
+   await panel.waitForFunction(code=>WorkspaceI18n.getLanguage()===code,code);
+   assert.equal(await panel.locator('.draft-maintenance-row button').first().textContent(),await panel.evaluate(()=>WorkspaceI18n.t('删除本机草稿')));
+   assert.equal(await panel.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,'capacity cleanup fits '+code);
+  }
+  if(process.env.RUNTIME_SOP_AUDIT_DIR)await panel.screenshot({path:path.join(process.env.RUNTIME_SOP_AUDIT_DIR,'draft-capacity-320.png'),fullPage:true});
+
+  const before=await worker.evaluate(async()=>({drafts:(await chrome.storage.local.get('runtime-sop-recorder-v1'))['runtime-sop-recorder-v1'].drafts,settings:await CatalogSync.getSettings()}));
+  panel.once('dialog',dialog=>dialog.dismiss());await panel.locator('.draft-maintenance-row button').first().click();
+  assert.deepEqual(await worker.evaluate(async()=>(await chrome.storage.local.get('runtime-sop-recorder-v1'))['runtime-sop-recorder-v1'].drafts),before.drafts);
+  panel.once('dialog',dialog=>dialog.accept());await panel.locator('.draft-maintenance-row button').first().click();
+  await panel.waitForFunction(()=>document.querySelector('#draft-maintenance').hidden);
+  assert.deepEqual(await worker.evaluate(async()=>(await chrome.storage.local.get('runtime-sop-recorder-v1'))['runtime-sop-recorder-v1'].drafts),before.drafts.slice(1));
+  assert.deepEqual(await worker.evaluate(()=>CatalogSync.getSettings()),before.settings);
+  await work.bringToFront();await panel.waitForFunction(()=>WorkspaceApp.getContext().url==='https://example.test/work');
+  await panel.evaluate(()=>document.getElementById('start-record').click());await panel.waitForFunction(()=>document.querySelector('#stop-record').hidden===false);
+  assert.equal(await worker.evaluate(async()=>(await chrome.storage.local.get('runtime-sop-recorder-v1'))['runtime-sop-recorder-v1'].drafts.length),10);
+  assert.equal(await panel.locator('.draft-maintenance-row button:not(:disabled)').count(),0,'active recording must not be deletable');
+  await panel.locator('#stop-record').click();
+ }finally{if(context)await context.close();fs.rmSync(temp,{recursive:true,force:true});}
 });

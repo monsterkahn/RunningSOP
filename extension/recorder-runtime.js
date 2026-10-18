@@ -142,7 +142,7 @@
   function importDraft(state, backup) {
     if (state?.session) throw Error('请先停止当前录制，再导入草稿。');
     state = validateState(state);
-    if (state.drafts.length >= MAX_DRAFTS) throw Error('已保存 10 份草稿，请先导出并删除不需要的草稿。');
+    if (state.drafts.length >= MAX_DRAFTS) throw Error('已保存 10 份草稿，请先在整理草稿中删除不需要的本机草稿。');
     if (!backup || typeof backup !== 'object' || Array.isArray(backup) || backup.format !== 'runtime-sop-recording' || backup.schemaVersion !== 1 || !backup.draft || typeof backup.draft !== 'object' || Array.isArray(backup.draft) || Object.keys(backup).some(k => !['format','schemaVersion','draft'].includes(k))) throw Error('录制备份格式无效。');
     const normalized = validateState({drafts:[backup.draft],session:null}).drafts[0];
     let id;
@@ -203,7 +203,7 @@
     return serialized(async () => {
       const state = await storageRead();
       if (state.session) throw Error('当前已有录制会话，请先暂停或停止。');
-      if(state.drafts.length>=MAX_DRAFTS)throw Error('已保存 10 份草稿，请先导出并删除不需要的草稿。');
+      if(state.drafts.length>=MAX_DRAFTS)throw Error('已保存 10 份草稿，请先在整理草稿中删除不需要的本机草稿。');
       const tab = await chrome.tabs.get(message.tabId);
       if (!tab.active) throw Error('请先切换到目标网页，再开始录制。');
       const page = safePageUrl(tab.url || '');
@@ -324,7 +324,7 @@
     return serialized(async () => {
       const state = await storageRead();
       if (state.session) throw Error('请先停止当前录制，再新建草稿。');
-      if (state.drafts.length >= MAX_DRAFTS) throw Error('已保存 10 份草稿，请先导出并删除不需要的草稿。');
+      if (state.drafts.length >= MAX_DRAFTS) throw Error('已保存 10 份草稿，请先在整理草稿中删除不需要的本机草稿。');
       let workUrl;
       if (message.workUrl !== undefined) workUrl = safeWorkUrl(message.workUrl);
       else if (Number.isInteger(message.tabId)) {

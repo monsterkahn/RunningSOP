@@ -1,6 +1,6 @@
 # 隐私说明
 
-首次安装时不预设共享目录。未连接共享目录时，流程草稿、录制和备份可在本机使用；启用共享目录功能后，目录读取与统计同步按用户设置运行。本项目不包含供应商云端分析代码。
+首次安装时不预设共享目录。未连接共享目录时，流程草稿和录制可在本机使用；启用共享目录功能后，目录读取与统计同步按用户此前明确启用的设置运行。本项目不包含供应商云端分析代码。
 
 ## 本机处理的数据
 
@@ -11,7 +11,7 @@
 - 截图预览与标注使用扩展来源的隔离画面，并按标签页、操作模式及有效期校验会话。原网页 DOM 不接收截图字节；临时截图会话在加载后移除图像数据，关闭后清理。不能注入的页面在扩展侧栏内查看。
 - 截图只有用户主动触发时才通过浏览器 `getDisplayMedia` 选择界面。扩展仅抓取一帧后停止；画面可能包含个人信息、账号标识、消息或其他页面内容。截图和标记可能保存在本机草稿或用户选择的共享目录中。
 
-卸载扩展可能清除 Chrome 扩展本机存储。清除或卸载前，请导出需要保留的备份。扩展不会自动删除已写入共享目录的历史记录。
+卸载扩展可能清除 Chrome 扩展本机存储。清除或卸载前，请先将需要保留的 SOP 发布到自己控制的存储目录并核对内容。当前录制界面不提供备份导出入口。扩展不会自动删除已写入共享目录的历史记录。
 
 ## 可选共享目录与后台活动
 
@@ -22,7 +22,7 @@
 - 用户明确触发发布等功能时，将对应流程资料写入所选目录。
 - 分类数据写入独立的 `categories.json`，不改写流程正文。
 
-关闭目录自动检查会停止后续自动读取。关闭统计同步会停止后续统计写入；已经共享的统计历史不会由此自动删除。共享目录可能由用户或组织托管，其访问者、备份与保留策略由该组织控制。
+新安装默认关闭目录自动检查和统计同步；选择文件夹只触发一次内容库检查，不自动启用这些后台功能。当前设置页已移除自动检查与统计配置入口，更新安装仍保留旧版已明确启用的设置。共享目录可能由用户或组织托管，其访问者、备份与保留策略由该组织控制；已共享的历史不会自动删除。
 
 ## 权限与网络
 
@@ -32,7 +32,7 @@ URL 匹配及录制数据处理在本机进行。扩展不使用第三方云分�
 
 ## 用户控制
 
-用户可以不配置共享目录，只使用本机功能；也可以关闭目录自动检查或统计同步。关闭同步不会删除共享目录已有数据。清除本机记录或共享目录数据前，请确认是否需要备份。
+用户可以不配置共享目录，只使用本机功能。可以在 Chrome 扩展管理界面撤销网站或文件访问权限，或停用扩展来停止后续扩展活动；这些操作不会删除共享目录已有数据。当前设置界面没有独立的统计同步开关，不能将其描述为仍可在设置中操作。
 
 隐私问题请联系 [gwangphug@gmail.com](mailto:gwangphug@gmail.com)。
 
@@ -42,4 +42,4 @@ QR codes are generated locally from a user-configured HTTP(S) reader URL and a w
 
 ## Folder-based library connections
 
-When the user chooses an SOP folder, the extension saves its native directory handle in extension-owned IndexedDB and a random connection identifier with the folder display name in local extension settings. The initial picker requests read access only. The same selected directory is used for reading and publishing; write access is requested separately on publication. Choosing a catalog file alone does not activate it or grant access to adjacent files. Existing hand-entered file URL connections remain available for migration and require Chrome file URL permission. Folder handles are local browser permissions, not credentials transferable to other devices. Library selection does not enable statistics synchronization.
+When the user chooses an SOP folder, the extension saves its native directory handle in extension-owned IndexedDB and a random connection identifier with the folder display name in local extension settings. The initial picker requests read access, followed immediately by a read-permission request if needed. If no catalog exists, it requests write access before creating and reading back an empty catalog.json; an invalid existing catalog is not replaced. The same selected directory is used for reading and publishing; publication requests write access when it has not already been granted. Folder display names and icon choices are local metadata and do not rename the actual folder. Existing file URL connections are retained for migration and require Chrome file URL permission, but manual address and catalog-file pickers are no longer exposed in the settings UI. Folder handles are local browser permissions, not credentials transferable to other devices. Library selection does not enable statistics synchronization.

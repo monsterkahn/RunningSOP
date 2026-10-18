@@ -1,6 +1,6 @@
 {
   "name": "runtime-sop",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "description": "Local-first Chrome workflow recorder and shared SOP reader",
   "author": {
@@ -23,7 +23,8 @@
     "qr": "node tools/generate-qr.cjs",
     "test:qr-browser": "node --test tests/qr-browser.cjs",
     "test:folder-browser": "node --test tests/folder-browser.cjs",
-    "test:dashboard-languages": "node --test tests/dashboard-language-browser.cjs"
+    "test:dashboard-languages": "node --test tests/dashboard-language-browser.cjs",
+    "test:release-browser": "node --test --test-concurrency=1 tests/public-browser.cjs tests/folder-browser.cjs tests/qr-browser.cjs tests/dashboard-language-browser.cjs"
   },
   "devDependencies": {
     "playwright": "1.62.1"

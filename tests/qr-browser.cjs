@@ -2,7 +2,7 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const {chromium}=require(process.env.RUNTIME_SOP_PLAYWRIGHT||'playwright');
 const root=path.resolve(__dirname,'..'),{buildHtml:dashboard}=require('../tools/build-dashboard.cjs'),{loadSnapshot}=require('../tools/build-dashboard.cjs'),{buildHtml:mobile}=require('../tools/build-mobile-reader.cjs');
-const launch={headless:true,...(process.env.RUNTIME_SOP_CHROME?{executablePath:process.env.RUNTIME_SOP_CHROME}:{})};
+const launch={headless:!process.env.RUNTIME_SOP_CHROME,args:process.env.RUNTIME_SOP_CHROME?['--headless=new']:[],...(process.env.RUNTIME_SOP_CHROME?{executablePath:process.env.RUNTIME_SOP_CHROME}:{})};
 test('dashboard generates one stable QR, downloads all labels, and rejects local file destinations',{timeout:30000},async()=>{
  const browser=await chromium.launch(launch);try{
   const page=await browser.newPage({acceptDownloads:true,locale:'zh-CN'}),errors=[];page.on('pageerror',e=>errors.push(e.message));

@@ -27,3 +27,44 @@ main{width:min(920px,100%);justify-self:center;margin-inline:auto}.nav{display:f
 .source-bridge>span:last-child{overflow-wrap:anywhere;line-height:1.4}
 
 .source-grid{align-items:stretch}.source-bridge{position:relative}.source-track{position:absolute;top:50%;left:0;right:0}.source-bridge>span:last-child{position:absolute;top:calc(50% + 10px);left:0;right:0;margin:0;text-align:center}@media(max-width:520px){.source-end-label{min-height:32px}.source-card #source-kind{height:32px}}
+
+.about-support{max-width:560px;margin:18px auto;padding:14px 16px;border:1px solid var(--line);border-radius:8px;text-align:center;overflow-wrap:anywhere}.about-support h3{font-size:14px;margin:0 0 8px}.about-support p{margin:7px 0;line-height:1.7}.about-support p:last-child{color:var(--muted);font-size:12px}
+
+.source-appearance{width:100%;max-width:270px;font-size:12px}.source-appearance summary{cursor:pointer;list-style-position:inside;color:var(--blue)}.source-appearance label{margin:10px 0 4px}.source-appearance input{width:100%;text-align:center;box-sizing:border-box}.source-appearance small{display:block;margin-top:8px;line-height:1.5;color:var(--muted)}#source-icon-choices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin:8px 0}#source-icon-choices button{display:flex;justify-content:center;align-items:center;min-height:36px;padding:6px}#source-icon-choices button[aria-pressed=true]{color:var(--blue);border-color:var(--blue);background:var(--blue-soft)}#source-appearance-status{font-size:12px;margin:5px 0}
+
+#source-icon-choices button{border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--muted);cursor:pointer}#source-icon-choices button[aria-pressed=true]{border-color:var(--blue);background:var(--blue-soft);color:var(--blue)}#source-icon-choices .ui-icon{display:block;width:20px;height:20px;flex:none}#source-icon-choices button:focus-visible{outline:2px solid var(--blue);outline-offset:2px}#save-source-appearance{border:1px solid var(--blue);border-radius:6px;background:var(--blue);color:#fff;padding:6px 16px;cursor:pointer}
+
+.source-grid{display:flex;flex-direction:column;align-items:center;gap:12px}.source-grid>.source-end{width:min(100%,440px);min-height:0;padding:18px;gap:6px}.source-bridge{display:flex;flex-direction:column;align-items:center;gap:4px;align-self:center;min-height:60px;padding-top:12px}.source-track{position:relative;top:auto;left:auto;right:auto;width:72px}.source-bridge>span:last-child{position:static;margin:0}.source-bridge small{margin:0;font-size:12px;color:var(--muted)}.source-appearance{max-width:320px}#source-icon-choices{grid-template-columns:repeat(6,minmax(0,1fr))}@media(max-width:360px){#source-icon-choices{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+#source-icon-choices{grid-template-columns:repeat(3,minmax(0,1fr))}
+
+.source-card .source-end{width:min(100%,440px);margin:20px auto 0;min-height:0;padding:12px 18px}.source-folder-button{display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;border:0;border-radius:10px;padding:16px;background:transparent;color:var(--ink);font:inherit;cursor:pointer}.source-folder-button:hover{background:var(--blue-soft)}.source-folder-button:focus-visible{outline:2px solid var(--blue);outline-offset:2px}.source-folder-button:disabled{cursor:wait;opacity:.6}.source-folder-button strong{font-size:16px;overflow-wrap:anywhere;max-width:100%}.source-card #catalog-status{margin:8px 0 0;font-size:12px}.source-card #source-count{margin:0 0 8px}.source-card .source-appearance{margin-top:6px}
+
+.about-logo{display:block;width:56px;height:56px;margin:0 auto 10px;object-fit:contain}.about-support .about-paypal{margin:10px 0;overflow-wrap:anywhere}.about-paypal>span:last-child{font-weight:600;color:var(--blue)}
+
+.language-switch{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;width:100%}.language-switch #language-auto{grid-column:auto}.language-switch button{display:flex;align-items:center;justify-content:center;width:100%;min-width:0;height:40px;min-height:40px;padding:0;font-size:21px;line-height:1}.about-brand{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:10px}.about-brand .about-logo{margin:0;flex:none}.about-brand-text{text-align:left}.about-page .about-brand-text .about-version{margin:0}.about-page .about-brand-text h2{margin:0 0 4px}.support-methods{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:14px 0}.support-method{border:1px solid var(--line);border-radius:10px;min-width:0;min-height:124px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:#fff}.paypal-logo{display:block;object-fit:contain;max-width:100%}.about-support .support-account{margin:0;font-size:13px;font-weight:600;overflow-wrap:anywhere}.support-method small{margin:0;font-size:11px}.support-method-future{border-style:dashed;color:var(--muted);background:var(--canvas);font-size:13px}.support-plus{font-size:26px;line-height:1.2}@media(max-width:420px){.support-methods{grid-template-columns:1fr}.language-switch{gap:4px}.language-switch button{font-size:20px}}
+
+.language-switch{grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}.language-switch #language-auto{grid-column:1/-1;flex-direction:row;gap:8px;height:42px;font-size:13px}.language-switch button{flex-direction:column;height:66px;min-height:66px;gap:5px}.language-flag{font-size:22px;line-height:1}.language-name{font-size:11px;line-height:1.2;white-space:nowrap}.language-switch #language-auto img{flex:none}@media(max-width:420px){.language-switch{gap:3px}.language-name{font-size:9px}.language-flag{font-size:20px}.language-switch button{height:62px;min-height:62px}}
+
+.source-folder-button{background:#eaf3ff;border:1px solid #bfd8ff;color:#175eb2}.source-folder-button:hover{background:#deedff;border-color:#78aaf0}.source-folder-button .source-end-icon{background:#d9eaff}.source-folder-button:focus-visible{outline:2px solid #1769d2;outline-offset:3px}
+
+.language-flag{display:flex;align-items:center;justify-content:center;height:22px}.language-flag-image{display:block;width:22px;height:16px;object-fit:contain}
+
+.support-method{text-align:center}.support-method .paypal-logo{margin:0 auto;align-self:center}.about-support .support-account{width:100%;text-align:center}.support-method>small{width:100%;text-align:center}.language-switch #language-auto{overflow:visible}.language-switch #language-auto>img{display:block;width:28px;height:28px;object-fit:contain;object-position:center;flex:0 0 28px;padding:2px;box-sizing:content-box}
+
+/* 1.1.0: bounded, compositor-friendly onboarding cue, with a static fallback. */
+.source-folder-button .source-end-icon{position:relative;width:52px;height:52px;border:3px solid #79aaf0;border-radius:50%;background:#e1edff}
+.source-folder-button .source-end-icon:after{content:"";position:absolute;inset:-3px;border:2px solid #78aaf0;border-radius:50%;opacity:0;pointer-events:none}
+.source-connection[data-state=unconfigured] .source-folder-button:not(:disabled) .source-end-icon,
+.source-connection[data-state=permission] .source-folder-button:not(:disabled) .source-end-icon,
+.source-connection[data-state=offline] .source-folder-button:not(:disabled) .source-end-icon{animation:sop-folder-breathe 1.8s ease-in-out 3}
+.source-connection[data-state=unconfigured] .source-folder-button:not(:disabled) .source-end-icon:after,
+.source-connection[data-state=permission] .source-folder-button:not(:disabled) .source-end-icon:after,
+.source-connection[data-state=offline] .source-folder-button:not(:disabled) .source-end-icon:after{animation:sop-folder-ring 1.8s ease-out 3}
+.source-folder-button:hover .source-end-icon,.source-folder-button:focus-visible .source-end-icon,
+.source-folder-button:hover .source-end-icon:after,.source-folder-button:focus-visible .source-end-icon:after{animation-play-state:paused}
+html[data-motion-paused=true] .source-folder-button .source-end-icon,
+html[data-motion-paused=true] .source-folder-button .source-end-icon:after{animation-play-state:paused}
+@keyframes sop-folder-breathe{0%,100%{transform:scale(1)}45%{transform:scale(1.05)}}
+@keyframes sop-folder-ring{0%{transform:scale(1);opacity:.55}70%,100%{transform:scale(1.7);opacity:0}}
+@media(prefers-reduced-motion:reduce){.source-connection .source-folder-button .source-end-icon,.source-connection .source-folder-button .source-end-icon:after{animation:none!important;transform:none}}

@@ -55,7 +55,7 @@ test('apply changes only marked static text and designated placeholder or aria a
 
 
 test('browser language resolution supports six locales and stable fallback',()=>{
- for(const [raw,want]of [['es-MX','es'],['ru-RU','ru'],['ko-KR','ko'],['ja-JP','ja'],['zh-TW','zh'],['en-US','en'],['cy-GB','en']])assert.equal(I18n.resolveLanguage('auto',raw),want);
+ for(const [raw,want]of [['es-MX','es'],['ru-RU','ru'],['ko-KR','ko'],['ja-JP','ja'],['zh-TW','zh-TW'],['zh-HK','zh-TW'],['zh-Hant','zh-TW'],['en-US','en'],['cy-GB','en']])assert.equal(I18n.resolveLanguage('auto',raw),want);
  assert.equal(I18n.resolveLanguage('ko','es-MX'),'ko');
  const translations=require('../extension/locale-data.js');
  for(const lang of ['es','ru','ko','ja']){
@@ -64,3 +64,5 @@ test('browser language resolution supports six locales and stable fallback',()=>
  }
  I18n.setLanguage('auto');assert(I18n.LANGUAGES.includes(I18n.getLanguage()));I18n.setLanguage('zh');
 });
+
+test('traditional Chinese translates UI labels while leaving unknown user text intact',()=>{I18n.setLanguage('zh-TW');assert.equal(I18n.t('设置'),'設定');assert.equal(I18n.t('选择 SOP 文件夹'),'選擇 SOP 資料夾');assert.equal(I18n.t('my user text'),'my user text');I18n.setLanguage('zh');});

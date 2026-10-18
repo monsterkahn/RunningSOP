@@ -4,7 +4,7 @@ const root=path.resolve(__dirname,'..'),dist=path.join(root,'dist');fs.mkdirSync
 const manifest=JSON.parse(fs.readFileSync(path.join(root,'extension/manifest.json'),'utf8'));
 const version=manifest.version;
 const sourceRoots=['.github','docs','examples','extension','tests','tools'];
-const rootFiles=['AGENTS.md','.gitignore','CHANGELOG.md','CONTRIBUTING.md','LICENSE','PRIVACY.md','README.md','PROJECT-HANDOFF.md','NEXT-PROJECT-PROMPT.md','SECURITY.md','package.json','package-lock.json'];
+const rootFiles=['AGENTS.md','.gitignore','CHANGELOG.md','CHROMEWEBSTORE.md','CONTRIBUTING.md','LICENSE','PRIVACY.md','README.md','PROJECT-HANDOFF.md','NEXT-PROJECT-PROMPT.md','SECURITY.md','package.json','package-lock.json'];
 const ignored=new Set(['node_modules','dist','.git','.DS_Store','reports','test-results','playwright-report']);
 const table=Array.from({length:256},(_,n)=>{for(let k=0;k<8;k++)n=n&1?0xedb88320^(n>>>1):n>>>1;return n>>>0;});
 function crc(b){let c=0xffffffff;for(const v of b)c=table[(c^v)&255]^(c>>>8);return(c^0xffffffff)>>>0;}
