@@ -1,4 +1,10 @@
-# Running SOP
+<p align="center">
+  <img src="extension/assets/icons/icon-128.png" width="80" height="80" alt="Running SOP logo">
+</p>
+
+<h1 align="center">Running SOP</h1>
+
+![Running SOP: Clear steps. Right where you work.](docs/assets/running-sop-social-preview.png)
 
 **Current official release: v1.1.1** · [Download](https://github.com/monsterkahn/RunningSOP/releases/latest)
 
