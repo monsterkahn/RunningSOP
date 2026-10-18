@@ -60,7 +60,8 @@ async function snapshot(sourcePath, destinationPath) {
     const completed = new DatabaseSync(temporary);
     try { completed.exec('PRAGMA wal_checkpoint(TRUNCATE); PRAGMA journal_mode=DELETE;'); } finally { completed.close(); }
     const verification = verifySnapshot(temporary);
-    const descriptor = fs.openSync(temporary, 'r');
+    // Windows FlushFileBuffers requires a handle opened with write access.
+    const descriptor = fs.openSync(temporary, 'r+');
     try { fs.fsyncSync(descriptor); } finally { fs.closeSync(descriptor); }
     ensureUnused(destination);
     fs.linkSync(temporary, destination);

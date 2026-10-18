@@ -28,7 +28,9 @@ The default listener is `127.0.0.1:8787`. The first launch creates `config.json`
 
 The HTTP listener does not encrypt traffic. For team use, configure a trusted HTTPS reverse proxy and firewall, keep the backend reachable only by that proxy, and verify certificates on each client. Direct HTTP is for trusted isolated tests. This repository does not automatically configure TLS, DNS, firewall rules, operating-system service registration, or remote access. Proxy access logs can contain private SOP IDs or query strings; configure logging appropriately. The application does not log request contents or device tokens.
 
-Use Ctrl+C to stop an interactive instance. A managed installation should deliver a normal termination signal and wait for exit before starting another process against the same database. Run a single service writer process; process clustering and multiple independent writable replicas are not supported.
+Use Ctrl+C to stop an interactive instance. A managed installation should deliver a normal termination signal and wait for exit before starting another process against the same database. A trusted Node parent may launch the CLI with an IPC channel and send `{type:"shutdown"}` for graceful shutdown, including Windows. Parent-channel disconnection also closes the managed service; this adds no HTTP shutdown endpoint. Sending `child.kill("SIGTERM")` on Windows is an abrupt termination and must not be used as a graceful-stop mechanism. See the [Node process documentation](https://nodejs.org/download/release/latest-v24.x/docs/api/child_process.html#subprocesskillsignal).
+
+Run a single service writer process; process clustering and multiple independent writable replicas are not supported.
 
 ## Container option
 
@@ -84,3 +86,8 @@ node --test server/tests/backup.test.cjs
 ```
 
 Development checks ran on macOS with Node 26. The implementation uses APIs documented for Node 24, but Windows, Linux, Node 24 execution, filesystem hard-link behavior on alternative storage, actual power loss, disk failure, and container operations require deployment acceptance. A killed-process test demonstrates transaction recovery under that test, not protection against every hardware failure.
+
+
+## Cross-platform CI checkpoint
+
+The initial experimental CI run on commit `88f047ce8289ef13686b6ca7a2dc52ad39cbd4d8` passed service tests on Ubuntu and macOS (Node 24/26), team browser scenarios on Ubuntu/Windows Server 2022/macOS, and a container build plus non-root startup. Windows service tests exposed a real backup bug: flushing a read-only descriptor fails because [Windows FlushFileBuffers requires write access](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-flushfilebuffers). The snapshot now opens its already-owned temporary file with read/write access before flushing; it does not suppress file-flush errors. A trusted-parent IPC shutdown path handles Windows process management. Slow-response tests now control response completion rather than assuming a fixed TCP-buffer capacity. These fixes require a new green Windows run before acceptance; earlier failed checks remain failure evidence.

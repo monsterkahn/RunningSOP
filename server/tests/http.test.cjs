@@ -24,7 +24,7 @@ async function fixture(t, options = {}) {
     const response = await fetch(base + route, { method, headers: { 'X-Running-SOP-Protocol': '1', ...(authenticated ? { Authorization: 'Bearer synthetic_session_token_123' } : {}), ...(data === undefined ? {} : { 'Content-Type': 'application/json' }), ...headers }, body: data === undefined ? undefined : JSON.stringify(data) });
     return { status: response.status, headers: response.headers, body: response.status === 204 ? null : await response.json() };
   };
-  return { request, base };
+  return { request, base, server };
 }
 
 test('HTTP discovery, explicit protocol, joining and authentication boundaries', async t => {
@@ -110,8 +110,8 @@ test('CLI first launch uses private temporary configuration and graceful stop', 
   const fs = require('node:fs'); const os = require('node:os'); const path = require('node:path'); const { spawn } = require('node:child_process');
   const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'sop-cli-'));
   t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
-  const launch = async () => {
-    const child = spawn(process.execPath, [path.join(__dirname, '../cli.cjs')], { env: { ...process.env, SOP_DATA_DIR: directory, DB_PATH: path.join(directory, 'test.sqlite'), JOIN_CODE: '', HOST: '127.0.0.1', PORT: '0', ALLOW_ORIGINS: '' }, stdio: ['ignore', 'pipe', 'pipe'] });
+  const launch = async (useIpc=process.platform==='win32') => {
+    const child = spawn(process.execPath, [path.join(__dirname, '../cli.cjs')], { env: { ...process.env, SOP_DATA_DIR: directory, DB_PATH: path.join(directory, 'test.sqlite'), JOIN_CODE: '', HOST: '127.0.0.1', PORT: '0', ALLOW_ORIGINS: '' }, stdio: ['ignore', 'pipe', 'pipe', 'ipc'] });
     let output = '';
     await new Promise((resolve, reject) => {
       const timeout = setTimeout(() => { child.kill('SIGKILL'); reject(new Error('CLI start timed out')); }, 5000);
@@ -119,14 +119,14 @@ test('CLI first launch uses private temporary configuration and graceful stop', 
       child.once('exit', code => { clearTimeout(timeout); reject(new Error(`CLI exited before listening (${code})`)); });
       child.stdout.on('data', chunk => { output += chunk; if (output.includes('is listening')) { clearTimeout(timeout); resolve(); } });
     });
-    await new Promise((resolve, reject) => { child.once('exit', code => code === 0 ? resolve() : reject(new Error('CLI shutdown failed'))); child.kill('SIGTERM'); });
+    await new Promise((resolve, reject) => { child.once('exit', code => code === 0 ? resolve() : reject(new Error('CLI shutdown failed'))); if(useIpc)child.send({type:'shutdown'});else child.kill('SIGTERM'); });
     return output;
   };
   assert.ok((await launch()).includes('First-launch join code:'));
   const config = JSON.parse(fs.readFileSync(path.join(directory, 'config.json'), 'utf8'));
   assert.ok(config.joinCode.length >= 16);
   if (process.platform !== 'win32') assert.equal(fs.statSync(path.join(directory, 'config.json')).mode & 0o777, 0o600);
-  assert.equal((await launch()).includes('First-launch join code:'), false);
+  assert.equal((await launch(true)).includes('First-launch join code:'), false);
 });
 
 test('500 actors behind one address can burst while actor rate limits recover', async t => {
@@ -200,10 +200,14 @@ test('normal lock contention consumes its envelope and preserves the connection'
   assert.equal(second.status, 409); assert.equal(second.reused, true);
 });
 
+// Hold response completion explicitly: kernel TCP buffers vary by OS and may
+// accept the entire synthetic payload even after the reader pauses. The wire
+// budget covers outstanding Node responses, not kernel memory.
 test('slow large response reserves bytes, overloads explicitly, and releases on client close', async t => {
   const http = require('node:http'); const payload = 'x'.repeat(8 * 1024 * 1024);
-  const { base, request } = await fixture(t, { maxBufferedResponseBytes: 9 * 1024 * 1024, store: { get: () => ({ guide: { image: payload } }), lockInfo: () => null } });
-  const held = await new Promise((resolve, reject) => { const req = http.get(base + '/v1/sops/sample', { headers: { Authorization: 'Bearer synthetic_session_token_123', 'X-Running-SOP-Protocol': '1' } }, res => { res.pause(); resolve({ req, res }); }); req.once('error', reject); });
+  const { base, request,server } = await fixture(t, { maxBufferedResponseBytes: 9 * 1024 * 1024, store: { get: () => ({ guide: { image: payload } }), lockInfo: () => null } });
+  server.prependListener('request',(req,res)=>{if(req.url==='/v1/sops/sample?hold=1'){res.end=function(){res.flushHeaders();return res;};}});
+  const held = await new Promise((resolve, reject) => { const req = http.get(base + '/v1/sops/sample?hold=1', { headers: { Authorization: 'Bearer synthetic_session_token_123', 'X-Running-SOP-Protocol': '1' } }, res => { res.pause(); resolve({ req, res }); }); req.once('error', reject); });
   assert.equal(held.res.statusCode, 200);
   const overloaded = await request('/v1/sops/sample');
   assert.equal(overloaded.status, 503); assert.equal(overloaded.headers.get('retry-after'), '1');
@@ -214,10 +218,11 @@ test('slow large response reserves bytes, overloads explicitly, and releases on 
 
 test('slow response deadline releases active admission without waiting for reader disconnect', async t => {
   const http = require('node:http');
-  const { base, request } = await fixture(t, { maxConcurrent: 1, responseTimeoutMs: 100, store: { get: () => ({ guide: { image: 'x'.repeat(8 * 1024 * 1024) } }), lockInfo: () => null } });
-  const held = await new Promise((resolve, reject) => { const req = http.get(base + '/v1/sops/sample', { headers: { Authorization: 'Bearer synthetic_session_token_123', 'X-Running-SOP-Protocol': '1' } }, res => { res.pause(); res.on('error', () => {}); resolve({ req, res }); }); req.once('error', reject); });
+  const { base, request,server } = await fixture(t, { maxConcurrent: 1, responseTimeoutMs: 300, store: { get: () => ({ guide: { image: 'x'.repeat(8 * 1024 * 1024) } }), lockInfo: () => null } });
+  server.prependListener('request',(req,res)=>{if(req.url==='/v1/sops/sample?hold=1'){res.end=function(){res.flushHeaders();return res;};}});
+  const held = await new Promise((resolve, reject) => { const req = http.get(base + '/v1/sops/sample?hold=1', { headers: { Authorization: 'Bearer synthetic_session_token_123', 'X-Running-SOP-Protocol': '1' } }, res => { res.pause(); res.on('error', () => {}); resolve({ req, res }); }); req.once('error', reject); });
   assert.equal((await request('/health')).status, 503);
-  await new Promise(resolve => setTimeout(resolve, 130));
+  await new Promise(resolve => setTimeout(resolve, 350));
   assert.equal((await request('/health')).status, 200);
   held.res.destroy(); held.req.destroy();
 });

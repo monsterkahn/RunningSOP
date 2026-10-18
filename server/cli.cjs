@@ -39,10 +39,13 @@ function main(env = process.env) {
   let stopping = false;
   const stop = () => {
     if (stopping) return; stopping = true;
-    server.close(() => { store.close(); });
+    server.close(() => { store.close(); if(process.connected)process.disconnect(); });
     server.closeIdleConnections();
   };
   process.once('SIGINT', stop); process.once('SIGTERM', stop);
+  // A trusted parent can stop the service gracefully on Windows, where
+  // child.kill(SIGTERM) is an abrupt termination rather than a POSIX signal.
+  if(process.send){process.on('message',message=>{if(message&&message.type==='shutdown')stop();});process.once('disconnect',stop);}
   server.once('error', () => { console.error('Team service could not listen. Check the configured address and port.'); stop(); process.exitCode = 1; });
   server.listen(port, host, () => {
     console.log('Running SOP experimental team service is listening.');

@@ -35,3 +35,7 @@ The private queue permits 50 pending records, each bounded to 4 MiB plus 64 KiB 
 The real-service browser scenario covers metadata-only listing, pagination, search, uncategorized/category filters, category creation/assignment, nonempty-delete rejection, concurrent rename protection, current/history reading, screenshot annotations, offscreen thumbnail deferral and scrolling, a closeable preview, narrow layouts, seven languages, imported markup rendered as text, and disconnection while a preview is open. The workspace scenario also checks the private queue's count limit, preservation of existing entries at capacity and exact-draft cleanup isolation.
 
 Native permission prompts, real shared drives, trusted HTTPS setup and physical two-device acceptance remain separate checks. Team statistics still remain local; the library does not silently use a previous folder statistics target.
+
+## Cancellation and account isolation
+
+The reader rechecks the private connection identity after API responses, before rendering. A public connection-settings change invalidates the page synchronously; reopening is required. Image previews use a caller-side sequence in addition to renderer tickets, so a late image completion cannot reopen a closed dialog or follow a changed reading target. Browser regression cases hold image and HTTP completion deliberately, including the private-credentials/public-notification gap.
