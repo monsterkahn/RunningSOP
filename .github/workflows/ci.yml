@@ -9,7 +9,7 @@ jobs:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
         with:
-          node-version: '22'
+          node-version: '24'
           cache: npm
       - run: npm ci
       - run: npm test
@@ -19,6 +19,9 @@ jobs:
       - run: npm run test:qr-browser
       - run: npm run test:folder-browser
       - run: npm run test:dashboard-languages
+      - run: npm run build:team-service
+      - run: npm run build:release-media
+      - run: node tools/release-checksums.cjs
       - uses: actions/upload-artifact@v7
         with:
           name: running-sop-packages
@@ -28,9 +31,11 @@ jobs:
           if-no-files-found: error
   windows:
     uses: ./.github/workflows/windows-compatibility.yml
+  team:
+    uses: ./.github/workflows/team-service.yml
   release:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: [verify, windows]
+    needs: [verify, windows, team]
     runs-on: ubuntu-24.04
     permissions:
       contents: write
@@ -41,7 +46,7 @@ jobs:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
         with:
-          node-version: '22'
+          node-version: '24'
       - uses: actions/download-artifact@v8
         with:
           name: running-sop-packages

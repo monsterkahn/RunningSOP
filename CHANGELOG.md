@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.2.0 · 2026-10-19 — GitHub release
+
+- Added a saved team-service address picker with add, rename, edit, selection and deletion; connection remains explicit.
+- Added an optional experimental team service and library, with exclusive per-SOP editing leases, revision history, recovery and account/session fencing. Existing folder-based storage remains the default.
+- Added an opt-in service source package and operational backup/restore guidance. The service requires Node.js 24 or later; extension users still need Chrome 116 or later.
+- Team ratings stay on the device; team statistics are not included. The service uses unencrypted HTTP unless an administrator separately configures an HTTPS reverse proxy. HTTPS deployment, native permission prompts and real two-device acceptance remain unverified and were consciously deferred for this release.
+- Automated validation passed 148 core tests and 44 service tests on Node.js 24/26, plus 13 browser scenarios each on Chrome 116 and the current tested Chrome. Release CI also passed the regular package checks; see [the v1.2.0 review](docs/RELEASE-REVIEW-1.2.0.md) for evidence and limits.
+
 ## 1.1.1 · 2026-10-18
 
 - Fixed false multiple-library errors when SOP and sop refer to the same native directory.

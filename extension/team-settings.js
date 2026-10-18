@@ -76,7 +76,7 @@
       const words = strings[root.WorkspaceI18n?.getLanguage()] || strings.en;
       doc.querySelectorAll('[data-team-text]').forEach(node => { node.textContent = words[Number(node.dataset.teamText)]; });
       get('team-status').textContent = words[state === 'busy' ? 8 : state === 'error' ? 9 : record.enabled ? 7 : 6] + (record.enabled && state === 'idle' ? ' · ' + record.endpoint : '');
-      if(get('team-library'))get('team-library').hidden=!record.enabled;
+      if(get('team-library'))get('team-library').hidden=!record.enabled;if(get('team-choose-service'))get('team-choose-service').disabled=state==='busy';root.RunningSOPTeamPicker?.refreshCurrent(record);
       get('team-connect').disabled = state === 'busy'; get('team-disconnect').disabled = state === 'busy' || !record.enabled;
       let url; try { url = new URL(get('team-endpoint').value); } catch (_) {}
       get('team-http-warning').hidden = !url || url.protocol !== 'http:' || ['localhost','127.0.0.1','[::1]'].includes(url.hostname);
@@ -98,11 +98,11 @@
       }
     }
     form.addEventListener('submit', async event => {
-      event.preventDefault(); if (!form.reportValidity() || state === 'busy') return;
+      event.preventDefault();if(state==='busy')return;if(!get('team-endpoint').value&&root.RunningSOPTeamPicker){root.RunningSOPTeamPicker.open();return;}if(!form.reportValidity())return;
       const pending = instance().connect({endpoint:get('team-endpoint').value,joinCode:get('team-join-code').value,displayName:get('team-display-name').value});
       const generation = ++readGeneration;
       state = 'busy'; render();
-      try { const next = await pending; if (generation === readGeneration) record = next; state = 'idle'; } catch (_) { state = 'error'; }
+      try { const next = await pending; if (generation === readGeneration) record = next; state = 'idle';await root.RunningSOPTeamPicker?.rememberCurrent(next); } catch (_) { state = 'error'; }
       finally { get('team-join-code').value = ''; render(); await refreshRecord(); }
     });
     get('team-disconnect').addEventListener('click',async () => { if (state === 'busy') return; const generation = ++readGeneration; state = 'busy'; render(); try { await instance().clear(); if (generation === readGeneration) record = {enabled:false}; state = 'idle'; } catch (_) { state = 'error'; } render(); await refreshRecord(); });

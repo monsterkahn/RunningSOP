@@ -1,19 +1,20 @@
 # Privacy notice
 
-A fresh installation has no preconfigured shared directory. Workflow drafts and recording work locally without a shared directory. Once shared-directory features are enabled, directory reads and statistics synchronization follow the settings the user previously enabled explicitly. This project contains no vendor cloud analytics code.
+Last reviewed for v1.2.0 on 2026-10-19. A fresh installation has no preconfigured shared directory or team-service connection. Workflow drafts and recording work locally without shared storage. Existing folder-based statistics synchronization runs only when previously enabled explicitly; it is separate from the experimental team service. This project contains no vendor cloud analytics code.
 
-## Data processed locally
+## Data processing and local storage
 
-- Workflow matching runs locally, primarily using the current tab URL. Matching does not read page body text or form values.
+- Folder-based workflow matching runs locally, primarily using the current tab URL. In team-service mode, the extension sends the current work URL to the configured service in a `POST /v1/matches` request. HTTP(S) query strings and fragments are removed; a `file://` URL is sent in full. Neither mode reads page body text or form values for matching.
 - Recording reads visible text or `aria-label` from controls the user clicks, label text associated with input controls, active dialog/tab titles, page titles, and sanitized URLs. It does not read field values, passwords, or verification codes. Control names, titles, URL paths, and manually entered work URLs or notes may still contain business information.
-- When a matched workflow is viewed, an anonymous device identifier and view counts are first stored locally. Submitted ratings are also stored locally as pending synchronization records.
+- In folder-based mode, viewing a matched workflow stores an anonymous device identifier and view count locally. Submitted ratings are stored locally; older installations may also have explicitly enabled synchronization of these records to their selected statistics directory. Team-service mode retains feedback locally and does not upload ratings or provide team statistics.
 - Local settings, drafts, recordings, notes, and pending synchronization records are stored in Chrome extension local storage. Workflow categories are an exception: they are stored in `categories.json` in the selected shared directory, separately from workflow bodies.
+- Team-service session tokens and uncertain pending publication records are stored in private extension-origin IndexedDB, separate from `chrome.storage.local`. Pending publication records can contain a draft, screenshots, and lease/idempotency data so a user can recover an uncertain publication.
 - Screenshot preview and annotation use an isolated extension-origin view, with sessions validated by tab, operation mode, and expiration. The original webpage DOM does not receive screenshot bytes. Temporary screenshot sessions remove image data after loading and are cleaned up on close. Pages that do not allow injection use the extension side panel for viewing.
 - Screenshots use the browser's `getDisplayMedia` selection interface only when explicitly triggered by the user. The extension captures one frame and then stops. The image may include personal information, account identifiers, messages, or other page content. Screenshots and annotations may be saved in local drafts or the user-selected shared directory.
 
 Uninstalling the extension may clear Chrome extension local storage. Before clearing data or uninstalling, publish any SOPs you need to retain to a storage directory you control and verify their contents. The current recording interface has no backup export entry. The extension does not automatically delete history already written to shared directories.
 
-## Optional shared directories and background activity
+## Folder-based shared directories and background activity
 
 Users explicitly select shared directories; a fresh installation does not connect automatically. After a directory is selected and permission is granted, the extension performs the following activities according to its settings:
 
@@ -24,11 +25,17 @@ Users explicitly select shared directories; a fresh installation does not connec
 
 Automatic directory checks and statistics synchronization are off by default on fresh installations. Choosing a folder triggers a single library check and does not enable these background features automatically. The current settings page no longer exposes automatic-check or statistics configuration controls; updated installations retain settings explicitly enabled in earlier versions. A shared directory may be hosted by the user or an organization, which controls its access, backups, and retention policy. Shared history is not deleted automatically.
 
+## Optional experimental team service
+
+The team service is separate from folder-based storage and is not configured or contacted by a fresh extension installation. An administrator must install and run it separately with Node.js 24 or later, configure allowed extension origins, and provide a service address and join code to users. Connecting sends the join code and chosen display name to that service; the display name is used to identify the actor on team edits, and the join code is cleared from the settings form and not saved by the extension. For matching, the service receives the sanitized work URL: HTTP(S) addresses include origin and path but omit query and fragment; a `file://` address is sent in full, including its path, query, and fragment. The service stores published SOP content and images, revisions, categories, audit/co-ordination records, and protected device-session data in its SQLite database. Local drafts remain in the browser. Team ratings stay on the device; the service does not receive uploaded ratings or provide team statistics.
+
+The service's built-in listener uses unencrypted HTTP. Anyone able to observe that network traffic may read or alter it, including SOPs and authentication material. For network use, an administrator must configure a trusted HTTPS reverse proxy, restrict backend access to that proxy, and verify TLS on clients. This project's HTTPS deployment has not been verified. The service does not add encryption at rest; backups contain the same sensitive SOP and history data and require equivalent access controls. See [team-service operations](server/README.md) for setup, backup and restore behavior. Native system permissions and real two-device access have not been acceptance-tested.
+
 ## Permissions and network activity
 
 HTTP(S) website origin permissions are requested as needed for recording or screenshot features on the current page. Without permission, the corresponding page injection features are unavailable. Running features on `file://` pages or reading directory files through `file://` URLs requires separately enabling “Allow access to file URLs” in Chrome's extension details. Chrome's folder picker grants File System Access permission for shared folders. The file URL switch and folder read/write permissions are independent.
 
-URL matching and recording data processing happen locally. The extension uses no third-party cloud analytics service and does not send workflow records to the Running SOP developer. User-selected synchronized storage, Chrome, or shared file-system services may have their own network and account activity.
+In folder mode, URL matching and recording processing happen locally. In team-service mode, the configured service receives sanitized matching URLs and any SOP data the user chooses to publish or edit there. The extension uses no third-party cloud analytics service and does not send workflow records to the Running SOP developer. Chrome, user-selected storage, service hosts, HTTPS proxies, or shared file systems may have their own network, account, and logging activity.
 
 ## User controls
 
@@ -43,3 +50,7 @@ QR links are generated locally from a user-configured HTTP(S) reader URL and a w
 ## Folder-based library connections
 
 When the user chooses an SOP folder, the extension saves its native directory handle in extension-owned IndexedDB and a random connection identifier with the folder display name in local extension settings. The initial picker requests read access, followed immediately by a read-permission request if needed. If no catalog exists, it requests write access before creating and reading back an empty catalog.json; an invalid existing catalog is not replaced. The same selected directory is used for reading and publishing; publication requests write access when it has not already been granted. Folder display names and icon choices are local metadata and do not rename the actual folder. Existing file URL connections are retained for migration and require Chrome file URL permission, but manual address and catalog-file pickers are no longer exposed in the settings UI. Folder handles are local browser permissions, not credentials transferable to other devices. Library selection does not enable statistics synchronization.
+
+## Saved team-service addresses
+
+The optional service picker saves up to 20 service names and addresses in a separate extension-origin IndexedDB database on this browser. It saves no join code, session token or password. Selecting, editing or deleting a saved address makes no network request and does not change the active connection. Users explicitly click Connect and authorize the chosen origin before connection requests. A successful connection may remember its address metadata. Saved addresses persist after Disconnect and can be deleted from the picker. This feature does not discover or scan LAN devices.
