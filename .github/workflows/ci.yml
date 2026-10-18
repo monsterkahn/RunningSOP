@@ -26,9 +26,11 @@ jobs:
             dist/running-sop-*.zip
             dist/SHA256SUMS.txt
           if-no-files-found: error
+  windows:
+    uses: ./.github/workflows/windows-compatibility.yml
   release:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: verify
+    needs: [verify, windows]
     runs-on: ubuntu-24.04
     permissions:
       contents: write

@@ -1,6 +1,6 @@
 # Running SOP project handoff
 
-Current status updated: 2026-10-18. The current public GitHub release is **v1.1.0**, published with successful CI. Recorded documentation baseline before the English-only update: `5c02d06b3b8788ef35ff7e6fd31339c96e701b28`. According to the user, v1.0.0 is awaiting Chrome Web Store review; v1.1.0 has not been submitted to the store. GitHub publication does not establish store approval or completion of the outstanding native-permission and two-device acceptance checks.
+Current status updated: 2026-10-18. The latest previously published GitHub release is **v1.1.0**. Version **v1.1.1** is prepared for the user-authorized GitHub update; successful publication must be verified from the release pipeline. Recorded documentation baseline before the English-only update: `5c02d06b3b8788ef35ff7e6fd31339c96e701b28`. According to the user, v1.0.0 is awaiting Chrome Web Store review; v1.1.0 has not been submitted to the store. GitHub publication does not establish store approval or completion of the outstanding native-permission and two-device acceptance checks.
 
 This folder contains synthetic examples, with no real SOPs, internal addresses, or browser data. Repository: https://github.com/monsterkahn/RunningSOP; local `origin` is configured.
 
@@ -204,3 +204,11 @@ Subsequent current status, 2026-10-18: v1.1.0 was published to GitHub with succe
 ## English documentation update — 2026-10-18
 
 GitHub explanatory documents and official release notes are now maintained in English. Mobile scanning instructions and the standalone mobile deployment guide were removed; software features and necessary data-processing disclosures were retained. Internal changelog entries were moved into docs/DEVELOPMENT-HISTORY.md so the public changelog shows only official releases. The release workflow synchronizes English descriptions for the two existing official releases without replacing published attachments. An isolated workflow test verifies idempotence and preservation of published binary assets; the local core suite now contains 109 passing tests. No extension runtime or interface language was changed by this documentation update.
+
+## Windows stability review — 2026-10-18
+
+Work on `codex/windows-stability` fixes case-insensitive library discovery and bounds shared publication reads, adds stable Git line endings and a read-only Windows CI matrix, and verifies packaged runtimes on Windows Server 2022/2025 plus local Chromium 151 and Chrome 116. See docs/COMPATIBILITY-REVIEW.md for exact evidence and limitations. This branch does not replace published release binaries or establish native authorization, Windows 10/11 desktop, old-hardware, or two-device NAS acceptance.
+
+## Authorized compatibility patch publication - 2026-10-18
+
+The user requested uploading the tested fixes. Version 1.1.1 includes the Windows stability changes, matching package/manifest/lock versions and release notes. The main release workflow calls the Windows matrix and requires Windows and Linux verification before publishing. Existing releases are preserved. No Chrome Web Store submission is performed. Native authorization and two-device acceptance remain outstanding.

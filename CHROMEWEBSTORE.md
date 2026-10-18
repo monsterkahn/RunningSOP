@@ -1,6 +1,6 @@
 # Chrome Web Store Listing — Running SOP
 
-> Last updated: 2026-10-18. Local review of version 1.1.0; not a store submission or approval.
+> Last updated: 2026-10-18. Local review of version 1.1.1; not a store submission or approval.
 
 ## Store listing
 
@@ -90,6 +90,7 @@ Privacy policy source: PRIVACY.md. Public repository link: https://github.com/mo
 
 | Version | Date | Changes | Status |
 | --- | --- | --- | --- |
+| 1.1.1 | 2026-10-18 | Case-insensitive library discovery, bounded shared reads, Windows package verification | GitHub update; not submitted to the Chrome Web Store |
 | 1.1.0 | 2026-10-18 | Lightweight finite folder guidance, Chrome 116 directory parser correction, confirmed local draft cleanup, specification/privacy review | Official GitHub release; not submitted to the Chrome Web Store |
 | 1.0.0 | 2026-10-17 | First public-version submission | Submitted for review per user; approval not independently checked |
 
@@ -102,3 +103,7 @@ Privacy policy source: PRIVACY.md. Public repository link: https://github.com/mo
 - Store screenshots, public privacy URL and live dashboard disclosure must be reviewed again before submitting 1.1.0. No new store action is performed by this audit.
 
 Public documentation convention: GitHub README uses official release numbering only. The Chrome standards statement describes Manifest V3 implementation and developer self-review; it must not be presented as Google certification or store approval.
+
+## Unreleased compatibility hardening — 2026-10-18
+
+The Windows stability branch corrects case-insensitive folder discovery, preserves hashed example bytes across Git checkouts, and bounds shared-storage reads. No permission, privacy disclosure, product description or screenshot change is required for these fixes. This work has not been submitted as a new store package. Automated results and outstanding native/real-device checks are recorded in docs/COMPATIBILITY-REVIEW.md.

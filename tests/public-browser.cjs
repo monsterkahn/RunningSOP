@@ -10,6 +10,18 @@ const { chromium } = require(process.env.RUNTIME_SOP_PLAYWRIGHT || 'playwright')
 const root = path.resolve(__dirname, '..');
 const extension = process.env.RUNTIME_SOP_EXTENSION || path.join(root, 'extension');
 
+// Avoid Node's native recursive copy path, which can abort on Windows Unicode
+// paths. Keep the actual installation path intact in compatibility tests.
+function copyRuntime(from, to) {
+  fs.mkdirSync(to, { recursive: true });
+  for (const entry of fs.readdirSync(from, { withFileTypes: true })) {
+    const source = path.join(from, entry.name), target = path.join(to, entry.name);
+    if (entry.isSymbolicLink()) throw new Error('Unexpected runtime symlink');
+    if (entry.isDirectory()) copyRuntime(source, target);
+    else fs.copyFileSync(source, target);
+  }
+}
+
 test('fresh extension install is private by default and About shows release identity', { timeout: 60000 }, async () => {
   const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'runtime-sop-public-'));
   const browserArgs = [
@@ -154,7 +166,7 @@ test('standalone demo dashboard opens and shows synthetic workflow', {timeout:30
 });
 
 test('screenshot iframe isolates image bytes from work pages and saves annotations', {timeout:60000},async()=>{
- const temp=fs.mkdtempSync(path.join(os.tmpdir(),'runtime-secure-viewer-')),staged=path.join(temp,'extension');fs.cpSync(extension,staged,{recursive:true});
+ const temp=fs.mkdtempSync(path.join(os.tmpdir(),'runtime-secure-viewer-')),staged=path.join(temp,'extension');copyRuntime(extension,staged);
  const m=JSON.parse(fs.readFileSync(path.join(staged,'manifest.json')));m.host_permissions.push('https://example.test/*');fs.writeFileSync(path.join(staged,'manifest.json'),JSON.stringify(m));
  let context;
  try{
@@ -177,6 +189,10 @@ test('screenshot iframe isolates image bytes from work pages and saves annotatio
   // The image intentionally has pointer-events:none; the canvas handles input.
   // Wait until marks and fit-to-window layout have initialized before measuring.
   await frame.waitForFunction(()=>document.getElementById('marks-count').textContent.startsWith('2 / 40'));
+  // Fresh-install settings can finish opening after the viewer loads. Restore
+  // the work tab before delivering native pointer input, especially on 116.
+  await work.bringToFront();
+  await frame.locator('#marks-number').click();
   const box=await frame.locator('#picture').boundingBox(),canvas=await frame.locator('#viewport').boundingBox();
   await frame.evaluate(()=>document.addEventListener('pointerdown',e=>{window.lastCanvasPointer={x:e.clientX,y:e.clientY,target:e.target.id,button:e.button};},{once:true}));
   await frame.locator('#viewport').click({position:{x:box.x-canvas.x+60,y:box.y-canvas.y+60}});
@@ -216,7 +232,7 @@ test('screenshot iframe isolates image bytes from work pages and saves annotatio
 
 test('guided recording edits STEP 1, advances explicitly and preserves approval points on stop', {timeout:60000},async()=>{
  const temp=fs.mkdtempSync(path.join(os.tmpdir(),'runtime-guided-'));
- const staged=path.join(temp,'extension');fs.cpSync(extension,staged,{recursive:true});
+ const staged=path.join(temp,'extension');copyRuntime(extension,staged);
  // Only this isolated test copy grants its synthetic origin up front.
  const m=JSON.parse(fs.readFileSync(path.join(staged,'manifest.json')));m.host_permissions.push('https://example.test/*');fs.writeFileSync(path.join(staged,'manifest.json'),JSON.stringify(m));
  let context;
@@ -309,7 +325,7 @@ test('annotation results stay with their original step when sidebar selection ch
 });
 
 test('full local drafts offer confirmed cleanup and allow another recording without changing shared settings',{timeout:60000},async()=>{
- const temp=fs.mkdtempSync(path.join(os.tmpdir(),'runtime-draft-capacity-')),staged=path.join(temp,'extension');fs.cpSync(extension,staged,{recursive:true});
+ const temp=fs.mkdtempSync(path.join(os.tmpdir(),'runtime-draft-capacity-')),staged=path.join(temp,'extension');copyRuntime(extension,staged);
  const manifest=JSON.parse(fs.readFileSync(path.join(staged,'manifest.json')));manifest.host_permissions.push('https://example.test/*');fs.writeFileSync(path.join(staged,'manifest.json'),JSON.stringify(manifest));
  let context;
  try{

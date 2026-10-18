@@ -1,35 +1,27 @@
-# Running SOP v1.1.0
+# Running SOP v1.1.1
 
-Running SOP brings visual, step-by-step instructions to your work webpages. Create and follow SOPs beside the task, then publish reviewed procedures to your own storage.
+This update improves shared-storage reliability and cross-platform verification. Existing SOP formats, drafts and storage settings remain compatible.
 
-## What's new
+## Fixes
 
-- Lightweight folder guidance plays three cycles, stops when connected, pauses on hidden pages and respects reduced motion. No animation library or additional permissions.
-- Fixed folder-library identifiers on Chrome 116; the minimum browser requirement remains Chrome 116.
-- When 10 local drafts fill the limit, confirmed cleanup frees space without deleting published SOPs. Cancel preserves data; active recordings cannot be deleted.
-- Reviewed permissions and updated privacy and installation documentation for the simplified interface. Existing SOP formats and local storage keys remain compatible.
+- Fixed false multiple-library errors on case-insensitive disks when SOP and sop refer to the same folder.
+- Preserved verified document bytes across Windows Git checkouts.
+- Added size checks before reading shared documents and images, including immutable-file verification, to protect memory and keep invalid content out of the catalog.
+- Added Windows Server 2022/2025 verification of the packaged extension from paths containing Unicode and spaces. Windows and Linux checks must pass before GitHub publication.
 
-## Chrome standards
+## Verification and limits
 
-Developed for Chrome Manifest V3, with executable scripts bundled locally, on-demand work-site permissions and user-authorized storage. SOP content is handled as data, not executable code. Recording does not read typed field values, screenshots are user-initiated, and no developer cloud analytics service is included.
+The preceding runtime review passed 115 core tests on macOS and all 10 browser scenarios on Chromium 151 and Chrome for Testing 116. Both Windows environments passed 114 core tests, with one Linux-only workflow test skipped, and all 10 browser scenarios. The release pipeline reruns checks for this version. See docs/COMPATIBILITY-REVIEW.md for evidence and coverage boundaries.
 
-This describes developer implementation and self-review. It is not Google certification or confirmation of Chrome Web Store approval.
-
-## Verification
-
-108 core tests passed. The packaged runtime passed 10 browser scenarios on Chromium 151.0.7922.34 and 10 on Chrome for Testing 116.0.5845.96. Coverage includes screenshot annotation persistence and isolation, recording, folder initialization, draft cleanup and dashboard languages. See the repository's release review for the complete scope and limitations.
-
-Native operating-system authorization, actual older hardware and real two-computer shared-storage behavior remain manual acceptance checks.
+Chrome 116 remains the minimum. Windows server VMs do not establish acceptance on every Windows 10/11 desktop or older computer. Native permission dialogs and actual two-device NAS behavior still require manual acceptance. Invalid or interrupted shared files are not automatically overwritten.
 
 ## Downloads
 
-- **running-sop-extension-v1.1.0.zip**: installation package. Extract it, open `chrome://extensions`, enable Developer mode, choose Load unpacked and select the `extension/` folder.
-- **running-sop-github-v1.1.0.zip**: complete source and documentation.
-- **running-sop-webstore-v1.1.0.zip**: Web Store upload package for maintainers, not a one-click installer.
+- **running-sop-extension-v1.1.1.zip**: installation package. Extract it, open chrome://extensions, enable Developer mode, select Load unpacked, and choose the extension/ folder.
+- **running-sop-github-v1.1.1.zip**: source and documentation.
+- **running-sop-webstore-v1.1.1.zip**: store upload package for maintainers.
 - **SHA256SUMS.txt**: package checksums.
 
-Upgrade by replacing files in the existing extension directory and reloading it. Do not uninstall first if you need local drafts.
+For an existing unpacked installation, replace files in the same extension directory and reload it. Do not uninstall first if you need to retain local drafts.
 
-New installations do not connect to shared storage or enable statistics synchronization. Users select and authorize their folder. The extension interface supports English, Simplified and Traditional Chinese, Spanish, Russian, Korean and Japanese; authored SOP content is not automatically translated.
-
-The previous official release and its binary assets are preserved. This GitHub publication is separate from Chrome Web Store submission and review.
+Developed for Chrome Manifest V3 with locally bundled code, user-authorized storage and no developer cloud analytics. This is a developer implementation statement, not Google certification or confirmation of Chrome Web Store approval. This GitHub update does not submit or replace the store package currently under review.

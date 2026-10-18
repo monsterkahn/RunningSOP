@@ -53,7 +53,10 @@ function create(options={}){
  }
  async function inspect(handle,expectedFile,createMissing=false){
   const hits=[];for(const parts of [[],['SOP'],['sop'],['工作SOP','SOP']]){
-   try{let dir=handle;for(const p of parts)dir=await dir.getDirectoryHandle(p);const file=await dir.getFileHandle('catalog.json');if(!hits.some(hit=>hit.path===parts.join('/')))hits.push({handle:dir,file,path:parts.join('/')});}
+   try{let dir=handle;for(const p of parts)dir=await dir.getDirectoryHandle(p);const file=await dir.getFileHandle('catalog.json');
+    // Case-insensitive filesystems can resolve SOP and sop to the same entry.
+    let duplicate=false;for(const hit of hits)if(await same(hit.file,file)){duplicate=true;break;}
+    if(!duplicate)hits.push({handle:dir,file,path:parts.join('/')});}
    catch(e){if(e.name!=='NotFoundError')throw e;}
   }
   if(!hits.length){

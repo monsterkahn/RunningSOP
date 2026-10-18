@@ -1,0 +1,47 @@
+name: Windows compatibility
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2022, windows-2025]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+      - run: npx playwright install chromium
+      - name: Test the packaged extension from a Unicode path with spaces
+        shell: pwsh
+        run: |
+          $version = node -p "require('./package.json').version"
+          $runtime = Join-Path $env:GITHUB_WORKSPACE 'dist/Windows 兼容测试/extension'
+          Expand-Archive -LiteralPath "dist/running-sop-webstore-v$version.zip" -DestinationPath $runtime
+          "RUNTIME_SOP_EXTENSION=$runtime" >> $env:GITHUB_ENV
+          "RUNTIME_SOP_AUDIT_DIR=$env:GITHUB_WORKSPACE/dist/windows-audit" >> $env:GITHUB_ENV
+          $PSVersionTable | Out-String | Set-Content dist/windows-environment.txt
+          Get-CimInstance Win32_OperatingSystem | Select-Object Caption,Version,OSArchitecture | Out-String | Add-Content dist/windows-environment.txt
+      - name: Run browser scenarios sequentially
+        run: npm run test:release-browser
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: compatibility-${{ matrix.os }}
+          path: |
+            dist/windows-audit/
+            dist/windows-environment.txt
+          if-no-files-found: warn
