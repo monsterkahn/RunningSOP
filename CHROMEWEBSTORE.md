@@ -102,3 +102,7 @@ Privacy policy source: PRIVACY.md. Public repository link: https://github.com/mo
 - Store screenshots, public privacy URL and live dashboard disclosure must be reviewed again before submitting 1.1.0. No new store action is performed by this audit.
 
 Public documentation convention: GitHub README uses official release numbering only. The Chrome standards statement describes Manifest V3 implementation and developer self-review; it must not be presented as Google certification or store approval.
+
+## Unreleased compatibility hardening — 2026-10-18
+
+The Windows stability branch corrects case-insensitive folder discovery, preserves hashed example bytes across Git checkouts, and bounds shared-storage reads. No permission, privacy disclosure, product description or screenshot change is required for these fixes. This work has not been submitted as a new store package. Automated results and outstanding native/real-device checks are recorded in docs/COMPATIBILITY-REVIEW.md.

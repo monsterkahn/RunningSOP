@@ -189,6 +189,10 @@ test('screenshot iframe isolates image bytes from work pages and saves annotatio
   // The image intentionally has pointer-events:none; the canvas handles input.
   // Wait until marks and fit-to-window layout have initialized before measuring.
   await frame.waitForFunction(()=>document.getElementById('marks-count').textContent.startsWith('2 / 40'));
+  // Fresh-install settings can finish opening after the viewer loads. Restore
+  // the work tab before delivering native pointer input, especially on 116.
+  await work.bringToFront();
+  await frame.locator('#marks-number').click();
   const box=await frame.locator('#picture').boundingBox(),canvas=await frame.locator('#viewport').boundingBox();
   await frame.evaluate(()=>document.addEventListener('pointerdown',e=>{window.lastCanvasPointer={x:e.clientX,y:e.clientY,target:e.target.id,button:e.button};},{once:true}));
   await frame.locator('#viewport').click({position:{x:box.x-canvas.x+60,y:box.y-canvas.y+60}});

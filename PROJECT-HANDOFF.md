@@ -204,3 +204,7 @@ Subsequent current status, 2026-10-18: v1.1.0 was published to GitHub with succe
 ## English documentation update — 2026-10-18
 
 GitHub explanatory documents and official release notes are now maintained in English. Mobile scanning instructions and the standalone mobile deployment guide were removed; software features and necessary data-processing disclosures were retained. Internal changelog entries were moved into docs/DEVELOPMENT-HISTORY.md so the public changelog shows only official releases. The release workflow synchronizes English descriptions for the two existing official releases without replacing published attachments. An isolated workflow test verifies idempotence and preservation of published binary assets; the local core suite now contains 109 passing tests. No extension runtime or interface language was changed by this documentation update.
+
+## Windows stability review — 2026-10-18
+
+Work on `codex/windows-stability` fixes case-insensitive library discovery and bounds shared publication reads, adds stable Git line endings and a read-only Windows CI matrix, and verifies packaged runtimes on Windows Server 2022/2025 plus local Chromium 151 and Chrome 116. See docs/COMPATIBILITY-REVIEW.md for exact evidence and limitations. This branch does not replace published release binaries or establish native authorization, Windows 10/11 desktop, old-hardware, or two-device NAS acceptance.
