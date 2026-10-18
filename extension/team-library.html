@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Running SOP</title><link rel="icon" href="assets/icons/icon-32.png"><link rel="stylesheet" href="team-library.css"></head>
+<body>
+<header><div class="brand"><img src="assets/icons/icon-48.png" width="36" height="36" alt=""><div><strong>Running SOP</strong><h1 data-word="title"></h1></div></div><a href="options.html" data-word="settings"></a></header>
+<p id="connection" class="connection"></p><p id="status" role="status" aria-live="polite"></p>
+<main>
+ <aside><h2 data-word="categories"></h2><nav id="categories"></nav>
+  <details id="category-tools"><summary data-word="manage"></summary>
+   <label for="category-edit" data-word="category"></label><select id="category-edit"></select>
+   <form id="category-form"><fieldset><legend data-word="manage"></legend>
+    <label for="category-name" data-word="name"></label><input id="category-name" maxlength="40" required autocomplete="off">
+    <label for="category-parent" data-word="parent"></label><select id="category-parent"></select>
+    <label for="category-color" data-word="color"></label><select id="category-color"></select>
+    <label for="category-icon" data-word="icon"></label><select id="category-icon"></select>
+    <div class="actions"><button id="save-category" class="primary" data-word="save"></button><button id="delete-category" type="button" data-word="remove"></button></div>
+   </fieldset></form>
+  </details>
+ </aside>
+ <section class="library"><form id="search-form"><label for="query" data-word="search"></label><div class="search"><input id="query" type="search" maxlength="120" autocomplete="off"><button class="primary" data-word="search"></button></div></form>
+  <p id="empty" hidden data-word="empty"></p><ul id="sops"></ul>
+  <div class="pagination"><button id="previous" data-word="previous" disabled></button><span id="page-number"></span><button id="next" data-word="next" disabled></button></div>
+ </section>
+ <section id="reader" hidden aria-labelledby="sop-title"><div class="reader-heading"><h2 id="sop-title"></h2><button id="close-reader" data-word="close"></button></div>
+  <p id="revision"></p><label for="sop-category" data-word="category"></label><div class="search"><select id="sop-category"></select><button id="move-sop" data-word="move"></button></div>
+  <div class="actions"><button id="read-sop" class="primary" data-word="read"></button><button id="history-sop" data-word="history"></button></div>
+  <p id="reader-status" role="status" aria-live="polite"></p><div id="guide"></div><ul id="history"></ul><button id="more-history" hidden data-word="more"></button>
+ </section>
+</main>
+<dialog id="image-dialog"><div class="reader-heading"><h2 id="image-title"></h2><button id="close-image" data-word="close"></button></div><div id="large-picture"></div></dialog>
+<script src="image-marks.js"></script><script src="catalog-engine.js"></script><script src="locale-data.js"></script><script src="traditional-zh.js"></script><script src="workspace-i18n.js"></script><script src="ui-icons.js"></script><script src="screenshot-editor.js"></script><script src="team-client.js"></script><script src="team-settings.js"></script><script src="team-library.js"></script>
+</body></html>

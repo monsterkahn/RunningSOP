@@ -24,7 +24,10 @@
     "test:qr-browser": "node --test tests/qr-browser.cjs",
     "test:folder-browser": "node --test tests/folder-browser.cjs",
     "test:dashboard-languages": "node --test tests/dashboard-language-browser.cjs",
-    "test:release-browser": "node --test --test-concurrency=1 tests/public-browser.cjs tests/folder-browser.cjs tests/qr-browser.cjs tests/dashboard-language-browser.cjs"
+    "test:release-browser": "node --test --test-concurrency=1 tests/public-browser.cjs tests/folder-browser.cjs tests/qr-browser.cjs tests/dashboard-language-browser.cjs",
+    "test:server": "node server/tools/test.cjs",
+    "test:team-scale": "node server/tools/scale.cjs",
+    "test:team-browser": "node --test --test-concurrency=1 tests/team-workspace-browser.cjs tests/team-library-browser.cjs"
   },
   "devDependencies": {
     "playwright": "1.62.1"

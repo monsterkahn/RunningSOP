@@ -37,7 +37,7 @@
     "default_path": "workspace.html"
   },
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'none'; connect-src 'self' file:"
+    "extension_pages": "script-src 'self'; object-src 'none'; connect-src 'self' file: http: https:"
   },
   "optional_host_permissions": [
     "https://*/*",

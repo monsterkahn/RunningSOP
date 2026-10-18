@@ -1,0 +1,15 @@
+{
+  "name": "running-sop-team-service",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Experimental local-network SOP coordination service",
+  "license": "MIT",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "start": "node cli.cjs",
+    "test": "node tools/test.cjs",
+    "test:scale": "node tools/scale.cjs"
+  }
+}

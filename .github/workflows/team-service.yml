@@ -1,0 +1,52 @@
+name: Verify experimental team service
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  service:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022, macos-14]
+        node: ['24', '26']
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node }}
+      - run: node server/tools/test.cjs
+  browser:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022, macos-14]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - if: runner.os == 'Linux'
+        run: npx playwright install --with-deps chromium
+      - if: runner.os != 'Linux'
+        run: npx playwright install chromium
+      - run: npm run test:team-browser
+  container:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - run: docker build -f server/Dockerfile -t running-sop-team:test .
+      - name: Verify container starts without administrator privileges
+        shell: bash
+        run: |
+          docker run -d --name sop-team -p 127.0.0.1:8787:8787 -e SOP_JOIN_CODE=synthetic-container-test-code running-sop-team:test
+          trap 'docker rm -f sop-team' EXIT
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:8787/health > /tmp/health.json; then break; fi
+            sleep 1
+          done
+          python3 -c 'import json; assert json.load(open("/tmp/health.json"))["data"]["status"] == "ok"'
+          test "$(docker exec sop-team id -u)" != '0'

@@ -1,0 +1,238 @@
+{
+  "kind": "real-sqlite-image-guide-500-normal-readers",
+  "node": "v26.9.0",
+  "platform": "darwin",
+  "clients": 500,
+  "guideBytes": 3148224,
+  "assetRows": 12,
+  "assetBytes": 2359296,
+  "responseBudgetBytes": 33554432,
+  "childHeapLimitMiB": 256,
+  "retryPolicy": {
+    "implementedInExtension": true,
+    "maxAttempts": 8,
+    "deadlineMs": 30000,
+    "retryStatuses": [
+      503
+    ],
+    "delay": "Retry-After minimum 1s plus exponential jitter capped at4s"
+  },
+  "baseline": {
+    "stats": true,
+    "peakRss": 149176320,
+    "peakHeapUsed": 35202312,
+    "peakArrayBuffers": 9589412,
+    "peakConnections": 501,
+    "connections": 501,
+    "getCalls": 2,
+    "memory": {
+      "rss": 140197888,
+      "heapTotal": 35291136,
+      "heapUsed": 11228232,
+      "external": 2494821,
+      "arrayBuffers": 209555
+    }
+  },
+  "phases": [
+    {
+      "name": "normal-consuming-no-retry",
+      "clients": 500,
+      "completed": 10,
+      "incomplete": 490,
+      "attempts": 500,
+      "statusCounts": {
+        "200": 10,
+        "503": 490
+      },
+      "failures": {
+        "503": 490
+      },
+      "transferredBytes": 31517940,
+      "elapsedMs": 164.342666,
+      "completedP95Ms": 164.28558299999997,
+      "server": {
+        "stats": true,
+        "peakRss": 252395520,
+        "peakHeapUsed": 86423616,
+        "peakArrayBuffers": 110590707,
+        "peakConnections": 501,
+        "connections": 501,
+        "getCalls": 12,
+        "memory": {
+          "rss": 225689600,
+          "heapTotal": 64536576,
+          "heapUsed": 39867864,
+          "external": 2494821,
+          "arrayBuffers": 209555
+        }
+      }
+    },
+    {
+      "name": "normal-consuming-benchmark-get-retry",
+      "clients": 500,
+      "completed": 500,
+      "incomplete": 0,
+      "attempts": 1939,
+      "statusCounts": {
+        "200": 500,
+        "503": 1439
+      },
+      "failures": {},
+      "transferredBytes": 1574282730,
+      "elapsedMs": 10850.6155,
+      "completedP95Ms": 9461.477125,
+      "server": {
+        "stats": true,
+        "peakRss": 355287040,
+        "peakHeapUsed": 152820744,
+        "peakArrayBuffers": 141864604,
+        "peakConnections": 501,
+        "connections": 271,
+        "getCalls": 512,
+        "memory": {
+          "rss": 254984192,
+          "heapTotal": 60669952,
+          "heapUsed": 32319064,
+          "external": 10360071,
+          "arrayBuffers": 8076371
+        }
+      }
+    },
+    {
+      "name": "actual-extension-client-bounded-retry",
+      "clients": 500,
+      "completed": 500,
+      "incomplete": 0,
+      "statusCounts": {
+        "200": 500,
+        "503": 625
+      },
+      "failures": {},
+      "elapsedMs": 9841.735791999998,
+      "completedP95Ms": 6743.451374999999,
+      "server": {
+        "stats": true,
+        "peakRss": 363151360,
+        "peakHeapUsed": 152820744,
+        "peakArrayBuffers": 141864604,
+        "peakConnections": 501,
+        "connections": 232,
+        "getCalls": 1012,
+        "memory": {
+          "rss": 216989696,
+          "heapTotal": 10371072,
+          "heapUsed": 6727656,
+          "external": 2493255,
+          "arrayBuffers": 209555
+        }
+      }
+    }
+  ],
+  "limitations": [
+    "One synthetic schema4 guide with 12 distinct JPEG-shaped 192KiB byte arrays; no actual image decoding or business screenshots.",
+    "500 independent warmed sockets; same host loopback, not physical LAN.",
+    "Normal readers stream/hash/discard responses; one real TeamClient verifies content with cache disabled. This does not measure 500 browser caches.",
+    "The third phase uses the actual extension client and a streaming HTTP adapter over the existing per-user socket; no browser rendering or image decoding.",
+    "Reported peak memory is observed, not a universal bound."
+  ],
+  "observedAt": "2026-10-18",
+  "sourceFingerprint": "c0fbf86109d25f626b3001737742e2e1291d6b02acc4c0aee9f5655528719287",
+  "sourceFiles": [
+    {
+      "path": "extension/manifest.json",
+      "sha256": "03af0fd9498244a6ff228801ad067b0c7a7dec9a4ed0ed0133339b65b6f70224"
+    },
+    {
+      "path": "extension/team-client.js",
+      "sha256": "890f2cbe182d5759c665c6123607f5acd84eeb147d2c4fc74ea8caba2e7eec8f"
+    },
+    {
+      "path": "extension/team-edit-session.js",
+      "sha256": "9500aec94b2d5cf2a53a82693934a9da9bbe2df00a187f376d94e40045c0aa99"
+    },
+    {
+      "path": "extension/team-pending.js",
+      "sha256": "9486e21ffd4ecbb577a0eb524987e031d8f6e50ae9d7532d336ade28b628d9ac"
+    },
+    {
+      "path": "extension/team-settings.js",
+      "sha256": "a0fa8cee16e9b3cf05ff89451e43e1c1a003c02aa4b5f67f8dca1d8fa1c98191"
+    },
+    {
+      "path": "extension/workspace.js",
+      "sha256": "1826e9b9ff82a2a81c2519e0594d46bdb209c608be4d8efb3bf91e7037c9c9c3"
+    },
+    {
+      "path": "server/app.cjs",
+      "sha256": "10438384c7f307a24c6d7f958e8d5c39660d4bd080c395810760fb7e227e41f0"
+    },
+    {
+      "path": "server/backup.cjs",
+      "sha256": "1886c789c686927bfe2becba277f14ea262e8f80ce7b969c6a57de2d463a91ab"
+    },
+    {
+      "path": "server/category-store.cjs",
+      "sha256": "0abec3ef8dc1f3e66a65460f3fb941783aa051270f0741bb07c47053981b7438"
+    },
+    {
+      "path": "server/cli.cjs",
+      "sha256": "082ee9c6ad53dae6dc275d4b755993acfe28676f716b00f82594848de6108c97"
+    },
+    {
+      "path": "server/guide-assets.cjs",
+      "sha256": "9da9c19ec271c5bf4a113481e4d40879bb63abfb89c322fd1690cd67dd119d37"
+    },
+    {
+      "path": "server/store.cjs",
+      "sha256": "9efacbcb5e17564436703e7c3410f0d662f131fb82794571075f331ad0a5f089"
+    },
+    {
+      "path": "server/tests/backup.test.cjs",
+      "sha256": "afe8023c679c03537c6eff7f2b18145f3f1528553291c3a674eed13bcfa460cf"
+    },
+    {
+      "path": "server/tests/fixtures/crash-worker.cjs",
+      "sha256": "a85d780177f5d5d8fa78b0cf6d2a14d0b8440259fe4a99e165e827671aa4ed06"
+    },
+    {
+      "path": "server/tests/http.test.cjs",
+      "sha256": "533bf608688d5a448098c7eb20e28ec033cae5c20afb5229a8e1335edce67e7c"
+    },
+    {
+      "path": "server/tests/store.test.cjs",
+      "sha256": "4b77ef6ffb63a185fb561d1ad76c08ad8657d464b1f7b4f2505d80131faee370"
+    },
+    {
+      "path": "server/tools/backup.cjs",
+      "sha256": "7c9698c7bc3c12223550f791c7a57d2f7e289e8755832e00bde660d2d953e3e4"
+    },
+    {
+      "path": "server/tools/fixture-large-response.cjs",
+      "sha256": "43555f961bd001990fd6bec1b2931930e48f06534ca714f957463340b9b985fe"
+    },
+    {
+      "path": "server/tools/fixture-real-large-read.cjs",
+      "sha256": "bbdbaed822fd8e37ff5df3dbf4eb3a5ffb171d56d759d00f2709825a81055d90"
+    },
+    {
+      "path": "server/tools/fixture-service.cjs",
+      "sha256": "fe261f69773fb223986d4aaee862698a907e3bc4abfd56c44e299874cf163f24"
+    },
+    {
+      "path": "server/tools/large-response.cjs",
+      "sha256": "4eabd7fb44114df7eba0768a49f67c8fca358bb137fc4f2c6fd4588c0800192a"
+    },
+    {
+      "path": "server/tools/real-large-read.cjs",
+      "sha256": "bcd406c9b78455199d97c74c62055b05e02fe6a20aacaa73c9087109d1088059"
+    },
+    {
+      "path": "server/tools/scale.cjs",
+      "sha256": "06ebffa6589c6f90d42fac6863e6743d91a4b1abd2e0891338a006189af917dd"
+    },
+    {
+      "path": "server/tools/test.cjs",
+      "sha256": "7c88ecf3ff583cac1d5988cb902528e181e9f7d3b2f266ee5e0b35dbdbfab550"
+    }
+  ]
+}

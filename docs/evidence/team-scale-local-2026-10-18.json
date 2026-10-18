@@ -1,0 +1,276 @@
+{
+  "kind": "isolated-local-http-load-test",
+  "node": "v26.9.0",
+  "platform": "darwin",
+  "arch": "arm64",
+  "cpuModel": "Apple M4",
+  "cpus": 10,
+  "totalMemory": 17179869184,
+  "sops": 200000,
+  "clients": 500,
+  "socketPool": 500,
+  "phases": [
+    {
+      "name": "join",
+      "requests": 500,
+      "concurrency": 500,
+      "durationMs": 53.99220800000012,
+      "p50Ms": 31.527000000000044,
+      "p95Ms": 47.97895800000015,
+      "maxMs": 49.68404199999986,
+      "responseBytes": 85000
+    },
+    {
+      "name": "indexed-match",
+      "requests": 500,
+      "concurrency": 500,
+      "durationMs": 21.575374999999894,
+      "p50Ms": 11.50525000000016,
+      "p95Ms": 17.40770799999973,
+      "maxMs": 18.119750000000295,
+      "responseBytes": 126500
+    },
+    {
+      "name": "read",
+      "requests": 500,
+      "concurrency": 500,
+      "durationMs": 28.131374999999935,
+      "p50Ms": 14.547957999999653,
+      "p95Ms": 23.743000000000393,
+      "maxMs": 24.79554199999984,
+      "responseBytes": 249890
+    },
+    {
+      "name": "paged-list",
+      "requests": 500,
+      "concurrency": 500,
+      "durationMs": 55.50324999999975,
+      "p50Ms": 28.259292000000187,
+      "p95Ms": 50.580209000000195,
+      "maxMs": 52.964166000000205,
+      "responseBytes": 5412500
+    },
+    {
+      "name": "deep-paged-list",
+      "requests": 500,
+      "concurrency": 500,
+      "durationMs": 60.22437499999978,
+      "p50Ms": 30.728665999999976,
+      "p95Ms": 55.19658299999992,
+      "maxMs": 57.67116699999997,
+      "responseBytes": 5412500
+    },
+    {
+      "name": "selective-search",
+      "requests": 500,
+      "concurrency": 500,
+      "durationMs": 382.51575,
+      "p50Ms": 221.68375000000015,
+      "p95Ms": 364.27891599999975,
+      "maxMs": 379.56745800000044,
+      "responseBytes": 125500
+    },
+    {
+      "name": "broad-chinese-search",
+      "requests": 500,
+      "concurrency": 500,
+      "durationMs": 120.65495799999917,
+      "p50Ms": 61.80695800000012,
+      "p95Ms": 113.25016599999981,
+      "maxMs": 118.11495899999954,
+      "responseBytes": 2187500
+    },
+    {
+      "name": "contested-lock",
+      "requests": 500,
+      "concurrency": 500,
+      "durationMs": 23.048291000000063,
+      "p50Ms": 11.484292000000096,
+      "p95Ms": 19.33112500000061,
+      "maxMs": 20.39350000000013,
+      "responseBytes": 33674
+    },
+    {
+      "name": "independent-locks",
+      "requests": 500,
+      "concurrency": 500,
+      "durationMs": 36.149209000000155,
+      "p50Ms": 18.11083299999973,
+      "p95Ms": 31.93383300000005,
+      "maxMs": 33.388458000000355,
+      "responseBytes": 120500
+    },
+    {
+      "name": "publish",
+      "requests": 500,
+      "concurrency": 500,
+      "durationMs": 147.75,
+      "p50Ms": 78.53762499999993,
+      "p95Ms": 137.34491700000035,
+      "maxMs": 143.24962500000038,
+      "responseBytes": 243890
+    }
+  ],
+  "limitations": [
+    "Synthetic one-step documents; not 200,000 image-heavy production SOPs.",
+    "Loopback VM/process tests do not establish physical LAN latency or old-hardware performance."
+  ],
+  "serviceSchemaVersion": 6,
+  "seedMs": 3340.4811250000002,
+  "queryPlans": {
+    "match": [
+      {
+        "id": 2,
+        "parent": 0,
+        "notused": 56,
+        "detail": "SEARCH matches USING COVERING INDEX sqlite_autoindex_matches_1 (matchKey=?)"
+      }
+    ],
+    "list": [
+      {
+        "id": 4,
+        "parent": 0,
+        "notused": 211,
+        "detail": "SCAN workflows USING COVERING INDEX workflow_listing"
+      }
+    ],
+    "search": [
+      {
+        "id": 3,
+        "parent": 0,
+        "notused": 156,
+        "detail": "SCAN title_search VIRTUAL TABLE INDEX 0:M2"
+      },
+      {
+        "id": 8,
+        "parent": 0,
+        "notused": 44,
+        "detail": "SEARCH w USING COVERING INDEX sqlite_autoindex_workflows_1 (id=?)"
+      }
+    ]
+  },
+  "databaseBytes": 250421248,
+  "connectionStartup": "gradual batches of 32",
+  "sustained": {
+    "requests": 10000,
+    "requestsPerActor": 20,
+    "durationMs": 435.32758399999966,
+    "p95Ms": 35.222500000000764,
+    "maxMs": 38.98512500000015
+  },
+  "server": {
+    "stats": true,
+    "memory": {
+      "rss": 102170624,
+      "heapTotal": 35536896,
+      "heapUsed": 17989464,
+      "external": 2746908,
+      "arrayBuffers": 461682
+    },
+    "connections": 500,
+    "peakConnections": 500
+  },
+  "unexpectedFailures": 0,
+  "initialLatencyTargetMet": true,
+  "requiresOptimization": [],
+  "observedAt": "2026-10-18",
+  "sourceFingerprint": "c0fbf86109d25f626b3001737742e2e1291d6b02acc4c0aee9f5655528719287",
+  "sourceFiles": [
+    {
+      "path": "extension/manifest.json",
+      "sha256": "03af0fd9498244a6ff228801ad067b0c7a7dec9a4ed0ed0133339b65b6f70224"
+    },
+    {
+      "path": "extension/team-client.js",
+      "sha256": "890f2cbe182d5759c665c6123607f5acd84eeb147d2c4fc74ea8caba2e7eec8f"
+    },
+    {
+      "path": "extension/team-edit-session.js",
+      "sha256": "9500aec94b2d5cf2a53a82693934a9da9bbe2df00a187f376d94e40045c0aa99"
+    },
+    {
+      "path": "extension/team-pending.js",
+      "sha256": "9486e21ffd4ecbb577a0eb524987e031d8f6e50ae9d7532d336ade28b628d9ac"
+    },
+    {
+      "path": "extension/team-settings.js",
+      "sha256": "a0fa8cee16e9b3cf05ff89451e43e1c1a003c02aa4b5f67f8dca1d8fa1c98191"
+    },
+    {
+      "path": "extension/workspace.js",
+      "sha256": "1826e9b9ff82a2a81c2519e0594d46bdb209c608be4d8efb3bf91e7037c9c9c3"
+    },
+    {
+      "path": "server/app.cjs",
+      "sha256": "10438384c7f307a24c6d7f958e8d5c39660d4bd080c395810760fb7e227e41f0"
+    },
+    {
+      "path": "server/backup.cjs",
+      "sha256": "1886c789c686927bfe2becba277f14ea262e8f80ce7b969c6a57de2d463a91ab"
+    },
+    {
+      "path": "server/category-store.cjs",
+      "sha256": "0abec3ef8dc1f3e66a65460f3fb941783aa051270f0741bb07c47053981b7438"
+    },
+    {
+      "path": "server/cli.cjs",
+      "sha256": "082ee9c6ad53dae6dc275d4b755993acfe28676f716b00f82594848de6108c97"
+    },
+    {
+      "path": "server/guide-assets.cjs",
+      "sha256": "9da9c19ec271c5bf4a113481e4d40879bb63abfb89c322fd1690cd67dd119d37"
+    },
+    {
+      "path": "server/store.cjs",
+      "sha256": "9efacbcb5e17564436703e7c3410f0d662f131fb82794571075f331ad0a5f089"
+    },
+    {
+      "path": "server/tests/backup.test.cjs",
+      "sha256": "afe8023c679c03537c6eff7f2b18145f3f1528553291c3a674eed13bcfa460cf"
+    },
+    {
+      "path": "server/tests/fixtures/crash-worker.cjs",
+      "sha256": "a85d780177f5d5d8fa78b0cf6d2a14d0b8440259fe4a99e165e827671aa4ed06"
+    },
+    {
+      "path": "server/tests/http.test.cjs",
+      "sha256": "533bf608688d5a448098c7eb20e28ec033cae5c20afb5229a8e1335edce67e7c"
+    },
+    {
+      "path": "server/tests/store.test.cjs",
+      "sha256": "4b77ef6ffb63a185fb561d1ad76c08ad8657d464b1f7b4f2505d80131faee370"
+    },
+    {
+      "path": "server/tools/backup.cjs",
+      "sha256": "7c9698c7bc3c12223550f791c7a57d2f7e289e8755832e00bde660d2d953e3e4"
+    },
+    {
+      "path": "server/tools/fixture-large-response.cjs",
+      "sha256": "43555f961bd001990fd6bec1b2931930e48f06534ca714f957463340b9b985fe"
+    },
+    {
+      "path": "server/tools/fixture-real-large-read.cjs",
+      "sha256": "bbdbaed822fd8e37ff5df3dbf4eb3a5ffb171d56d759d00f2709825a81055d90"
+    },
+    {
+      "path": "server/tools/fixture-service.cjs",
+      "sha256": "fe261f69773fb223986d4aaee862698a907e3bc4abfd56c44e299874cf163f24"
+    },
+    {
+      "path": "server/tools/large-response.cjs",
+      "sha256": "4eabd7fb44114df7eba0768a49f67c8fca358bb137fc4f2c6fd4588c0800192a"
+    },
+    {
+      "path": "server/tools/real-large-read.cjs",
+      "sha256": "bcd406c9b78455199d97c74c62055b05e02fe6a20aacaa73c9087109d1088059"
+    },
+    {
+      "path": "server/tools/scale.cjs",
+      "sha256": "06ebffa6589c6f90d42fac6863e6743d91a4b1abd2e0891338a006189af917dd"
+    },
+    {
+      "path": "server/tools/test.cjs",
+      "sha256": "7c88ecf3ff583cac1d5988cb902528e181e9f7d3b2f266ee5e0b35dbdbfab550"
+    }
+  ]
+}

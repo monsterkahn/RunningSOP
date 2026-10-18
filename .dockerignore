@@ -1,0 +1,14 @@
+*
+!LICENSE
+!server/
+!server/**
+!extension/
+!extension/catalog-engine.js
+!extension/image-marks.js
+!extension/category-engine.js
+server/node_modules/
+server/tests/
+server/tools/*
+!server/tools/backup.cjs
+server/data/
+server/*.sqlite*

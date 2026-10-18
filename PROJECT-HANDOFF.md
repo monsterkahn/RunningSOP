@@ -212,3 +212,26 @@ Work on `codex/windows-stability` fixes case-insensitive library discovery and b
 ## Authorized compatibility patch publication - 2026-10-18
 
 The user requested uploading the tested fixes. Version 1.1.1 includes the Windows stability changes, matching package/manifest/lock versions and release notes. The main release workflow calls the Windows matrix and requires Windows and Linux verification before publishing. Existing releases are preserved. No Chrome Web Store submission is performed. Native authorization and two-device acceptance remain outstanding.
+
+
+## Active team-service development — 2026-10-18
+
+The active user goal is approximately 500 users across mixed devices/configurations/browser versions, with the previously discussed 200,000-SOP catalog. Do not mark that goal complete from the current foundation. Work is on `codex/team-service-foundation`; no new official release or store submission was made. Read `docs/TEAM-SERVICE-DESIGN.md` for the full acceptance ledger, measured failures and remaining work, and `server/README.md` for experimental operations. The service is NAS-brand-independent and can run on a capable NAS or a separate Windows/macOS/Linux host with its database on local disk.
+
+The worktree adds an opt-in HTTP team mode, private device sessions/pending publication recovery, exclusive fenced editing leases, canonical revision history, indexed/bounded search and pagination, stable categories with independent assignment revisions/audit, internal binary image deduplication, response admission, and verified live-WAL backup/restore. Current schema is 6. Server requires Node 24+; extension minimum remains Chrome 116. Build outputs remain ignored and are development artifacts, not replacements for published releases. The Docker definition and new OS CI matrix exist but have not been executed here. Do not report those checks as passing.
+
+Reproduce: `npm test`, `npm run test:server`, `npm run test:team-browser`, `npm run test:release-browser`, `npm run build`. A current Chrome 116 binary exists under ignored `dist/compatibility/chrome116/` and can be selected with `RUNTIME_SOP_CHROME`. Use `node server/tools/scale.cjs --sops 200000 --clients 500` for the catalog workload and `node server/tools/real-large-read.cjs REPORT_PATH` for image-heavy traffic. Both use temporary synthetic data. The latter deliberately demonstrates immediate admission failures before testing eventual recovery; successful recovery does not mean every initial request succeeded. Cold socket bursts hit the local OS accept-queue cap of 128; no host settings were changed.
+
+Outstanding: smaller/lazy image reading protocol, UI/category/dashboard integration and team statistics, bounded pending-request cleanup, executable OS/container CI, stronger mixed-client/upgrade/long-duration evidence, installation artifacts, trusted HTTPS setup and physical two-device/NAS/native-permission acceptance. The folder mode remains the default on a fresh installation. Never silently publish or synchronize team work to the previously selected folder target.
+
+
+## User-revised workload — 2026-10-18 (takes precedence)
+
+The user now estimates about 500 active SOPs for a 500-person organization, with 15% novice users (75 people). This is the new primary planning scenario, superseding the 200,000-SOP/500-concurrent-reader assumption above. Seventy-five is a potential user cohort, not measured concurrency; use a 75-reader simultaneous burst for validation, without imposing hard product limits. Retain prior stress evidence. The default load tools now use 500 SOPs/75 clients; the image tool accepts `--clients` and `--out` while retaining its legacy positional report path. See the design ledger for exact commands, measured results, remaining acceptance gaps and the revised priorities. Issues belong inside steps; step counts and SOP document counts are not interchangeable. Goal work remains active and incomplete.
+
+
+## Team-library continuation — 2026-10-18
+
+Added `extension/team-library.html/js/css`, linked from connected Team service settings. It supports 50-record paging, two-character search, all/uncategorized/category filters, custom category name/color/icon/parent, optimistic category assignment/update, safe empty-only deletion, verified current/history reading and in-tab screenshot previews. Seven languages and narrow layouts are browser-tested. Thumbnail decoding is deferred near the viewport with at most two jobs; the network protocol still reads an entire guide. Private pending requests now have count/byte limits and exact-draft cleanup after confirmed deletion; never prune using an old draft snapshot. See `docs/TEAM-LIBRARY.md`. The server remains schema 6; the uncategorized filter requires no schema migration.
+
+The team browser script now includes workspace and library tests. Native prompts/real NAS and the dedicated team statistics/dashboard protocol remain outstanding. Remote OS/container checks must be inspected after execution; they are not established by creating a workflow file.
