@@ -224,6 +224,17 @@ test('rejects oversized existing image before allocating bytes or updating catal
  assert.equal(reads,0);assert.equal(catalogHandle.value,before);
 });
 
+test('rejects oversized pre-existing immutable output before reading or changing the catalog',async()=>{
+ const {publisher,root,catalogHandle}=await fixture(),before=catalogHandle.value,input=guide('hostile-output');
+ const packed=await require('../extension/sop-assets.js').pack(Engine.validateGuide(input),{id:input.workflowId,viewer:'guide'},crypto);
+ const hash=await Publisher.sha256(JSON.stringify(packed.document),crypto);
+ await putFile(root,`workflows/${input.workflowId}/versions/${hash}.json`,'');
+ const handle=root.dirs.get('workflows').dirs.get(input.workflowId).dirs.get('versions').files.get(hash+'.json');
+ let reads=0;handle.getFile=async()=>({size:Publisher.MAX_TOTAL+1,async arrayBuffer(){reads++;throw Error('must not allocate');},async text(){reads++;throw Error('must not allocate');}});
+ await assert.rejects(publisher.publish(input),/读取上限/);
+ assert.equal(reads,0);assert.equal(catalogHandle.value,before);
+});
+
 test('requests permission only during publish and exposes missing picker fallback', async () => {
   let requested = 0;
   const seed = await seeded(), root = directory('sop');

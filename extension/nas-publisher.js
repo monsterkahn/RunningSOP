@@ -57,22 +57,13 @@
       catch (error) { try { await writable.abort(); } catch (_) {} throw error; }
       // Verify immutable bytes before the catalog can reference them.
       const verified = await handle.getFile();
-      if (typeof raw === 'string') {
-        if (await verified.text() !== raw) fail('不可变发布文件写入后回读不一致。');
-      } else {
-        const actual = new Uint8Array(await verified.arrayBuffer());
-        if (actual.length !== raw.length || actual.some((value, i) => value !== raw[i])) fail('不可变发布文件写入后回读不一致。');
-      }
+      const actual = await boundedBytes(verified, MAX_TOTAL), expected = typeof raw === 'string' ? bytes(raw) : raw;
+      if (actual.length !== expected.length || actual.some((value, i) => value !== expected[i])) fail('不可变发布文件写入后回读不一致。');
       return;
     }
     const file=await handle.getFile();
-    if (typeof raw === 'string') {
-      const existing=await file.text();
-      if(existing!==raw)fail('不可变发布文件已存在但内容不一致，已停止以保护现有内容。');
-    } else {
-      const existing=typeof file.arrayBuffer==='function'?new Uint8Array(await file.arrayBuffer()):bytes(await file.text());
-      if(existing.length!==raw.length||existing.some((v,i)=>v!==raw[i]))fail('不可变发布文件已存在但内容不一致，已停止以保护现有内容。');
-    }
+    const existing=await boundedBytes(file,MAX_TOTAL),expected=typeof raw==='string'?bytes(raw):raw;
+    if(existing.length!==expected.length||existing.some((v,i)=>v!==expected[i]))fail('不可变发布文件已存在但内容不一致，已停止以保护现有内容。');
   }
   async function replaceText(directory, path, raw) {
     const parts = path.split('/');
