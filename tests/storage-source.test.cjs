@@ -45,6 +45,20 @@ test('cancellation, malformed catalog, ambiguous libraries and mismatched files 
 test('known nested SOP directory is found without enumerating unrelated folders',async()=>{
  const e=env(),a=library();e.choose(folder('parent',{SOP:a.root,private:folder('private')}));const result=await e.source.chooseDirectory();assert.equal(result.name,'SOP');assert.equal(e.pair.handle,a.root);
 });
+test('case-insensitive SOP aliases identify one native library, including file-first selection',async()=>{
+ for(const expectedFile of [false,true]){
+  const e=env(),lib=library(),parent=folder('parent');
+  parent.getDirectoryHandle=async name=>{
+   if(name.toLowerCase()!=='sop')throw notFound();
+   // Native APIs can return distinct handle objects for the same file entry.
+   const alias={...lib.catalog,async isSameEntry(other){return other.entry===lib.catalog;},entry:lib.catalog};
+   return {...lib.root,async getFileHandle(name){if(name!=='catalog.json')throw notFound();return alias;}};
+  };
+  e.choose(parent);const alias={...lib.catalog,entry:lib.catalog};
+  const result=await e.source.chooseDirectory(expectedFile?{expectedFile:alias}:{});
+  assert.equal(result.workflowCount,1);assert.equal(await e.source.read(result.endpoint),catalog);
+ }
+});
 test('revoked permission, stale identity, oversized reads and legacy publisher changes fail closed',async()=>{
  const e=env(),a=library();e.choose(a.root);const chosen=await e.source.chooseDirectory();a.root.permission='prompt';await assert.rejects(e.source.read(chosen.endpoint),/重新授权/);a.root.permission='granted';await assert.rejects(e.source.read(Source.resolve(chosen.endpoint,'hello.txt'),{limit:2}),/上限/);await assert.rejects(e.source.read(chosen.endpoint.replace(/000001/, '000002')),/连接已变化/);e.replaceHandle(library('Other').root);await assert.rejects(e.source.info(),/连接已变化/);await assert.rejects(e.source.read(chosen.endpoint),/连接已变化/);
 });
