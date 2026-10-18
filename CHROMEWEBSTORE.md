@@ -1,16 +1,16 @@
 # Chrome Web Store Listing — Running SOP
 
-> Last updated: 2026-10-18. Local review of version 1.1.1; not a store submission or approval.
+> Last updated: 2026-10-18. Local review of GitHub release v1.2.0; this document is not a store submission or approval.
 
 ## Store listing
 
 - Extension name: Running SOP
-- English short description: Match SOPs to work pages, record steps, annotate screenshots and publish to a folder you choose. The package retains its existing localized manifest summary.
+- English short description: Create step-by-step guides with screenshots, follow them beside your work, and share SOPs through a folder you choose.
 - Category recommendation: Workflow & Planning (under Productivity); actual dashboard selection must be confirmed before submission.
 - Single purpose: Create and follow visual, step-by-step operating procedures beside their configured work webpages.
 - Primary listing language: English. UI: simplified Chinese, traditional Chinese, English, Spanish, Russian, Korean and Japanese. Authored SOP text is not translated.
 
-### Detailed description — 1.1.0 draft
+### Detailed description
 
 Running SOP brings step-by-step instructions to the webpage where you work. Create visual operating procedures, follow them beside your task, and publish them to a folder you choose.
 
@@ -61,11 +61,12 @@ Data is processed for the SOP function; "the developer does not receive data" mu
 
 | Data category | Processing | Off-device | Use |
 | --- | --- | --- | --- |
-| Work addresses and page titles | Local matching/selected recording; automatically captured HTTP(S) URLs omit query and fragment | May be present in SOPs explicitly published to chosen shared storage | Select and document the task |
+| Work addresses and page titles | Folder-based matching is local; team-service matching sends a sanitized address to the configured service. HTTP(S) omits query and fragment; `file://` is sent in full. Recording is user-selected. | May be included in procedures explicitly published to selected folder storage or the configured team service | Select and document the task |
 | User activity and control labels | Selected recording page only; no input field values | Only if included in published SOP | Draft the steps |
-| Website content | User-initiated single-frame screenshots, labels and manually entered notes | Only when published to chosen storage | Visual instructions |
-| Ratings and written feedback | Local anonymous-device records | Only under previously explicitly enabled statistics synchronization | Improve SOPs |
-| Identity/health/finance/authentication/communications/location | Not extracted as dedicated data categories; screenshots and user-written notes may incidentally include sensitive information | User-controlled publication can share that content | User must review it before publication |
+| Website content | User-initiated single-frame screenshots, labels and manually entered notes | Only when published to selected folder storage or the configured team service | Visual instructions |
+| Ratings and written feedback | Local anonymous-device records | Folder-based mode may synchronize records only under a previously explicitly enabled setting; team-service mode keeps ratings local and has no team statistics | Improve SOPs |
+| Service join code, display name and session | Join code and display name are sent when the user connects; session token is stored in private extension-origin IndexedDB | Join code and display name go to the configured team service; the service returns a session token stored in the browser | Authenticate the device and attribute team edits |
+| Other identity/health/finance/authentication/communications/location data | Not extracted as dedicated categories; screenshots and user-written notes may incidentally include sensitive information | User-controlled publication can share that content | User must review it before publication |
 
 - No sale of user data.
 - No developer analytics or vendor cloud collection.
@@ -90,17 +91,18 @@ Privacy policy source: PRIVACY.md. Public repository link: https://github.com/mo
 
 | Version | Date | Changes | Status |
 | --- | --- | --- | --- |
+| 1.2.0 | 2026-10-18 | Optional experimental team service and library; existing folder mode remains default | GitHub release; not submitted to the Chrome Web Store |
 | 1.1.1 | 2026-10-18 | Case-insensitive library discovery, bounded shared reads, Windows package verification | GitHub update; not submitted to the Chrome Web Store |
 | 1.1.0 | 2026-10-18 | Lightweight finite folder guidance, Chrome 116 directory parser correction, confirmed local draft cleanup, specification/privacy review | Official GitHub release; not submitted to the Chrome Web Store |
 | 1.0.0 | 2026-10-17 | First public-version submission | Submitted for review per user; approval not independently checked |
 
 ## Review notes and remaining manual gates
 
-- See docs/RELEASE-REVIEW-1.1.0.md for actual tests and package validation.
+- See docs/RELEASE-REVIEW-1.2.0.md for current test results and limitations.
 - Verify native OS folder/screen-sharing dialogs, permission renewal and actual shared-storage behavior on two computers. OPFS and isolated browser tests cannot prove these gates.
 - No claim of successful installation on all older hardware, every operating system or every Chrome version between tested endpoints.
 - A modern Skill is guidance, not an instruction to raise the browser floor, add permissions or introduce AI. Existing promise queues and transient locks are not mechanically rewritten when persistence and safety are already correct.
-- Store screenshots, public privacy URL and live dashboard disclosure must be reviewed again before submitting 1.1.0. No new store action is performed by this audit.
+- The experimental service uses unencrypted HTTP by default. HTTPS deployment, native permission prompts, and real two-device access remain unverified. The v1.2.0 GitHub release does not submit a store package or claim store approval.
 
 Public documentation convention: GitHub README uses official release numbering only. The Chrome standards statement describes Manifest V3 implementation and developer self-review; it must not be presented as Google certification or store approval.
 

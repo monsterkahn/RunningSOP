@@ -1,0 +1,79 @@
+{
+  "date": "2026-10-18",
+  "repository": "monsterkahn/RunningSOP",
+  "commit": "fb70640f689e00c801d4d86c45fda36444119445",
+  "tree": "4b349cde2136c6e3ac6e2abd941e60d014548d01",
+  "runId": 39128728309,
+  "jobs": [
+    {
+      "id": 117680315420,
+      "name": "browser (macos-14)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 117680315565,
+      "name": "service (macos-14, 24)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 117680315588,
+      "name": "browser (windows-2022)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 117680315594,
+      "name": "service (windows-2022, 26)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 117680315598,
+      "name": "service (ubuntu-24.04, 24)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 117680315606,
+      "name": "service (windows-2022, 24)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 117680315614,
+      "name": "browser (ubuntu-24.04)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 117680315648,
+      "name": "service (macos-14, 26)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 117680315713,
+      "name": "service (ubuntu-24.04, 26)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 117680316106,
+      "name": "container",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "serviceTestsPerJob": 44,
+  "coreTests": 148,
+  "existingExtensionRunId": 39128728341,
+  "limits": [
+    "GitHub hosted runners; not Windows 10/11 desktop or old hardware",
+    "Native authorization mocked in browser automation",
+    "Trusted HTTPS and real two-device/NAS acceptance remain outstanding",
+    "Team ratings remain local; dedicated team statistics/dashboard not yet implemented",
+    "Push run 39128725376 was canceled, not passed"
+  ]
+}

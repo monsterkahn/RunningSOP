@@ -6,18 +6,20 @@
 
 ![Running SOP: Clear steps. Right where you work.](docs/assets/running-sop-social-preview.png)
 
-**Current official release: v1.1.1** · [Download](https://github.com/monsterkahn/RunningSOP/releases/latest)
+**Version: v1.2.0** · [Download](https://github.com/monsterkahn/RunningSOP/releases/latest)
 
-Running SOP brings step-by-step operating procedures to the webpage where you work. Follow instructions beside your task, create visual SOPs as you work, and publish reviewed procedures to a folder you choose.
+Create step-by-step guides with screenshots, follow them beside your work, and share SOPs through a folder you choose.
 
 ## What it does
 
-- Recommends SOPs using the current work address. Matching happens locally and does not inspect form values or arbitrary page text.
+- Recommends SOPs using the current work address. Folder mode matches locally; team mode sends a sanitized work URL to the configured team service. Neither mode inspects form values or arbitrary page text.
 - Shows numbered steps, screenshot thumbnails, reporting requirements, approval points and exception-handling branches in a compact side panel.
 - Records selected page interactions without reading typed field values. Add your own instructions and capture a single screenshot when you choose.
 - Adds numbered markers, arrows and boxes to screenshots. Enlarge images within the current work page when supported, with a safe side-panel fallback.
 - Saves local drafts and publishes procedures to a local or mounted shared folder. When the 10-draft limit is reached, confirmed cleanup removes only the selected local draft, not published SOPs.
 - Keeps categories separate from SOP content and provides a standalone storage dashboard with available view and feedback statistics.
+
+Folder storage remains the default. An optional experimental team service and library adds shared editing coordination, revision history, and backup/recovery tools. It requires Node.js 24 or later and a separately configured service; it is not enabled by a fresh extension install. Team ratings remain local and team statistics are not included. The service currently uses unencrypted HTTP unless an administrator configures an HTTPS reverse proxy; this project's HTTPS deployment and real two-device/native-permission acceptance have not been verified. See [team service operations](server/README.md) before evaluating it.
 
 SOP guidance does not verify that a business task has been completed, replace organizational checks, or grant an actual approval.
 
@@ -70,15 +72,15 @@ GitHub explanatory documentation and public release notes are maintained in Engl
 
 - [Privacy](PRIVACY.md): processed data, storage and sharing boundaries.
 - [Security](SECURITY.md): trust boundaries and private vulnerability reporting.
-- [Release review](docs/RELEASE-REVIEW-1.1.0.md): actual test results and limitations.
+- [Release review](docs/RELEASE-REVIEW-1.2.0.md): actual test results and limitations.
 - [Chrome Web Store metadata](CHROMEWEBSTORE.md): permissions and disclosure preparation.
 - [Release checklist](docs/RELEASE-CHECKLIST.md): build, package and manual acceptance checks.
 
-The reviewed release passed 108 core tests and 10 browser scenarios on each of the two tested browser versions. Native operating-system authorization, actual older hardware and real two-computer shared-storage behavior still need acceptance testing in the target environment. File-based sharing does not provide a cross-device transaction lock.
+The local v1.2.0 candidate passed 153 core tests and 14 browser scenarios each on Chrome 116 and the current tested Chromium. The unchanged team-service runtime has 44 passing tests on Node.js 24/26. Earlier runtime CI passed the recorded package checks. GitHub publication is gated on the release commit's configured CI checks. Native operating-system authorization and real two-device acceptance remain outstanding; the team service's HTTPS deployment is also unverified. See the release review for exact scope and limits.
 
 ## Development
 
-Requires Node.js 20 or later.
+Extension development requires Node.js 20 or later. The optional experimental team service requires Node.js 24 or later.
 
 ```sh
 npm ci
@@ -109,3 +111,5 @@ See [Contributing](CONTRIBUTING.md) and [AGENTS.md](AGENTS.md). Successful check
 **don Kimxote** · [gwangphug@gmail.com](mailto:gwangphug@gmail.com)
 
 Copyright 2026. Released under the [MIT License](LICENSE).
+
+In Team service settings, choose **Select team service** to add, select, rename, edit or delete saved service addresses. Saving/selecting an address does not connect automatically. Enter your display name and join code, then select **Connect**. Only names and addresses are remembered; join codes and sessions are excluded from the address list.

@@ -1,0 +1,13 @@
+'use strict';
+const { TeamStore } = require('../../store.cjs');
+if (!process.send || !process.env.SOP_CRASH_TEST_DB) throw new Error('Isolated crash-test worker only.');
+const store = new TeamStore({ dbPath: process.env.SOP_CRASH_TEST_DB, now: () => 1000, leaseMs: 100 });
+store.db.exec('PRAGMA wal_autocheckpoint=0;');
+const actor = store.createSession({ displayName: 'Synthetic crash fixture' }).actor;
+const guide = { format: 'runtime-sop-guide', schemaVersion: 1, workflowId: 'sample', title: 'Committed', version: '1', notice: '', steps: [{ id: 'step-1', title: '', where: 'Synthetic', actions: ['Synthetic action'], expected: '', trouble: '', acceptance: [], workUrl: 'https://example.test/task' }] };
+store.create(guide, { actor, idempotencyKey: 'crash-create' });
+const lease = store.acquireLock('sample', { actor });
+store.publish('sample', { ...guide, title: 'Committed second revision' }, { actor, ...lease, expectedRevision: 1, idempotencyKey: 'crash-publish' });
+store.db.exec("BEGIN IMMEDIATE; UPDATE workflows SET title='UNCOMMITTED', revision=999, fence=999 WHERE id='sample'; DELETE FROM revisions WHERE id='sample';");
+process.send({ staged: true });
+setInterval(() => {}, 1000);

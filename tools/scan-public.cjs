@@ -2,7 +2,7 @@
 const fs=require('node:fs'),path=require('node:path');
 const root=path.resolve(__dirname,'..');
 const blocked=[['192','168','1','220'].join('.'),['kahn','kim'].join(''),['UCcmHam','T8tZflo'].join('')];
-const privateName=/(^\.env($|\.)|\.DS_Store$|\.(pem|key|crx|log|sqlite|db)$)/i;
+const privateName=/(^\.env($|\.)|\.DS_Store$|\.(pem|key|crx|log)$|\.(sqlite|db)(?:-(?:wal|shm|journal))?$)/i;
 let count=0;
 function walk(dir){for(const item of fs.readdirSync(dir,{withFileTypes:true})){if(['node_modules','dist','.git','.DS_Store'].includes(item.name))continue;const file=path.join(dir,item.name),relative=path.relative(root,file);if(item.isSymbolicLink())throw Error('Symlink not allowed: '+relative);if(privateName.test(item.name))throw Error('Private file type: '+relative);if(item.isDirectory()){walk(file);continue;}if(/\.(png|jpe?g|gif|webp|ico)$/i.test(item.name))continue;const text=fs.readFileSync(file,'utf8');if(text.includes('\u0000'))throw Error('Binary file in public source: '+relative);for(const token of blocked)if(text.includes(token))throw Error('Private identifier found: '+relative);count++;}}
 walk(root);

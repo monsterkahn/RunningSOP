@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Running SOP",
-  "version": "1.1.1",
-  "description": "按工作页面匹配 SOP，录制操作、编辑截图标记，并发布到用户选择的文件夹。",
+  "version": "1.2.0",
+  "description": "Create step-by-step guides with screenshots, follow them beside your work, and share SOPs through a folder you choose.",
   "minimum_chrome_version": "116",
   "permissions": [
     "sidePanel",
@@ -37,7 +37,7 @@
     "default_path": "workspace.html"
   },
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'none'; connect-src 'self' file:"
+    "extension_pages": "script-src 'self'; object-src 'none'; connect-src 'self' file: http: https:"
   },
   "optional_host_permissions": [
     "https://*/*",

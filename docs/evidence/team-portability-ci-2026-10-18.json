@@ -1,0 +1,75 @@
+{
+  "date": "2026-10-18",
+  "scope": "experimental team-service portability fixes; later changes need their own final CI",
+  "repository": "monsterkahn/RunningSOP",
+  "commit": "2810dac7aa0f6c15097b208f8db4f25a5c5911ed",
+  "runId": 39127823019,
+  "jobs": [
+    {
+      "id": 117677610703,
+      "name": "browser (windows-2022)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 117677610742,
+      "name": "service (ubuntu-24.04, 26)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 117677610796,
+      "name": "service (windows-2022, 26)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 117677610801,
+      "name": "browser (macos-14)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 117677610809,
+      "name": "service (macos-14, 24)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 117677610812,
+      "name": "container",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 117677610865,
+      "name": "service (windows-2022, 24)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 117677610892,
+      "name": "service (macos-14, 26)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 117677610896,
+      "name": "service (ubuntu-24.04, 24)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 117677610898,
+      "name": "browser (ubuntu-24.04)",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "limits": [
+    "GitHub hosted runners, not physical user devices or a NAS",
+    "Native authorization mocked in browser automation",
+    "Trusted HTTPS and real two-device acceptance remain outstanding",
+    "Duplicate push run 39127819962 was canceled, not passed"
+  ]
+}

@@ -1,0 +1,10 @@
+'use strict';
+const {readdirSync}=require('node:fs');
+const {spawnSync}=require('node:child_process');
+const path=require('node:path');
+if(Number(process.versions.node.split('.')[0])<24)throw Error('The team service requires Node.js 24 or later; extension users still require only Chrome 116 or later.');
+const directory=path.resolve(__dirname,'../tests');
+const tests=readdirSync(directory).filter(name=>name.endsWith('.test.cjs')).sort().map(name=>path.join(directory,name));
+const result=spawnSync(process.execPath,['--test',...tests],{stdio:'inherit'});
+if(result.error)throw result.error;
+process.exitCode=result.status??1;
