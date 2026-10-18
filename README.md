@@ -2,7 +2,9 @@
 
 **Running SOP** 是一个面向 Chrome 的本地优先工作助手：按当前网页地址推荐工作流程，在侧栏查看步骤、编辑草稿并维护本机记录，并可选择使用本机文件夹共享经过人工确认的流程资料。公开版基于 Chrome Manifest V3。首次安装不预设共享目录；连接目录并启用相应功能后，可按设置自动读取目录或同步统计。本项目不包含供应商云端分析代码。
 
-中文是主要说明语言。当前开发版本：**1.1.0**；1.0.0 已由用户提交商店审核，既有审核资料保持不变。1.1.0 尚未提交或宣称获批。
+当前正式发布版本：**v1.1.0** · [下载正式版](https://github.com/monsterkahn/RunningSOP/releases/latest)
+
+中文是主要说明语言。GitHub 说明仅展示正式发布编号。
 
 ## English overview
 
@@ -43,6 +45,20 @@ docs/                   安装与存储说明
 
 请阅读[贡献指南](CONTRIBUTING.md)及仓库内的 `AGENTS.md`。在本机运行 `npm test` 执行适用测试；`npm run build` 生成本地打包产物。打包内容和测试结果应在发布前复核，`dist/` 默认不进入版本控制。
 
+## Chrome 规范声明
+
+Running SOP 按 [Chrome Manifest V3 扩展规范](https://developer.chrome.com/docs/extensions/develop/migrate/what-is-mv3)开发，并依据 [Chrome Web Store 的 Manifest V3 代码要求](https://developer.chrome.com/docs/webstore/program-policies/mv3-requirements)进行开发者自查：
+
+- 使用 Manifest V3 与事件驱动的后台服务。
+- 执行代码随扩展包提供，不下载执行远程脚本；SOP 内容仅作为数据读取和展示。
+- 权限与功能对应，HTTP(S) 工作网站权限按需请求，文件夹由用户选择并授权。
+- 录制不读取输入框的值；截图由用户主动触发，数据保存在本机或用户选择的存储中。
+- 不包含开发者云端分析服务；权限理由、隐私说明和本地验证结果均可在仓库查阅。
+
+This project is developed for Chrome Manifest V3 and has been self-reviewed against the applicable code, permission and user-data requirements described above. This developer statement is not Google certification or confirmation of Chrome Web Store approval.
+
+以上为开发者的规范遵循说明，不代表 Google 认证或 Chrome 网上应用店已审核通过。
+
 ## 隐私与安全
 
 - [隐私说明](PRIVACY.md)：记录什么、存在哪里，以及自动同步与用户主动写入的边界。
@@ -63,7 +79,7 @@ npm run build
 npm run demo:server
 ```
 
-打开 `http://localhost:8080/demo-work-page.html`。在扩展设置中将目录地址设置为本仓库 `examples/storage/catalog.json` 的完整 `file:///` 地址，并按安装说明允许文件访问，即可验证自动匹配。`dist/dashboard.html` 是可单独打开的演示总表。示例只在本机运行。
+打开 `http://localhost:8080/demo-work-page.html`。在扩展设置中点击文件夹卡片，选择本仓库的 `examples/storage/` 文件夹，即可验证自动匹配。`dist/dashboard.html` 是可单独打开的演示总表。示例只在本机运行。
 
 浏览器检查使用 `npx playwright install chromium` 安装测试浏览器，再执行 `npm run test:browser`。打包后的源码与扩展 ZIP 及校验值位于 `dist/`；源码包不包含依赖目录、真实业务资料或本机配置。上传 GitHub 时使用源码目录内容，扩展 ZIP 可作为 Release 附件。
 
@@ -74,12 +90,6 @@ npm run demo:server
 ## 1.1.0 审查
 
 本次结果见 [1.1.0 审查报告](docs/RELEASE-REVIEW-1.1.0.md)，商店权限与数据说明集中在 [CHROMEWEBSTORE.md](CHROMEWEBSTORE.md)。最低浏览器保持 Chrome 116；轻量动画播放三轮后停止，并尊重减少动态效果。
-
-## 2.5.13 历史检查
-
-本轮检查覆盖录制隐私、截图隔离、原步骤标记保存、并发目录缓存、发布写回核验、统计重试、六种语言及窄侧栏布局。详见 [发布检查清单](docs/RELEASE-CHECKLIST.md)。
-
-`dist/` 包含开发者安装包、GitHub 源码包、商店上传专用包及 SHA256SUMS.txt；商店包的 manifest.json 位于 ZIP 根目录。原生截图选择器、文件夹授权及真实共享盘的双设备体验仍需按清单人工验收。1.0.0 的提交状态来自用户说明；1.1.0 尚未提交，未宣称商店审核或真实双机验收已完成。
 
 ## 每份 SOP 的手机二维码
 
@@ -95,23 +105,19 @@ npm run test:qr-browser
 
 ## 选择 SOP 文件夹
 
-设置 → SOP存储地址 → **选择 SOP 文件夹**。选择含 catalog.json 的文件夹，或其已知上级目录；设置会校验内容库并显示名称及数量，读取和发布使用同一位置。本机和已挂载的局域网共享文件夹使用相同操作，不需要输入路径。
+设置 → SOP存储地址 → **点击淡蓝色文件夹区域**。选择 SOP 文件夹后校验内容库并显示名称及数量，读取和发布使用同一位置；没有 catalog.json 时，经写入授权后创建空内容库。本机和已挂载的局域网共享文件夹使用相同操作，不需要输入路径。
 
-“其他选择方式”中可以选择 catalog.json 文件，但需再选择它所在的文件夹，才能读取相邻正文和图片；旧 file:// 地址仍可在收起的高级选项使用。详见 [数据与存储](docs/STORAGE.md)。文件夹原生授权仍可能在重启后需要恢复，未进行真实双机和原生系统选择器验收。
+当前设置不再提供独立文件选择或手动地址入口；已有连接保留兼容。文件夹原生授权可能在重启后需要恢复，真实双机共享及原生系统授权仍需在目标环境验收。详见 [数据与存储](docs/STORAGE.md)。
 
 ## 连接布局
 
-设置中的 SOP 存储地址采用居中的左右连接卡片：左侧为内容库，右侧为当前电脑。连线依实际检查结果显示状态，检查时短暂播放动画。上次检查时间与读取状态一并展示；这不表示获得写入许可或持续实时在线。
+设置使用单个淡蓝色文件夹卡片，引导选择保存位置。未连接或需要重新授权时显示轻量光圈，最多三轮；连接成功后停止，并尊重系统的减少动态效果设置。连接后可修改显示名称，选择文件夹、网络硬盘或本地电脑图标，不会重命名真实文件夹。
 
-存储器／局域网／本机选择只是当前内容库的位置标记，不会自动挂载服务器或转换手机地址。浏览器不可靠地提供原生文件夹的绝对路径，因此不会虚构 NAS IP。文件夹选择和发布权限逻辑保持不变。
+连接状态表示最近一次读取检查结果，不代表已获写入授权或持续在线。局域网共享文件夹需先由系统挂载；插件不会自动登录或挂载服务器。
 
 ## 总表语言
 
 独立 index 总表右上方可切换中文、英语、西班牙语、俄语、韩语和日语。首次访问跟随浏览器语言，未支持语言使用英语；选择保存在该浏览器。SOP 步骤、分类名称与反馈原文不自动翻译。
-
-## 公开分发基线
-
-本次按公开分发重新编号为 1.0.0，保留完整功能、SOP 格式和存储键。发布包不包含真实业务 SOP、内部存储地址、浏览器数据或密钥。Chrome 商店审核和真实双机验收尚未完成，GitHub 发布不代表已通过商店审核。
 
 ## GitHub 下载与自动检查
 

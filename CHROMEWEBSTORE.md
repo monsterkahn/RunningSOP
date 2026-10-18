@@ -100,3 +100,5 @@ Privacy policy source: PRIVACY.md. Public repository link: https://github.com/mo
 - No claim of successful installation on all older hardware, every operating system or every Chrome version between tested endpoints.
 - A modern Skill is guidance, not an instruction to raise the browser floor, add permissions or introduce AI. Existing promise queues and transient locks are not mechanically rewritten when persistence and safety are already correct.
 - Store screenshots, public privacy URL and live dashboard disclosure must be reviewed again before submitting 1.1.0. No new store action is performed by this audit.
+
+Public documentation convention: GitHub README uses official release numbering only. The Chrome standards statement describes Manifest V3 implementation and developer self-review; it must not be presented as Google certification or store approval.
