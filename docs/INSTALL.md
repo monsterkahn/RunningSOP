@@ -1,40 +1,40 @@
-# 安装与首次使用
+# Installation and first use
 
-## 要求
+## Requirements
 
-- Google Chrome 116 或更新版本。
-- 从 GitHub Releases 下载的 Running SOP 发布压缩包。
-- 安装、扩展更新和本机存储需要时，可在文件夹选择器中选定目标目录。
+- Google Chrome 116 or later.
+- A Running SOP release archive downloaded from GitHub Releases.
+- Access to the target folder through the folder picker when needed for installation, extension updates, or local storage.
 
-本项目目前通过 GitHub Releases 分发，不是 Chrome 网上应用店的一键安装。
+The project currently distributes installation packages through GitHub Releases rather than one-click installation from the Chrome Web Store.
 
-## 安装
+## Installation
 
-1. 从项目的 **Releases** 页面下载最新发布压缩包并解压到一个长期保留的位置。
-2. 在 Chrome 打开 `chrome://extensions`。
-3. 启用“开发者模式”。
-4. 选择“加载已解压的扩展程序”，并选择解压目录中的 `extension/` 文件夹。
-5. 在工具栏扩展菜单中固定 Running SOP（可选），点击扩展图标打开侧栏。
+1. Download the latest release archive from the project's **Releases** page and extract it to a location you will keep.
+2. Open `chrome://extensions` in Chrome.
+3. Enable **Developer mode**.
+4. Choose **Load unpacked**, then select the `extension/` folder inside the extracted directory.
+5. Optionally pin Running SOP in the toolbar's extensions menu. Click the extension icon to open the side panel.
 
-不要在安装后移动或删除扩展目录，否则 Chrome 可能无法加载它。升级时下载新版本并在扩展管理页重新加载同一扩展目录；需要保留本机数据时，不要先卸载扩展或清除其存储。
+Keep the extension directory in place after installation; moving or deleting it may prevent Chrome from loading the extension. To upgrade, download the new version, replace the contents of the same extension directory, and reload it on the extensions page. To preserve local data, keep the extension installed and retain its storage.
 
-## 权限
+## Permissions
 
-扩展可以在没有共享目录的情况下使用本机草稿与录制功能。HTTP(S) 网站来源权限按需请求，只针对当前页面录制或截图等功能；拒绝权限时，对应页面注入功能可能不可用，其他本机功能仍可使用。
+Local drafts and recording work without a shared folder. HTTP(S) site permissions are requested as needed for functions such as recording or screenshots on the current page. If permission is denied, page injection may be unavailable on that site; other local functions remain usable.
 
-在 `file://` 页面运行功能或通过 `file://` 地址读取目录文件时，需在 Chrome 扩展管理页的 Running SOP 详情中启用“允许访问文件网址”。这项开关与共享文件夹的 File System Access 读写授权相互独立。只在需要时启用。
+To use functions on `file://` pages or read catalog files through a `file://` address, enable **Allow access to file URLs** in Running SOP's details on Chrome's extensions page. This switch is separate from the shared folder's File System Access read/write authorization. Enable it when needed.
 
-要读取或写入共享目录，请在对应功能中选择目录，并按 Chrome 提示授权。选择文件夹只执行一次检查，不默认启用后台同步；当前设置不再显示统计与自动检查开关，升级时保留此前明确启用的配置。空文件夹经写入授权后才创建 catalog.json。写入操作需要目录的读写权限。具体数据范围见[存储说明](STORAGE.md)。
+To read or write a shared folder, select the folder in the relevant function and follow Chrome's permission prompts. Selecting a folder performs one check and does not enable background sync by default. The current settings no longer show statistics or automatic-check switches; upgrades retain configurations explicitly enabled in earlier versions. An empty folder receives a `catalog.json` only after write permission is granted. Writing requires read/write access to the folder. See [data and storage](STORAGE.md) for the data involved.
 
-## 首次启动
+## First launch
 
-1. 首次安装自动打开设置页；点击淡蓝色文件夹区域选择 SOP 存储目录，或暂时只使用本机草稿。
-2. 打开工作网页，点击扩展图标打开侧栏，开始记录并逐步填写说明。截图由浏览器选择界面授权后抓取一帧。
-3. 需要共享时，发布到已选择且有写入权限的目录。当前界面不提供备份导出；卸载前先发布需保留的内容并核对。
-4. 发布和截图由用户主动触发；评价记录在统计同步启用后会自动同步。截图及手填内容可能包含敏感信息，保存或分享前请检查。
+1. Settings open automatically on first installation. Click the light-blue folder area to choose an SOP storage folder, or start with local drafts.
+2. Open a work page, click the extension icon to open the side panel, start recording, and fill in each step. Screenshots capture one frame after permission is granted through the browser's chooser.
+3. To share, publish to the selected folder with write permission. The current interface has no backup export control. Before uninstalling, publish and verify anything you need to keep.
+4. Publishing and screenshots are user-triggered. Rating records sync automatically if statistics sync has been enabled. Screenshots and manually entered content may contain sensitive information; review them before saving or sharing.
 
-如果从源码开发，参见仓库根目录 `CONTRIBUTING.md`。可移植测试通过 `npm test` 运行；发布压缩包由 `npm run build` 生成。
+For development from source, see `CONTRIBUTING.md` in the repository root. Run portable tests with `npm test`; generate release archives with `npm run build`.
 
-## 本机草稿上限
+## Local draft limit
 
-本机最多保留 10 份草稿。达到上限时，侧栏出现“整理草稿”；先发布需保留的内容，再选择要删除的本机草稿并确认。取消确认不会改变内容；正在录制时不能删除。这里只清理本机草稿，不删除存储器的已发布 SOP。
+Up to 10 drafts can be kept locally. At the limit, the side panel shows **Manage drafts**. Publish anything you need to keep, then select and confirm the local drafts to delete. Canceling leaves the content unchanged. Deletion is disabled during recording. This only removes local drafts; published SOPs in storage remain available.

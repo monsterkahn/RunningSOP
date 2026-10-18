@@ -1,11 +1,11 @@
-# 连续分步制作 SOP
+# Create an SOP step by step
 
-1. 在工作网页打开侧栏，点击开始录制；首次使用需同意该网页的访问权限。
-2. 直接修改 SOP 名称，输入后自动保存。下方从 STEP 1 开始制作，标题可以留空。
-3. 填写操作说明；需要时截图、编辑编号箭头，并选择报告点或审批点，说明对象、提交内容和继续条件。报告点与审批点通过两个互斥按钮选择；再次点击可取消，作为普通操作。
-4. 点击加宽的下一步，当前内容自动保存并创建下一步，无需再点保存本步。所有图片均显示缩略图，点击可放大。网页地址自动跟随当前工作页；最近操作仅作制作参考，不自动拆分步骤。
-5. 完成最后一步后点击结束录制。可继续整理草稿，预期结果、验收标准和异常处置为选填；按业务需要补充后发布。
+1. Open the side panel on your work page and click **Start recording**. On first use, grant access to that site.
+2. Edit the SOP name directly; changes save automatically as you type. Start with STEP 1 below. Step titles are optional.
+3. Enter instructions. When useful, capture a screenshot, add numbered or arrow annotations, and choose a **Reporting point** or **Approval point** to explain the recipient, required submission, and conditions for continuing. These two buttons are mutually exclusive; click the selected button again to return to a standard action.
+4. Click the wide **Next step** button to save the current content and create the next step automatically. Images appear as thumbnails; click to enlarge them. The work address follows the current work page. Recent actions provide a reference for writing and do not automatically create separate steps.
+5. After the last step, click **Stop recording**. You can continue editing the draft. Expected results, acceptance criteria, and exception handling are optional; add them as the work requires, then publish.
 
-普通操作、报告点和审批点用于说明工作要求，不代表已经完成汇报或实际获得批准。本版本不提供审批流引擎。
+Standard actions, reporting points, and approval points describe work requirements. They do not prove that a report was submitted or approval was granted. This version does not provide an approval workflow engine.
 
-暂停后仍可编辑；继续录制前保存。跨站、关闭页面或权限丢失会暂停记录，本机草稿保留。公开版查看者应使用 1.0.0 或更新版本（此前 2.5.x 为内部编号）。
+You can edit while paused; save before resuming recording. Moving to another site, closing the page, or losing permission pauses recording and retains the local draft. Users of public releases should use version 1.0.0 or later; earlier 2.5.x versions were internal development numbers.

@@ -44,6 +44,18 @@ jobs:
         with:
           name: running-sop-packages
           path: dist
+      - name: Synchronize historical release description
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          historical_notes=docs/releases/v1.0.0.md
+          historical_state=$(gh release view v1.0.0 --repo "$GITHUB_REPOSITORY" --json body,isDraft)
+          if [[ $(jq -r '.isDraft' <<< "$historical_state") == false ]] && \
+             [[ $(jq -r '.body' <<< "$historical_state") != "$(cat "$historical_notes")" ]]; then
+            gh release edit v1.0.0 --repo "$GITHUB_REPOSITORY" --notes-file "$historical_notes"
+          fi
       - name: Publish the version once
         env:
           GH_TOKEN: ${{ github.token }}
@@ -55,7 +67,11 @@ jobs:
           (cd dist && sha256sum --check SHA256SUMS.txt)
           if release_state=$(gh release view "$release_tag" --repo "$GITHUB_REPOSITORY" --json isDraft,targetCommitish); then
             if [[ $(jq -r '.isDraft' <<< "$release_state") == false ]]; then
-              echo "Release already published; keep existing version and assets unchanged."
+              published_notes=$(gh release view "$release_tag" --repo "$GITHUB_REPOSITORY" --json body --jq '.body')
+              if [[ "$published_notes" != "$(cat docs/GITHUB-RELEASE.md)" ]]; then
+                gh release edit "$release_tag" --repo "$GITHUB_REPOSITORY" --notes-file docs/GITHUB-RELEASE.md
+              fi
+              echo "Release description synchronized; existing version and binary assets unchanged."
               exit 0
             fi
             if [[ $(jq -r '.targetCommitish' <<< "$release_state") != "$GITHUB_SHA" ]]; then

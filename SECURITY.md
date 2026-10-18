@@ -1,26 +1,26 @@
-# 安全说明
+# Security policy
 
-## 安全边界
+## Security boundaries
 
-Running SOP 是本机优先的 Chrome Manifest V3 扩展。流程匹配主要依据活动标签页 URL；录制会读取用户点击控件的文字/`aria-label`、关联标签文字、活动弹窗或标签标题、页面标题及脱敏 URL，不读取输入值。网站访问权限按需申请；截图、手工网址和备注、URL 路径及共享目录内容可能包含敏感信息。
+Running SOP is a local-first Chrome Manifest V3 extension. Workflow matching primarily uses the active tab URL. Recording reads text/`aria-label` from controls the user clicks, associated label text, active dialog or tab titles, page titles, and sanitized URLs, without reading input values. Website access permissions are requested as needed. Screenshots, manually entered URLs and notes, URL paths, and shared-directory content may contain sensitive information.
 
-扩展只应读取或写入用户明确选择的共享目录。流程内容按数据处理，不应作为可执行脚本或远程代码加载。请不要在 issue、讨论区或公开测试报告中发布个人信息、真实业务流程、访问凭据、完整浏览器配置或未脱敏截图。
+The extension should read or write only shared directories explicitly selected by the user. Workflow content is data and must not be loaded as executable scripts or remote code. Do not post personal information, real business workflows, access credentials, complete browser profiles, or unsanitized screenshots in issues, discussions, or public test reports.
 
-## 报告安全问题
+## Reporting security issues
 
-请勿通过公开 issue 发布尚未修复的漏洞。请将可复现步骤、影响范围、受影响版本和安全的测试样本发送到 [gwangphug@gmail.com](mailto:gwangphug@gmail.com)，主题注明“Running SOP security report”。若问题涉及真实用户数据，请先移除或替换相关内容。
+Do not disclose unfixed vulnerabilities in public issues. Send reproduction steps, scope of impact, affected versions, and safe test samples to [gwangphug@gmail.com](mailto:gwangphug@gmail.com), with the subject “Running SOP security report”. Remove or replace any real user data before sending.
 
-维护者将评估报告并通过邮件沟通修复与披露时间。该邮箱并非全天候响应服务；在问题确认和修复之前，请避免公开利用细节。
+The maintainer will assess reports and coordinate remediation and disclosure timing by email. This mailbox is not a round-the-clock response service. Avoid publishing exploitation details before an issue is confirmed and fixed.
 
-## 用户安全建议
+## User security recommendations
 
-- 仅从项目的 GitHub Releases 下载并核对发布说明。
-- 只授予当前任务所需的网站访问和文件夹访问权限。
-- 使用共享目录前确认其访问控制符合组织要求。
-- 分享截图、备注、导出文件和诊断信息前，检查是否包含个人或业务数据。
+- Download only from the project's GitHub Releases and review the release notes.
+- Grant only the website and folder access needed for the current task.
+- Before using a shared directory, confirm that its access controls meet your organization's requirements.
+- Check screenshots, notes, exported files, and diagnostic information for personal or business data before sharing them.
 
-## 发布检查边界
+## Release verification limits
 
-2.5.13 的隔离浏览器回归覆盖截图页面来源隔离、标签页会话绑定、原步骤标记保存，以及嵌套可编辑内容不进入录制控件名称。截图关闭不会关闭工作标签页。临时数据不会写入公开网页 DOM。
+The earlier isolated browser regressions documented in the [release review](docs/RELEASE-REVIEW-2.5.13.md) cover screenshot origin isolation, tab-session binding, preservation of existing step annotations, and exclusion of nested editable content from recorded control names. Closing a screenshot does not close the work tab. Temporary data is not written to the public webpage DOM.
 
-共享目录使用文件级校验和乐观冲突检测，不提供跨设备事务锁。多人修改同一份 SOP 或分类仍应依次操作；不能把统计或本机步骤当作真实审批结果。原生截图/文件夹授权、组织共享盘权限和商店审核需要按发布清单人工验收。
+Shared directories use file-level validation and optimistic conflict detection, without cross-device transaction locks. Multiple people editing the same SOP or categories should still work sequentially. Statistics or local step state must not be treated as actual approval outcomes. Native screenshot/folder permissions, organizational shared-drive permissions, and Chrome Web Store review require manual acceptance checks according to the release checklist.

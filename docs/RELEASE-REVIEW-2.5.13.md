@@ -1,4 +1,6 @@
-# 2.5.13 release review · 2026-10-16
+# Historical internal release review · 2026-10-16
+
+Internal development identifier: 2.5.13. Public releases use the separately assigned release version.
 
 Automated checks: 68 core tests, 5 isolated Chrome flows, 52 JavaScript syntax checks, 24 localized-status assertions. Screenshot review covered 320/390 px panels, a 1280 px desktop settings page, six languages and light/dark reading.
 

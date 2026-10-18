@@ -1,91 +1,95 @@
-# Running SOP 项目交接
+# Running SOP project handoff
 
-交接日期：2026-10-16。基线版本：1.0.0（公开分发重新编号，保留完整功能）。状态：源码已上传 GitHub，自动发布检查修复中；尚未提交 Chrome 商店，未获得商店审核。当前文件夹包含合成示例，不包含真实 SOP、内部地址或浏览器数据。GitHub 仓库为 https://github.com/monsterkahn/RunningSOP；本地已绑定 origin。
+Current status updated: 2026-10-18. The current public GitHub release is **v1.1.0**, published with successful CI. Recorded documentation baseline before the English-only update: `5c02d06b3b8788ef35ff7e6fd31339c96e701b28`. According to the user, v1.0.0 is awaiting Chrome Web Store review; v1.1.0 has not been submitted to the store. GitHub publication does not establish store approval or completion of the outstanding native-permission and two-device acceptance checks.
 
-## 1. 目标和产品边界
+This folder contains synthetic examples, with no real SOPs, internal addresses, or browser data. Repository: https://github.com/monsterkahn/RunningSOP; local `origin` is configured.
 
-Running SOP 是 Chrome Manifest V3 扩展：用户在工作网页中阅读与当前地址匹配的 SOP，也可以边操作边录制、截图标记、编辑步骤并发布到共享存储器。面向企业和家庭内部工作，不再限定 YouTube。
+The original handoff was dated 2026-10-16, when v1.0.0 became the public distribution baseline by renumbering the complete feature set. The sections below preserve development history and evidence from that time onward. Historical statements about uploads, branches, layouts, and release readiness describe their recorded stage; the current status above takes precedence. The 2.x numbers are archived internal development identifiers, not current public releases.
 
-核心使用链路：打开工作页 → 自动匹配 SOP → 阅读步骤/缩略图/异常分支；未匹配时显示图文录制说明 → 开始录制 → 编辑第一步 → 下一步自动保存 → 结束并发布。网址匹配只推荐流程，不能证明用户完成了业务操作。
+## 1. Purpose and product boundaries
 
-## 2. 已确认的产品要求
+Running SOP is a Chrome Manifest V3 extension. Users read SOPs matched to the current work-page address, or record their work, annotate screenshots, edit steps, and publish to shared storage. It serves internal business and household workflows and is no longer limited to YouTube.
 
-- 品牌为 Running SOP；作者 don Kimxote；公开邮箱 gwangphug@gmail.com；MIT 许可证。
-- 侧栏紧凑：顶部开始录制与设置按钮同高；版本和评价在底部，录制时隐藏评价。删除旧的识别、搜索和全部 SOP 浏览模块。
-- 阅读按工作地址分组、有序显示；STEP 加粗带边框，步骤名称在框内；标题允许空白。操作文字清晰，图片默认缩略图，可放大。
-- 放大截图在当前工作页内显示并可关闭，不另开网页；受限页面使用侧栏回退。通过扩展来源 iframe 隔离截图，不能将截图字节放进工作网页 DOM。
-- 录制后直接编辑 SOP 名称和第一步；下一步自动保存；下一步与发布按钮等宽；无需添加步骤、保存本步、前移后移等冗余按钮。
-- 报告点、审批点采用按钮表达，带图标；截图与添加图片等宽带图标，位于说明编辑框底部。最新修改：这两个按钮外框高度为 42px。
-- 截图支持数字、箭头、框等标记；保存后再次查看必须呈现标记。图片始终默认缩略图。
-- ISSUE 是异常处置分支；选项与按钮对齐；ISSUE 和备份模块不用额外颜色区分。
-- 满意度为五种表情，从淡红到淡绿；选中后该图标位置变为居中小飞机，再按发送；真实同步失败不能提示发送成功。
-- 设置融合为单页；“SOP存储地址”“局域网存储”；界面使用“存储器”称呼。关于居中、紧凑、直接展开，版本更新内容放在关于中，favicon 统一。
-- 支持中文、英语、西班牙语、俄语、韩语、日语；支持浏览器语言选择与回退。不要宣称 Chrome 一定能翻译扩展页面。
-- 未开始录制说明文字禁止选中复制，输入控件仍需可编辑。
-- 内容库与历史在独立二级页面；总览只做 dashboard。摘要位于工作区上方，无最近更新模块，尽量利用整个屏幕。
-- 分类允许自定义名称、颜色、指定图标；分类组织与地址匹配分开，避免把目录扫描当成识别方式。
-- 支持内网 IP、私有域名和 file:// 工作地址；file:// 仍受 Chrome 文件网址授权限制。能访问工作页是业务使用前提，不另加 SOP 公开范围审批。
+Core flow: open a work page → match SOPs automatically → read steps, thumbnails, and exception branches. When there is no match, show illustrated recording guidance → start recording → edit the first step → save automatically with Next step → finish and publish. URL matching recommends a workflow; it cannot prove that a business action was completed.
 
-以上是产品约定，不意味着每个条件已在日常浏览器和真实共享盘验收。
+## 2. Confirmed product requirements
 
-## 3. 项目入口与结构
+- Brand: Running SOP; author: don Kimxote; public email: gwangphug@gmail.com; MIT license.
+- Compact side panel: Start recording and Settings have equal height; version and feedback appear at the bottom, with feedback hidden during recording. Remove the old recognition, search, and browse-all-SOP modules.
+- Group reading content by work address and display it in order. STEP is bold and bordered, with the step name inside the border; names may be blank. Keep action text readable. Images default to thumbnails and can be enlarged.
+- Show enlarged screenshots within the current work page, with a close action; do not open another webpage. Use a side-panel fallback on restricted pages. Isolate screenshots in an extension-origin iframe; never put screenshot bytes in the work-page DOM.
+- After recording starts, edit the SOP name and first step directly. Next step saves automatically. Next step and Publish have equal width. Avoid redundant Add step, Save this step, and move-forward/back buttons.
+- Report and approval points use icon buttons. Screenshot and Add image have equal width and icons, below the description editor. Their border height was set to 42px.
+- Screenshots support numbered, arrow, and box annotations. Saved annotations must appear when reopened. Images always default to thumbnails.
+- ISSUE denotes an exception-handling branch. Align options with buttons. ISSUE and backup modules need no separate accent colors.
+- Satisfaction uses five faces from pale red to pale green. Selection replaces the chosen icon with a centered small paper plane, then Send submits it. A real synchronization failure must not be reported as success.
+- Settings use one page. Storage labels refer to SOP storage and local-network storage, using the term “storage” in the interface. About is centered, compact, and expanded, with release notes included and consistent favicons.
+- Initially support Chinese, English, Spanish, Russian, Korean, and Japanese, with browser-language selection and fallback. Traditional Chinese was added later (see section 16). Do not claim that Chrome can always translate extension pages.
+- Disable selection/copying of pre-recording instructional text while keeping input controls editable.
+- Content library and history have separate secondary pages. The overview is a dashboard only. Put the summary above the workspace, omit a recent-updates module, and use the available screen space.
+- Categories support custom names, colors, and specified icons. Category organization is separate from URL matching; directory scanning is not recognition.
+- Support internal IP addresses, private domains, and `file://` work addresses. Chrome's file-URL access permission still applies. Access to the work page is a prerequisite; do not add a separate approval gate for SOP visibility.
 
-| 路径 | 用途 |
+These are product decisions, not proof that every condition has passed acceptance in everyday browser profiles or on real shared drives. Later dated changes supersede earlier layout decisions where stated.
+
+## 3. Entry points and structure
+
+| Path | Purpose |
 | --- | --- |
-| extension/manifest.json | 扩展版本、权限与入口 |
-| extension/workspace.html / workspace.js / workspace.css | 侧栏阅读、录制、编辑、反馈 |
-| extension/options.html / options.js / options.css | 单页设置 |
-| extension/about.js / release-notes.js | 作者、版本与更新记录 |
-| extension/background.js | 扩展后台与消息协调 |
-| extension/recorder-content.js / recorder-runtime.js | 页面事件录制和本机草稿 |
-| extension/catalog-engine.js / catalog-runtime.js / search-engine.js | 内容目录、加载与匹配 |
-| extension/nas-publisher.js / sop-assets.js | 共享发布、独立文档与图片 |
-| extension/stats-*.js / sync-*.js | 五档评价与统计同步 |
-| extension/screenshot-editor.js / screenshot-overlay.js / screenshot-viewer.* | 截图编辑、隔离查看与回传 |
-| extension/image-marks.js | 图片标记模型与绘制 |
-| extension/category-*.js / dashboard* | 分类、独立总表 |
-| extension/locale-data.js / workspace-i18n.js | 六语言文案与动态状态 |
-| examples/ | 合成示例，不是真实经营数据 |
-| tests/ | 核心与隔离 Chrome 测试 |
-| tools/ | 构建、隐私扫描、打包、示例总表 |
-| docs/STORAGE.md | 共享存储数据说明 |
-| docs/RELEASE-CHECKLIST.md | 正式发布检查清单 |
+| extension/manifest.json | Extension version, permissions, and entry points |
+| extension/workspace.html / workspace.js / workspace.css | Side-panel reading, recording, editing, and feedback |
+| extension/options.html / options.js / options.css | Single-page settings |
+| extension/about.js / release-notes.js | Author, version, and release notes |
+| extension/background.js | Background processing and message coordination |
+| extension/recorder-content.js / recorder-runtime.js | Page-event recording and local drafts |
+| extension/catalog-engine.js / catalog-runtime.js / search-engine.js | Catalog, loading, and matching |
+| extension/nas-publisher.js / sop-assets.js | Shared publishing, separate documents, and images |
+| extension/stats-*.js / sync-*.js | Five-level feedback and statistics synchronization |
+| extension/screenshot-editor.js / screenshot-overlay.js / screenshot-viewer.* | Screenshot editing, isolated viewing, and return messages |
+| extension/image-marks.js | Image-annotation model and rendering |
+| extension/category-*.js / dashboard* | Categories and standalone dashboard |
+| extension/locale-data.js / workspace-i18n.js | Interface translations and dynamic states |
+| examples/ | Synthetic examples, not real business data |
+| tests/ | Core and isolated Chrome tests |
+| tools/ | Builds, privacy scans, packaging, and sample dashboard |
+| docs/STORAGE.md | Shared-storage data documentation |
+| docs/RELEASE-CHECKLIST.md | Release checklist |
 
-先读 README.md、AGENTS.md、本文件及 docs/RELEASE-REVIEW-2.5.13.md。
+Read README.md, AGENTS.md, this file, and docs/RELEASE-REVIEW-1.1.0.md first. docs/RELEASE-REVIEW-2.5.13.md contains the earlier baseline review.
 
-## 4. 存储与安全边界
+## 4. Storage and security boundaries
 
-1. 首次安装不预设私人存储地址，默认不连接、不发布、不同步。用户配置并启用后才检查更新或同步。
-2. 本机草稿、共享 SOP、分类、匿名设备统计分离。共享布局将界面与 SOP 数据分文件夹，支持分别升级。
-3. 共享文档及图片采用独立文件；目录维护索引。发布需校验、冲突保护、历史和写后回读，不能先更新目录再验证正文。
-4. 文件共享不具备服务器级分布式事务，同一 SOP 的同时编辑仍需协调。不能因单机并发测试通过而声称双机强一致。
-5. 录制不收集表单值、密码、Cookie；控件标签提取不得间接收集可编辑后代的文字。
-6. 截图仅由用户主动触发，截图可能包含私人内容。临时截图使用扩展可信 session 存储，并校验 tab、会话、模式与有效期；关闭与取消需清理。
-7. 不能降低截图隔离、将 session 存储开放给内容脚本，或让错误标签页关闭/覆盖正常截图会话。
-8. 导入内容作为文本或数据处理，不能执行脚本；真实业务数据、私有地址、密钥和浏览器配置不能进入源码包。
+1. A fresh installation has no private storage address and does not connect, publish, or synchronize by default. Update checks and synchronization run only after user configuration and enablement.
+2. Keep local drafts, shared SOPs, categories, and anonymous device statistics separate. Shared storage separates interface files from SOP data so they can be upgraded independently.
+3. Shared documents and images are separate files, with a catalog index. Publishing requires validation, conflict protection, history, and read-back verification. Do not update the catalog before validating the document.
+4. File sharing does not provide server-level distributed transactions. Concurrent editing of the same SOP still requires coordination. Single-machine concurrency tests do not establish strong consistency across two devices.
+5. Recording does not collect form values, passwords, or cookies. Control-label extraction must not indirectly collect text from editable descendants.
+6. Screenshots require an explicit user action and may contain private information. Temporary screenshots use trusted extension session storage, with tab, session, mode, and expiration checks. Closing and cancellation must clean up.
+7. Do not weaken screenshot isolation, expose session storage to content scripts, or let the wrong tab close or overwrite a valid screenshot session.
+8. Treat imports as text or data; never execute scripts. Real business data, private addresses, keys, and browser profiles must not enter source packages.
 
-## 5. 本轮实际修复
+## 5. Fixes recorded in the original handoff
 
-- 已发布的含图 SOP 再编辑时变量重赋值导致失败。
-- 正文、图片和统计写入后未严格验证持久化内容。
-- 切换内容源与并发加载导致的缓存错配、覆盖。
-- 工作网页可接触截图内容以及截图会话授权边界问题。
-- 编辑标记时切到另一条步骤，标记保存到错误目标的问题。
-- 控件标签包含输入元素后代时泄露输入文字的问题。
-- 空步骤标题导致当前步骤状态识别失败。
-- 动态连接状态未跟随语言切换、窄屏布局及按钮尺寸问题。
+- Reassignment of a variable prevented editing an already-published SOP containing images.
+- Documents, images, and statistics lacked strict verification after persistence.
+- Source changes and concurrent loads caused cache mismatches and overwrites.
+- Work pages could access screenshot content, and screenshot-session authorization had boundary issues.
+- Switching steps while editing annotations could save them to the wrong target.
+- Labels containing input descendants could leak entered text.
+- Blank step titles broke current-step recognition.
+- Dynamic connection states did not follow language changes; narrow layouts and button dimensions needed fixes.
 
-## 6. 验证证据和限制
+## 6. Validation evidence and limitations
 
-此前基线验证：68 项核心测试通过；5 组隔离 Chrome 流程通过；52 个 JS/CJS 语法检查通过；24 项本地化状态断言通过；检查 320/390px 侧栏、1280px 桌面、六语言及浅/深色布局。记录见 docs/RELEASE-REVIEW-2.5.13.md。这些属于迁移前基线结果，不代表新机器无需重跑。
+Earlier baseline: 68 core tests, 5 isolated Chrome flows, 52 JS/CJS syntax checks, and 24 localization-state assertions passed. Layouts were checked at 320/390px side-panel widths and 1280px desktop width, across six languages and light/dark themes. See docs/RELEASE-REVIEW-2.5.13.md. These are pre-migration baseline results and do not remove the need to rerun checks on a new machine.
 
-五组浏览器流程覆盖：新装及设置、合成总表、隔离截图与标记、逐步录制、编辑目标切换竞态。
+The five browser flows covered fresh installation/settings, the synthetic dashboard, isolated screenshots/annotations, step-by-step recording, and races when switching editing targets.
 
-尚需人工验证：Chrome 原生截图选择器的分享/取消；原生文件夹授权及重新授权；原加载目录覆盖升级且保留数据；两台真实设备访问共享目录与冲突处理；商店权限和隐私披露。未在用户日常浏览器配置或真实业务数据上自动写入测试。
+Manual checks remain: sharing/canceling through Chrome's native screenshot picker; native folder permission and reauthorization; upgrading the original loaded directory while preserving data; two real devices accessing shared storage and handling conflicts; and store permissions/privacy disclosures. Automated write tests have not used the user's everyday browser profile or real business data.
 
-## 7. 继续开发与构建
+## 7. Development and builds
 
-需要 Node.js 20+。没有新增框架运行依赖；Playwright 为开发测试依赖。
+Node.js 20+ is required. No framework runtime dependencies were added; Playwright is a development/test dependency.
 
 ```sh
 npm ci
@@ -94,104 +98,109 @@ npm run test:browser
 npm run build
 ```
 
-浏览器测试可能需要安装测试用 Chromium，或按 tests/public-browser.cjs 使用 RUNTIME_SOP_CHROME、RUNTIME_SOP_PLAYWRIGHT 指定已有测试运行时。只用隔离浏览器配置，不接管日常 Chrome 数据目录。
+Browser tests may require a test Chromium installation, or an existing runtime configured with `RUNTIME_SOP_CHROME` and `RUNTIME_SOP_PLAYWRIGHT` as described in tests/public-browser.cjs. Use isolated browser profiles; do not take over the everyday Chrome data directory.
 
-构建生成 dist/：
-- running-sop-extension-v1.0.0.zip：开发者模式安装素材。
-- running-sop-github-v1.0.0.zip：公开源码包。
-- running-sop-webstore-v1.0.0.zip：商店专用，manifest.json 在 ZIP 根目录。
-- SHA256SUMS.txt：当次三个包的校验值。
+The build produces files in `dist/`, currently named:
 
-源码包采用显式打包名单。新增公开文档或源码文件后检查 tools/package.cjs 是否包含；本交接及接续提示词已纳入名单。
+- `running-sop-extension-v1.1.0.zip`: developer-mode installation assets.
+- `running-sop-github-v1.1.0.zip`: public source package.
+- `running-sop-webstore-v1.1.0.zip`: store package, with manifest.json at the ZIP root.
+- `SHA256SUMS.txt`: checksums for the three packages from that build.
 
-升级保留数据：先备份，覆盖原来已加载的文件夹，再重新加载扩展。不要先卸载或随意更换目录。后续行为有改动时同步版本、更新记录、文档和必要测试；1.0.0 是当前公开分发基线，旧 2.x 是内部开发编号。
+Earlier v1.0.0 builds used the same filenames with `v1.0.0`. The source package uses an explicit allowlist. When adding public documentation or source files, check tools/package.cjs. This handoff and the continuation prompt are included in the allowlist.
 
-## 8. 下一位维护者的建议顺序
+To preserve data during upgrades, back up first, replace files in the originally loaded folder, then reload the extension. Do not uninstall first or casually change directories. Behavior changes require corresponding version, release-note, documentation, and necessary test updates. v1.1.0 is the current public GitHub release; 2.x numbers are internal development history.
 
-1. 核对实际文件与 AGENTS.md，重跑测试，确认环境依赖。
-2. 用测试 SOP 手动完成录制→截图标记→下一步→发布→读取→异常分支→评价发送。
-3. 完成原生授权、原目录升级、真实双机验收，记录结果。
-4. 继续优化仅以可复现问题或明确新需求为依据，不重复推翻已确认的紧凑布局。
-5. 发布前复查 PRIVACY.md、SECURITY.md、LICENSE、权限说明和 ZIP 内容。确认仓库目标与发布授权后再上传；本次交接不等于授权对外发布。
+## 8. Suggested order for the next maintainer
 
-当前未确定：GitHub 仓库地址、商店开发者账号、公开隐私政策 URL、最终商店文案与截图、最终生产存储服务部署方案。不能自行补造这些信息。
+1. Compare the actual files with AGENTS.md, rerun tests, and confirm environment dependencies.
+2. With a test SOP, manually complete recording → screenshot annotation → Next step → publish → read → exception branch → feedback submission.
+3. Complete native authorization, in-place upgrades, and real two-device acceptance, and record results.
+4. Base further improvements on reproducible issues or explicit requirements. Preserve the confirmed compact layout.
+5. Before release, review PRIVACY.md, SECURITY.md, LICENSE, permission descriptions, and ZIP contents. Prior GitHub publication is complete; further publication or store submission requires the relevant authorization. This handoff alone does not authorize a new external release.
 
-## 9. 2.5.14 手机二维码接续
+Still to confirm: store developer-account details, the public privacy-policy URL, final store copy/screenshots, and the final production storage deployment. Do not invent these details. The GitHub repository is confirmed in the current-status paragraph.
 
-每份 SOP 在总表详情有“手机扫码”，内容库有“二维码标签”；本地编码、SVG 下载和批量打印按稳定 ID 生成。新增 sop-sharing.js、qr-code.js、mobile-reader.*、reader-integrity.js，构建/部署见 docs/MOBILE-QR.md。手机阅读页面独立部署为 sop.html，读取同源 ./SOP/catalog.json；打开时加载当前发布版本，阅读过程中不自动切换。
+## 9. Archived 2.5.14 QR and read-only reader work
 
-用户当前提供的是挂载文件路径，尚未提供手机可访问的 HTTP(S) 网站地址。不能将 file:///、插件地址或存储器管理控制台当作扫码入口；需要实际手机站点地址后才可生成生产二维码。代码和手机阅读器可先部署，不能声称已完成生产手机扫码验收。
+This internal development stage added per-SOP QR labels, local encoding, SVG output, and batch printing based on stable IDs. Added files included sop-sharing.js, qr-code.js, mobile-reader.*, and reader-integrity.js. The read-only reader loaded the published version when opened and did not switch versions during reading. This section preserves implementation history, not mobile deployment or scanning instructions.
 
-2.5.14 本次实际验证：83 项核心测试通过；原有 5 组隔离 Chrome 流程通过；新增 2 组二维码与手机阅读流程通过，含普通 HTTP 下的 SHA-256 回退、图片标记、版本更新和损坏拒绝。二维码编码器还经独立解码器验证。真实手机相机及生产网站可达性尚未验收。
+At that stage, the user had provided a mounted file path but no phone-accessible HTTP(S) website. Production mobile acceptance had not been completed.
 
-## 10. 2.5.15 文件夹连接
+Recorded 2.5.14 validation: 83 core tests, the existing 5 isolated Chrome flows, and 2 additional QR/reader flows passed, including a SHA-256 fallback on plain HTTP, image annotations, version updates, and rejection of corruption. An independent decoder also verified the QR encoder. Real phone-camera behavior and production website reachability were not accepted.
 
-新增 storage-source.js，原生目录句柄和本机连接元数据绑定；内部 sop-directory 标识不是公开访问地址。后台、侧栏和设置共享同一目录来源。原文件地址模式兼容保留。
+## 10. Archived 2.5.15 folder connections
 
-主界面“选择 SOP 文件夹”；文件和旧地址收起。选择 catalog.json 文件后必须选择对应目录完成授权，不能假装文件选择自动获得父目录权限。读取与发布共用目录，权限分开；统计不自动开启。后续改动请保留取消/错误选择原连接、切换时缓存隔离、原生身份比对和写后验证。原生系统选择器、权限恢复和真实双机仍需人工验收。
+Added storage-source.js to bind native directory handles to local connection metadata. Internal `sop-directory` identifiers are not public addresses. Background, side panel, and settings share one directory source. Legacy file-address mode remained compatible.
 
-2.5.15 实测结果：98 项核心测试通过，原有 5 组扩展/总表/截图流程、2 组二维码手机流程及 1 组文件夹原生句柄流程通过（共 8 组浏览器流程）。文件夹流程使用隔离扩展内的原生 OPFS 句柄和真实 IndexedDB，不代表已点击系统原生选择器或验证真实网络共享盘。
+The main control became Select SOP folder, with file and legacy-address modes collapsed. Selecting catalog.json still required authorization for its containing folder; selecting a file must not be presented as automatically granting parent-directory permission. Reading and publishing share the directory, with separate permissions; statistics do not enable automatically. Preserve the original connection after cancellation or a wrong selection, isolate caches on source changes, compare native identities, and verify writes by reading back. Native system pickers, permission restoration, and real two-device access remained manual checks.
 
-## 11. 2.5.16 正式连接布局
+Recorded 2.5.15 results: 98 core tests and 8 browser flows passed: 5 existing extension/dashboard/screenshot flows, 2 QR/reader flows, and 1 native-folder-handle flow. The folder flow used native OPFS handles and real IndexedDB inside an isolated extension; it did not establish that the OS picker or a real network share had been tested.
 
-先前讨论的居中草稿已接入正式设置：source-connection 根据 connection-view.js 纯状态模型显示 unconfigured/checking/ready/offline/permission/idle。选定文件夹本身不表示已连接；实际目录检查、来源匹配和读取许可共同决定状态。检查动画有限次数，非检查状态不播放；支持减少动态效果。
+## 11. Archived 2.5.16 connection layout
 
-位置分类通过 preferences.sourceLocationKind 与 sourceLocationEndpoint 显式标记，不猜测本机或局域网。语言与位置标记共用偏好写入队列；切换内容库后不会挪用旧标签。选错目录时保留原连接并保留错误提示。
+The earlier centered draft was incorporated into settings. `source-connection` used the pure state model in connection-view.js to show unconfigured/checking/ready/offline/permission/idle. Selecting a folder alone did not mean it was connected; directory checks, source matching, and read permission jointly determined the state. Checking animations ran a limited number of times, stopped outside checking, and respected reduced motion.
 
-2.5.16 验证：102 项核心测试通过；8 组隔离浏览器流程通过，文件夹流程覆盖真实目录校验、断线恢复、位置标记持久化、六语言 320/390px、有限动画和减少动态效果。检查时刷新设置不会重新开启用户关闭的自动检查；手工旧地址编辑不会被状态刷新覆盖。真实 OS 选择器与双机共享仍需人工验收。
+Location labels used `preferences.sourceLocationKind` and `sourceLocationEndpoint` explicitly, without guessing local/network status. Language and location labels shared the preference-write queue. Changing libraries did not reuse old labels. Choosing the wrong directory preserved the original connection and the error message.
 
-## 12. 2.5.17 总表六语言
+Recorded 2.5.16 validation: 102 core tests and 8 isolated browser flows passed. The folder flow covered directory validation, offline recovery, location-label persistence, six languages at 320/390px, finite animation, and reduced motion. Refreshing settings during a check did not reenable automatic checks disabled by the user; state refresh did not overwrite manual legacy-address edits. Real OS pickers and two-device sharing still required manual acceptance.
 
-独立 index 总表右上方支持六语言，默认跟随浏览器，未支持语言回退英语；本机选择独立保留。dashboard-i18n.js 仅翻译界面，不遍历后续生成的 SOP、分类或反馈正文。静态标签捕获原始文本节点，动态统计和步骤标记在渲染时翻译；日期与分类排序采用当前区域设置。
+## 12. Archived 2.5.17 dashboard languages
 
-新增验证命令 npm run test:dashboard-languages。本轮实测：102 项核心测试通过；8 组浏览器流程通过（既有 5 组、二维码/手机 2 组、总表六语言 1 组）。六语言 390px 截图已检查，选择持久化、原文保留与输入提示翻译通过。真实系统选择器和双机共享仍需人工验收。
+The standalone index dashboard added six-language selection at the upper right, initially following the browser and falling back to English for unsupported languages. Local selection persisted independently. dashboard-i18n.js translated interface text only, without traversing generated SOP, category, or feedback content. Static labels captured original text nodes; dynamic statistics and step markers were translated during rendering. Dates and category sorting used the active locale.
 
-## 13. 2.5.18 图标
+Added `npm run test:dashboard-languages`. Recorded validation: 102 core tests and 8 browser flows passed (5 existing, 2 QR/reader, and 1 six-language dashboard flow). Six-language screenshots at 390px were inspected; selection persistence, preservation of source content, and input-hint translations passed. Real system pickers and two-device sharing still required manual acceptance.
 
-统一五种尺寸的 PNG 图标改为带透明通道的轻微立体标志，保留原有蓝色清单造型。设置页 favicon、工具栏图标、侧栏和总表共用同套素材。
+## 13. Archived 2.5.18 icons
 
-## 14. 1.0.0 公开编号
+The five PNG icon sizes were replaced with a slightly dimensional mark with transparency, preserving the blue checklist motif. Settings favicon, toolbar, side panel, and dashboard use the same assets.
 
-用户要求将当前完整版本重新编号为 V1.0.0 并上传 GitHub；2.x 历史作为内部开发记录保留。版本不影响数据格式或存储键。仓库地址与 GitHub 身份验证需以本轮实际结果为准，不得将本地打包当成已上传。
+## 14. Public numbering began at 1.0.0
 
-1.0.0 本轮验证：102 项核心测试与 9 组隔离浏览器流程通过，含六语言总表、文件夹句柄、截图标记和手机二维码。五种图标尺寸四角透明，已检查浅蓝背景的实际显示。GitHub 上传尚需仓库目标与账号授权确认。
+The user requested renumbering the complete version to v1.0.0 and uploading it to GitHub. The 2.x history remains an internal development record. Version renumbering did not change data formats or storage keys. At that stage, the repository and GitHub authorization still needed verification; local packaging was not evidence of an upload. GitHub publication has since completed, as recorded in the current status above.
 
-## 15. 关于页面的自愿支持说明
+Recorded v1.0.0 validation: 102 core tests and 9 isolated browser flows passed, including the six-language dashboard, folder handles, screenshot annotations, and QR/reader functionality. All four corners of the five icon sizes were transparent, and appearance on a light-blue background was inspected. GitHub target/account authorization was still pending at the time of that record.
 
-2026-10-17：在关于页面作者信息下方加入用户确认的“去火星”文案。用户随后将其改为“RunningSOP由我一个人开发和维护，准备用它所有的收益用于去火星。欢迎请我喝杯咖啡，为火星计划添点燃料。”以及“不打赏也完全不影响使用。登船名额暂时也没有。”文案，删除此前收回 100 美元支出的说明。最新调整：“欢迎请我喝杯咖啡，为火星计划添点燃料。”独立成段，共三段。文案保留圆角外框，框内标题和文字均居中。中文保留原文，英语、西班牙语、俄语、韩语和日语使用对应翻译。文案随界面语言切换，不涉及 SOP 正文。
+## 15. Voluntary support text in About
 
-本次仅添加说明和排版，尚未配置收款链接或接入支付服务。版本号保持 1.0.0；未执行发布。文案修订后重新实测：102 项核心测试通过，5 组 public-browser 流程通过；隔离浏览器检查六语言 390px 页面，每种语言均显示三段说明、有外框且居中、无横向溢出；已查看中文窄屏和桌面截图。
+2026-10-17: Added user-approved Mars-themed support text below the author details. The user revised it to explain that RunningSOP is developed and maintained by one person, with proceeds intended for a trip to Mars; invite readers to buy the developer a coffee to fuel the Mars plan; and state that donations do not affect use and no boarding places are available. This replaced an earlier statement about recovering a $100 expense. The coffee invitation became its own paragraph, producing three paragraphs in total. The text and title are centered within a rounded border. The Chinese source wording was retained in the product, with English, Spanish, Russian, Korean, and Japanese translations. This follows the interface language and does not affect SOP content.
 
+This stage added text and layout only, without payment links or payment integration. The version stayed at 1.0.0 and no release was performed at that stage. After the text revision, 102 core tests and 5 public-browser flows passed. Isolated-browser checks at 390px verified three centered, bordered paragraphs and no horizontal overflow in each of six languages. Chinese narrow and desktop screenshots were inspected.
 
-## 16. 文件夹授权、初始化与显示设置
+## 16. Folder authorization, initialization, and display settings
 
-2026-10-17：选好文件夹后立即调用读取授权；无 catalog.json 时请求写入授权，再创建合法的空内容库并回读验证。校验器允许零条 SOP。已有损坏目录不覆盖，拒绝授权保留原连接。新增名称与图标编辑，六种固定图标和最多 80 字显示名称，只存本机元数据，不修改实际目录；重新选择同一目录保留显示设置，切换其他目录不沿用。新增标签支持六语言。系统已经授权时不会强制出现第二次原生弹窗。
+2026-10-17: Selecting a folder immediately requests read permission. If catalog.json is absent, request write permission, create a valid empty catalog, and verify it by reading back. Validation permits zero SOPs. Do not overwrite an existing corrupt catalog; refusal of permission preserves the original connection. Added display-name/icon editing: six fixed icons and a name of up to 80 characters, stored only in local metadata without modifying the actual folder. Reselecting the same folder preserves its display settings; switching folders does not reuse them. Labels cover six languages. An already-authorized system does not force a second native prompt.
 
-本轮 106 项核心测试和文件夹浏览器测试通过；检查 390px 实际截图，名称作为文本呈现，刷新及语言切换后保留，空库创建使用原生 OPFS 句柄测试。原生系统弹窗及双机共享仍需人工验收。发布包仍为 1.0.0，本轮未提交 GitHub 或商店。
+Recorded validation: 106 core tests and the folder browser test passed. Actual 390px screenshots were inspected; the name rendered as text and persisted across refresh/language changes. Empty-catalog creation used native OPFS handles. Native OS prompts and two-device sharing still required manual acceptance. Packages remained at 1.0.0; this stage did not submit changes to GitHub or the store.
 
-2026-10-17 设置精简：移除本地电脑卡片、局域网/本机位置选项与独立局域网存储登录模块。只保留文件夹显示卡与连接状态。图标限定文件夹、网络硬盘、本地电脑。原登录设置不再使用，既有本机数据未删除。
+2026-10-17 settings simplification: Removed the local-computer card, local/network location choices, and separate network-storage login module. Retained the folder display card and connection state. Icons were limited to folder, network drive, and local computer. Old login settings were no longer used; existing local data was not deleted.
 
-2026-10-17 设置进一步精简：文件夹卡片内的名称与图标现在是原生选择器入口，删除其下的连接示意、独立选择/检查按钮、自动更新开关、高级连接与统计设置。文件夹卡片之后只保留关于。已有显式启用的自动检查设置保留；首次选择仅检查一次，不默认启用后台检查。
+2026-10-17 further settings simplification: The name/icon within the folder card became the native-picker entry point. Removed the connection diagram, separate Select/Check buttons, automatic-update switch, advanced connection settings, and statistics settings below it. Only About follows the folder card. Existing explicitly enabled automatic checks remain enabled; first selection checks once without enabling background checks by default.
 
-2026-10-17 关于中增加同套 Running SOP logo；支持开发者中注明 PayPal 账号与公开联系邮箱一致，六语言翻译，无代付或未经验证的收款链接。文件夹显示设置保存成功后收起。
+2026-10-17: Added the same Running SOP logo to About. Developer support identifies the PayPal account as the public contact email, with six-language translations and no intermediary or unverified payment links. Folder display settings collapse after a successful save.
 
-2026-10-17 关于品牌区采用 logo 左、名称和版本右的居中组合。打赏方式采用可扩展独立网格，PayPal 字标和公开邮箱置于单独卡片，另留“更多打赏方式／敬请期待”占位。无支付动作。语言切换为单行七个等宽按钮（跟随浏览器为地球，其余六种国旗），保留辅助名称及悬停提示。
+2026-10-17: The About brand area became a centered group with logo on the left and name/version on the right. Support methods use an extensible grid: PayPal wordmark and public email in a separate card, plus a More support methods / Coming soon placeholder. No payment action was added. Language selection became one row of seven equal buttons (a globe for browser default and six flags), with accessible labels and hover hints.
 
-2026-10-17 设置语言区改成首行 Chrome 跟随按钮和第二行七个等宽国旗/语言按钮，新增繁体中文界面（静态词表，离线加载，不转换 SOP 正文）。zh-TW、zh-HK、zh-Hant 浏览器自动匹配繁体。关于不再使用 details，去除关于标题和图标，内容永久展开。
+2026-10-17: Language settings changed to a Chrome-follow button on the first row and seven equal flag/language buttons on the second. Added Traditional Chinese through an offline static dictionary; SOP content is not converted. Browser locales zh-TW, zh-HK, and zh-Hant select Traditional Chinese automatically. About no longer uses details; its heading/icon were removed and content stays expanded.
 
-2026-10-17 录制编辑器移除备份/导出 UI，下一步右侧为绿色发布按钮。原保存到本机改为清空步骤，只清空当前步骤的内容、截图、标记、报告审批与异常分支，保留工作地址、步骤位置和其他步骤。自愿支持区域的其他方式占位仅留灰色空白卡片。草稿底层存储和导入校验保持兼容。
+2026-10-17: Removed backup/export UI from the recording editor; a green Publish button sits to the right of Next step. The former Save locally action became Clear step, clearing only the current step's content, screenshot, annotations, report/approval points, and exception branches while preserving its work address, position, and other steps. The support placeholder became a blank gray card. Underlying draft storage and import validation remain compatible.
 
-2026-10-17 未匹配 SOP 时的录制图文引导增加首项“设置保存位置”，说明从上方设置选择 SOP 保存/发布文件夹，并明确未设置时录制仍保存在本机。覆盖七种界面语言，不增加录制权限门槛。
+2026-10-17: When no SOP matches, illustrated recording guidance now begins with Set save location, directing users to select the save/publish folder through Settings above and explaining that recordings remain local without a configured folder. Covers seven interface languages and adds no recording-permission gate.
 
-2026-10-17 录制说明图标去除边框与底色，并对齐文字顶部；PayPal 卡片内容居中，字标内部锚点居中。浏览器跟随按钮改用 Google Chrome 官网的完整 SVG 标志本地副本，保持比例并留白，不请求远程图片。
+2026-10-17: Removed borders/backgrounds from recording-guide icons and aligned them to the top of the text. Centered PayPal card contents and the wordmark's internal anchor. The browser-default button uses a local copy of the complete SVG logo from Google's Chrome website, preserving proportions and whitespace without remote image requests.
 
-2026-10-17 首次安装监听 onInstalled(reason=install) 自动打开 options.html，更新、重载和浏览器启动不主动打开。不会自动选择文件夹、申请目录权限或启用同步。
+2026-10-17: `onInstalled(reason=install)` opens options.html on first installation. Updates, reloads, and browser startup do not open it proactively. No folder selection, directory-permission request, or synchronization is enabled automatically.
 
+## 17. v1.1.0 development and publication history
 
-## 1.1.0 开发分支
+2026-10-17: At the user's request, installed the official chrome-extensions and modern-web-guidance Skills from GoogleChrome/modern-web-guidance into local Codex skills. These are development aids, excluded from extension packages, and do not change user-browser requirements. Chrome DevTools MCP was not installed in this stage. AGENTS.md records the Chrome 116 minimum, lightweight fallbacks, and low-overhead animation requirements. This installation stage changed development conventions only; product tests, builds, and publication were not rerun then.
 
-2026-10-17：按用户要求，在本机 Codex skills 中安装 GoogleChrome/modern-web-guidance 仓库的 chrome-extensions 与 modern-web-guidance 两项官方 Skill。它们是开发辅助，不打入扩展包，不改变用户浏览器要求；Chrome DevTools MCP 本轮未安装。AGENTS.md 已记录 Chrome 116 兼容下限、轻量回退与低开销动画要求。此安装轮只修改开发约定，未重新运行产品测试、构建或发布。
+The user confirmed that v1.0.0 had been submitted for store review and assigned subsequent requirements to v1.1.0 onward. Development moved to `codex/v1.1.0`. Before switching, the three local v1.0.0 packages and checksum file were archived in `dist/baselines/v1.0.0-before-1.1.0`; previously delivered review materials were not changed. The version change did not alter catalog versions or local storage keys. The first requirement was a lightweight breathing ring inspired by the pin circle: play only three cycles when unconfigured, missing permission, or offline; stop when connected or selecting. Reduced-motion settings produce a static display, and hidden pages pause it. Animation uses only transform/opacity, without an animation library or persistent scripts. Chrome 116 remains the minimum; older browsers require actual testing, and support for earlier versions or old hardware must not be claimed without evidence.
 
-用户确认 1.0.0 已提交商店审核，后续需求归入 1.1.0 及之后。开发切换到 codex/v1.1.0；切换前的本机 1.0.0 三种构建包与校验表已归档到 dist/baselines/v1.0.0-before-1.1.0，未修改已交付的 1.0.0 审核资料。版本升级不改变内容库版本或本机存储键。首项需求为参考 pin 圆圈的轻量呼吸光圈：未设置/授权缺失/离线时仅播放三轮，已连接及正在选择时停止；系统减少动画时静态显示，隐藏页面暂停。动画仅使用 transform/opacity，不引入动画库或持续脚本。最低 Chrome 116 不变，旧浏览器需实测，不能宣称支持更早浏览器或旧硬件已通过。
+2026-10-18 official-Skill review: Read the chrome-extensions permission, background, and release checklists and modern-web-guidance motion guidance. Fixed internal directory-identifier parsing in Chrome 116. Added a confirmed cleanup action when local drafts reach 10; deletion is disabled during recording, cancellation changes nothing, and published SOPs are untouched. Updated README/PRIVACY/installation documents and CHROMEWEBSTORE.md, removing promotion of the deleted export UI. Recorded results: 108 core tests passed; Chromium 151 and Chrome 116 each passed 10 browser tests against runtimes extracted from ZIPs. The serial matrix command is `npm run test:release-browser`. See docs/RELEASE-REVIEW-1.1.0.md. Native system authorization and real two-device acceptance remained incomplete. At that review stage, v1.0.0 delivery packages were unchanged and v1.1.0 had not yet been pushed or submitted.
 
-2026-10-18 1.1.0 官方 Skill 审查：实际读取 chrome-extensions 的权限、后台与发布清单，以及 modern-web-guidance 的 motion 指南。修复 Chrome 116 内部目录标识解析；新增满 10 份本机草稿时的确认清理入口，录制中禁用删除、取消不改数据、不触碰已发布 SOP。维护 README/PRIVACY/安装文档与 CHROMEWEBSTORE.md，清除已移除的导出宣传。108 项核心测试、从 ZIP 解出运行时的 Chromium 151 与 Chrome 116 各 10 项浏览器测试通过；串行矩阵脚本为 npm run test:release-browser。详见 docs/RELEASE-REVIEW-1.1.0.md。原生系统授权和真实双机验收仍未完成，不得声明正式发布完成；1.0.0 交付包未变，未推送/提交 1.1.0。
+Subsequent current status, 2026-10-18: v1.1.0 was published to GitHub with successful CI; `main` is `5c02d06b3b8788ef35ff7e6fd31339c96e701b28`. This supersedes the earlier local-only/pending-upload statements. v1.0.0 remains under store review according to the user; no v1.1.0 store submission has occurred. The outstanding manual checks remain outstanding.
+
+## English documentation update — 2026-10-18
+
+GitHub explanatory documents and official release notes are now maintained in English. Mobile scanning instructions and the standalone mobile deployment guide were removed; software features and necessary data-processing disclosures were retained. Internal changelog entries were moved into docs/DEVELOPMENT-HISTORY.md so the public changelog shows only official releases. The release workflow synchronizes English descriptions for the two existing official releases without replacing published attachments. An isolated workflow test verifies idempotence and preservation of published binary assets; the local core suite now contains 109 passing tests. No extension runtime or interface language was changed by this documentation update.

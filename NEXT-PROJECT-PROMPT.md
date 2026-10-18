@@ -1,9 +1,13 @@
-# 给下一个项目的开场提示词
+# Opening prompt for the next project session
 
-请接手当前 Running SOP 项目。先阅读 AGENTS.md、PROJECT-HANDOFF.md、README.md 和 docs/RELEASE-REVIEW-2.5.13.md，再检查实际代码。
+Please take over the current Running SOP project. First read AGENTS.md, PROJECT-HANDOFF.md, README.md, docs/RELEASE-REVIEW-1.1.0.md, and CHROMEWEBSTORE.md, then inspect the actual code. docs/RELEASE-REVIEW-2.5.13.md records the earlier baseline.
 
-当前工作分支为 codex/v1.1.0，1.0.0 已由用户提交商店审核；先阅读 docs/RELEASE-REVIEW-1.1.0.md 和 CHROMEWEBSTORE.md。设置已精简为语言、文件夹、关于，新增文件夹光圈和草稿容量整理；保留 2.5.14 手机功能（增加每份 SOP 的手机二维码及只读阅读页，见 docs/MOBILE-QR.md），Chrome Manifest V3、原生 HTML/CSS/JavaScript、MIT。品牌 Running SOP，作者 don Kimxote。已完成截图隔离与标记保存、录制下一步、共享发布完整性、目录并发、多语言和窄屏布局修复。迁移前 68 项核心测试及 5 组隔离浏览器流程通过；请区分历史结果与本次实测。
+The current public GitHub release is v1.1.0, published with successful CI. Current `main` is `5c02d06b3b8788ef35ff7e6fd31339c96e701b28`; verify the actual checkout before continuing. According to the user, v1.0.0 is awaiting Chrome Web Store review; v1.1.0 has not been submitted. Earlier development used `codex/v1.1.0`; historical local-only release statements are superseded by the current GitHub publication status. Do not claim that the extension is listed or approved by the store.
 
-先验证开发环境和测试，再围绕我提出的新需求继续；保留现有紧凑布局及文档中的产品决定。用合成数据和隔离浏览器测试，不写入真实业务 SOP，不改动日常 Chrome 配置。原生截图授权、文件夹授权、保留本机数据升级和真实双机共享仍需人工验收。不要把文件共享描述为强一致事务，也不要宣称已上架。
+Settings have been simplified to language, folder, and About, with a finite folder-selection breathing ring and draft-capacity cleanup. Keep Chrome Manifest V3, native HTML/CSS/JavaScript, the Chrome 116 minimum, and the MIT license. Brand: Running SOP; author: don Kimxote. Screenshot isolation and annotation persistence, recording with Next step, shared-publishing integrity, catalog concurrency, multilingual interfaces, and narrow layouts have been addressed. Keep interface and code localization multilingual while maintaining GitHub explanatory documentation in English. Do not add mobile QR scanning or deployment instructions.
 
-修改后更新相关文档和必要测试，生成可检查的安装包；未经明确授权，不上传 GitHub、不提交商店、不删除真实或历史业务文件。新问题先说明证据与结论，使用自然语言沟通，避免不必要的确认。
+Distinguish recorded evidence from fresh verification. The pre-migration baseline had 68 passing core tests and 5 isolated browser flows. The v1.1.0 review recorded 108 passing core tests and 10 browser tests each in Chromium 151 and Chrome 116 against ZIP-extracted runtimes; see its review document for scope and limitations.
+
+Verify the development environment and tests first, then continue with my new requirements. Preserve the compact layout and documented product decisions. Use synthetic data and isolated browsers; do not write to real business SOPs or change everyday Chrome profiles. Native screenshot authorization, folder authorization, upgrades preserving local data, and real two-device sharing still require manual acceptance. Do not describe file sharing as strongly consistent transactions or treat GitHub publication as completion of these checks.
+
+After changes, update relevant documentation and necessary tests, and produce inspectable installation packages when required. Without explicit authorization, do not publish further GitHub releases, submit to the store, or delete real or historical business files. Explain evidence and conclusions in natural language and avoid unnecessary confirmation requests.

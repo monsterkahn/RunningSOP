@@ -1,57 +1,57 @@
-# Running SOP 1.1.0 本地构建与审查
+# Running SOP 1.1.0 local build and review
 
-日期：2026-10-18。工作分支：codex/v1.1.0。结论：本次源码审查、自动化回归、构建与压缩包安装检查完成；这是供验收的本地测试版，不代表商店已提交、获批或实际双机验收完成。用户已提交的 1.0.0 审核资料未重新生成或覆盖。
+Date: 2026-10-18. Working branch: `codex/v1.1.0`. Outcome: source review, automated regression checks, build, and archive installation checks were completed for this local test version. Store submission, approval, and real two-device acceptance remain separate steps. The user's previously submitted 1.0.0 review materials were not regenerated or overwritten.
 
-## 审查依据
+## Review references
 
-- GoogleChrome/modern-web-guidance 的 chrome-extensions Skill：Manifest V3、权限、侧栏入口、Service Worker 生命周期、消息与截图边界、图标及商店发布清单。
-- modern-web-guidance 实际检索并读取 motion 指南：只让 transform/opacity 参与光圈动画；支持减少动态效果；有限三轮、悬停/键盘聚焦/页面隐藏时暂停。未引入动画库、新 API 或额外运行时依赖。
-- [Chrome Service Worker 生命周期](https://developer.chrome.com/docs/extensions/develop/concepts/service-workers/lifecycle)、[alarms API](https://developer.chrome.com/docs/extensions/reference/api/alarms)。按 Chrome 116 下限采用一分钟的可选定时任务，不照搬新浏览器的半分钟周期或新持久化参数。
-- 项目 AGENTS.md 的离线、隐私、显式授权、严格验证和不接触真实业务数据要求优先。指南中的通用示例不作为增加权限、执行导入代码或机械重写 Promise 队列的理由。
+- The `chrome-extensions` Skill from GoogleChrome/modern-web-guidance: Manifest V3, permissions, side panel entry points, service worker lifecycle, messaging and screenshot boundaries, icons, and the store release checklist.
+- The motion guidance was actually searched and read through modern-web-guidance: the halo animates only `transform`/`opacity`, respects reduced motion, runs for three cycles, and pauses on hover, keyboard focus, or page hiding. No animation library, new API, or additional runtime dependency was introduced.
+- [Chrome service worker lifecycle](https://developer.chrome.com/docs/extensions/develop/concepts/service-workers/lifecycle) and the [alarms API](https://developer.chrome.com/docs/extensions/reference/api/alarms). Optional scheduled tasks use a one-minute interval for the Chrome 116 minimum, rather than newer browsers' half-minute interval or newer persistence parameters.
+- The project's `AGENTS.md` requirements for offline operation, privacy, explicit authorization, strict validation, and avoiding real business data take precedence. Generic guidance examples do not justify adding permissions, executing imported code, or mechanically rewriting Promise queues.
 
-## 发现与处理
+## Findings and changes
 
-| 问题 | 处理与证据 |
+| Finding | Change and evidence |
 | --- | --- |
-| Chrome 116 对内部 sop-directory 标识的 URL 解析存在版本差异，可能阻止读取 | 改为严格格式校验和受限相对路径解析；保留来源身份、读取上限和授权检查。目录测试拒绝凭据、查询串、编码目录穿越及控制字符；实际 Chrome 116 连接、读正文及空库初始化通过。 |
-| 满 10 份本机草稿后，界面没有清理入口，无法继续新建 | 仅达到上限时显示整理草稿。删除前确认、可取消、录制会话存在时禁用；只调用本机草稿删除，不删除共享 SOP。测试验证取消后数据完全不变、只删除指定草稿、保留其余草稿和共享配置，随后可重新录制；七种界面语言在 320px 无横向溢出。 |
-| 隐私及安装说明仍宣称存在备份导出、统计设置入口 | 更新 PRIVACY.md、README、安装说明和交接文字；明确当前入口已移除、新选择目录只执行一次检查、旧版显式启用的后台配置被保留、空库初始化申请写入权限。 |
-| 商店说明和权限理由没有集中维护 | 按 Skill 模板新增 CHROMEWEBSTORE.md；列明每项必要/可选权限、数据处理与传输、截图刷新和公共隐私页面待更新项。清除摘要中已移除的导出宣传，未改写已提交 1.0.0 资料。 |
-| 浏览器测试过早使用截图坐标，以及 Chrome 116 测试环境差异 | 等待标记计数/缩放初始化后操作实际画布，再等待新增标记反馈。旧版测试使用 new headless；新增可测试压缩包解出文件的入口。最终发布回归逐文件串行执行，不删测试、不跳过安全断言。 |
+| Chrome 116 parses internal `sop-directory` identifiers differently, potentially blocking reads | Replaced URL parsing with strict format validation and constrained relative-path resolution; retained source identity, read limits, and authorization checks. Directory tests reject credentials, query strings, encoded path traversal, and control characters. Connection, content reading, and empty-library initialization passed in actual Chrome 116. |
+| At the 10-draft limit, there was no cleanup control and users could not create another draft | **Manage drafts** appears only at the limit. Deletion requires confirmation, can be canceled, and is disabled while a recording session exists. It deletes only local drafts. Tests verify that cancellation changes nothing, only the selected draft is deleted, other drafts and shared configuration remain, and recording can start again. Seven interface languages fit at 320 px without horizontal overflow. |
+| Privacy and installation documentation still advertised backup export and statistics settings controls | Updated `PRIVACY.md`, README, installation instructions, and handoff text. Clarified that these controls have been removed, a new folder selection performs one check, previously explicitly enabled background configurations are retained, and empty-library initialization requests write permission. |
+| Store listing information and permission justifications lacked a central document | Added `CHROMEWEBSTORE.md` using the Skill template, listing required/optional permissions, data processing and transfer, and pending screenshot/public privacy page updates. Removed export claims from the summary; previously submitted 1.0.0 materials were not rewritten. |
+| Browser tests used screenshot coordinates too early, and the Chrome 116 test environment differed | Wait for annotation count/zoom initialization before interacting with the actual canvas, then wait for new annotation feedback. Older-browser tests use new headless mode; an entry point allows tests against files extracted from the archive. The final release regression runs files sequentially, retaining all tests and security assertions. |
 
-## 源码审查范围
+## Source review scope
 
-- Manifest V3、最低 Chrome 116、版本/锁文件一致；图标引用均存在，尺寸正确且为透明通道 PNG。工具栏有明确侧栏打开行为，首次安装打开设置仅处理 install 原因。
-- 网站权限为当前工作来源按需请求；file URL 开关与原生文件夹授权分开。没有为动画或清理功能新增权限。保留 activeTab 用于已有用户触发的兼容截图接口；当前界面截图使用浏览器选择器。
-- 后台事件在同步注册入口接入；草稿、目录、统计数据均有存储，进程内队列/加载缓存不当作持久化数据。录制后台重启采用安全暂停，而非声称自动保持业务录制。
-- 管理录制/目录/统计消息限制扩展来源；录制事件核验标签页、主框架、令牌和页面身份。控件名称处理不读取输入值或可编辑后代。
-- 截图 iframe 使用扩展来源、关闭的 Shadow DOM、随机令牌、标签页/模式/有效期绑定。正文页面不能读取图像字节；错误标签页不得消费或取消其他会话。不能注入时使用扩展侧栏回退。
-- 导入内容通过结构校验，作为文本或数据处理；innerHTML 的使用点为固定图标、内部表情或已验证坐标生成的 SVG。没有发现 eval/new Function、远程脚本、chrome.storage.sync 或将 session 开放给不可信上下文的调用。
-- 发布先写不可变正文/图片并核验，再乐观检查目录指针、写入和回读，保留发布历史。文件共享仍不是跨设备事务锁，本地测试不证明双机强一致。
-- 使用合成 SOP、隔离 Chrome 配置与临时目录；未测试或修改用户日常浏览器配置、真实业务目录和实际审批结果。此次为源码与本地回归审查，不宣称独立安全认证。
+- Manifest V3, Chrome 116 minimum, and consistent versions in the manifest/package/lock file. Referenced icons exist, have the correct dimensions, and are PNGs with transparency. The toolbar explicitly opens the side panel. First-install settings opening handles only the `install` reason.
+- Site permissions are requested on demand for the current work origin. The file URL switch is separate from native folder authorization. Animation and cleanup add no permissions. `activeTab` remains for the existing user-triggered compatibility screenshot interface; the current screenshot UI uses the browser chooser.
+- Background event handlers register synchronously at entry. Drafts, catalogs, and statistics are stored persistently; in-process queues and loading caches are not treated as persistent storage. Restarting the recording background safely pauses recording rather than claiming uninterrupted business recording.
+- Recording-management, catalog, and statistics messages are restricted to the extension origin. Recording events validate the tab, main frame, token, and page identity. Control-label processing does not read input values or editable descendants.
+- Screenshot iframes use the extension origin, a closed Shadow DOM, random tokens, and tab/mode/expiry binding. The work page cannot read image bytes; the wrong tab cannot consume or cancel another session. An extension side panel fallback is used when injection is unavailable.
+- Imports undergo structural validation and are handled as text or data. Uses of `innerHTML` involve fixed icons, internal emoji, or SVG generated from validated coordinates. The review found no `eval`/`new Function`, remote scripts, `chrome.storage.sync`, or calls exposing session storage to untrusted contexts.
+- Publishing writes and verifies immutable content/images first, then optimistically checks the catalog pointer, writes it, and verifies it by reading it back, retaining publication history. File sharing does not provide a cross-device transaction lock; local tests do not establish strong consistency between two devices.
+- Tests use synthetic SOPs, isolated Chrome profiles, and temporary directories. They did not test or modify the user's everyday browser profile, real business folders, or actual approval outcomes. This source and local regression review is not independent security certification.
 
-## 本轮实际测试
+## Recorded test results
 
-| 验证 | 实际结果 | 覆盖和限制 |
+| Check | Recorded result | Coverage and limits |
 | --- | --- | --- |
-| npm test | 108 项通过，0 失败 | 目录/缓存/资产/发布/并发/录制隐私/统计/语言/分发；文件系统替身测试不等于真实共享盘验收 |
-| npm run test:release-browser，Chromium 151.0.7922.34 | 10 项通过，0 失败 | 从 1.1.0 商店包解出的运行时加载；首次安装、截图隔离/标记持久化/目标切换、录制、草稿容量、目录连接/空库、总表六语言、二维码和手机只读页 |
-| 同一矩阵，Chrome for Testing 116.0.5845.96 mac-arm64 | 10 项通过，0 失败 | 实际旧版浏览器，保持 manifest 最低版本 116；不等于在旧硬件或所有中间版本均测试过 |
-| 布局/视觉 | 已检查截图 | 文件夹光圈截图、390px 设置及 320px 草稿整理；七种设置语言、草稿清理语言与等宽布局断言；不将修改截图代替真实 UI |
-| 构建/扫描 | npm run build 通过 | 生成示例总表、只读页与三种 ZIP；公开内容扫描与本地引用检查通过 |
-| 产物核验 | 校验后交付 | ZIP CRC/SHA-256、manifest 位于商店 ZIP 根部、58 份运行时文件逐字节匹配被测解出目录、图标尺寸/RGBA、无源码配置/依赖/密钥/真实用户数据混入商店包；1.0.0 三份归档 ZIP 逐字节未变 |
+| `npm test` | 108 passed, 0 failed | Catalog/cache/assets/publishing/concurrency/recording privacy/statistics/languages/distribution. File system substitutes do not establish real shared-drive acceptance. |
+| `npm run test:release-browser`, Chromium 151.0.7922.34 | 10 passed, 0 failed | Runtime loaded from the extracted 1.1.0 store archive; first installation, screenshot isolation/annotation persistence/target switching, recording, draft capacity, folder connection/empty library, six-language dashboard, QR codes, and the mobile read-only page. |
+| Same matrix, Chrome for Testing 116.0.5845.96 mac-arm64 | 10 passed, 0 failed | An actual older browser, with manifest minimum version retained at 116. This does not establish coverage on old hardware or every intermediate browser version. |
+| Layout/visuals | Screenshots inspected | Folder halo screenshots, 390 px settings, and 320 px draft management; assertions for seven settings/draft-management languages and equal-width layouts. Edited screenshots were not substituted for the actual UI. |
+| Build/scans | `npm run build` passed | Generated the example dashboard, read-only page, and three ZIP variants. Public-content scan and local reference checks passed. |
+| Artifact verification | Verified before delivery | ZIP CRC/SHA-256; manifest at the store ZIP root; 58 runtime files matched the tested extracted directory byte for byte; icon dimensions/RGBA checked; no source configuration, dependencies, secrets, or real user data in the store archive. All three archived 1.0.0 ZIPs remained byte-for-byte unchanged. |
 
-可复现命令：先 npm test，再 npm run build；将商店 ZIP 解到隔离目录，把 RUNTIME_SOP_EXTENSION 指向解出目录后运行 npm run test:release-browser。旧版本另外设置 RUNTIME_SOP_CHROME 为相应浏览器可执行文件。该矩阵固定 --test-concurrency=1，不使用日常 Chrome 个人资料。
+To reproduce: run `npm test`, then `npm run build`. Extract the store ZIP into an isolated directory, set `RUNTIME_SOP_EXTENSION` to that directory, and run `npm run test:release-browser`. For the older browser, also set `RUNTIME_SOP_CHROME` to its executable. The matrix fixes `--test-concurrency=1` and does not use an everyday Chrome profile.
 
-早期并行启动多个 Chrome 116 实例的测试曾出现输入事件未到达截图 iframe，以及工作线程启动时 API 未就绪；串行的完整矩阵通过。并行失败记录不能被称为通过，也不据此判断真实多用户共享盘稳定性已验收。原生系统选择器在目录测试中只替换“选择结果”，其余使用原生 OPFS 句柄；真实 OS 弹窗、持久授权与再次授权未由自动化证明。页面隐藏通过模拟 visibilitychange 验证监听逻辑，非真实后台标签页节能测量。
+Earlier parallel runs of several Chrome 116 instances had failures in which input events did not reach the screenshot iframe or APIs were not ready when the worker started. The complete sequential matrix passed. The earlier parallel failures remain failures, and the results do not establish stability on a real shared drive with multiple users. Folder tests replace only the native picker's selection result; subsequent operations use native OPFS handles. Automation has not proved real OS dialogs, persistent authorization, or reauthorization. Page hiding is tested with simulated `visibilitychange` events, not measurements of real background-tab energy use.
 
-## 仍需人工验收和提交前工作
+## Manual acceptance and pre-submission work still required
 
-1. 实际系统文件夹/屏幕分享选择器、拒绝/恢复授权、浏览器重启及原目录覆盖升级保留数据。
-2. 两台真实电脑连接同一存储器后的新增、更新、断网恢复、冲突和组织文件权限。
-3. 旧硬件的实际响应与耗电表现；本轮证明的是浏览器版本兼容及有限动画，不是硬件性能保证。
-4. 1.1.0 商店截图、公共隐私页面和实际数据披露与本地草稿再次核对。用户已有的 1.0.0 提交和商店审核不在本次操作范围内。
+1. Actual system folder/screen-sharing choosers, permission denial/restoration, browser restart, and upgrading in the same directory while preserving data.
+2. Creation, updates, offline recovery, conflicts, and organizational file permissions with two real computers connected to the same storage.
+3. Responsiveness and power consumption on older hardware. This round establishes browser-version compatibility and finite animation, not a hardware-performance guarantee.
+4. Recheck 1.1.0 store screenshots, the public privacy page, and actual data disclosures against the local draft. The user's existing 1.0.0 submission and store review are outside this work.
 
-## 交付
+## Delivery
 
-本地生成三种原生构建包和 SHA256SUMS.txt；用户安装 ZIP 只包装同一份已核验运行时，解压后选择 Running-SOP 文件夹加载。源代码包包含此报告、隐私说明和 CHROMEWEBSTORE.md，商店包不包含这些开发文档。本报告记录本地审查阶段；后续 GitHub 更新以仓库发布为准，不代表已提交 Chrome 商店或安装到用户日常 Chrome。
+Three standard build archives and `SHA256SUMS.txt` were generated locally. The user-install ZIP wraps the same verified runtime; extract it and select the `Running-SOP` folder to load it. The source archive includes this report, the privacy documentation, and `CHROMEWEBSTORE.md`; the store archive excludes these development documents. This report records the local review stage. Subsequent GitHub updates depend on the repository release; this report does not establish Chrome Web Store submission or installation into the user's everyday Chrome profile.

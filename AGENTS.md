@@ -1,18 +1,16 @@
-# 维护约定
+# Maintenance conventions
 
-- 先检查问题的前提、缺失信息与证据；区分事实、设计选择和推测。避免为了迎合而扩大结论。
-- 保持 Chrome Manifest V3、离线核心可测试、无供应商云端分析和无远程可执行代码。
-- 浏览器兼容下限保持 Chrome 116，兼顾旧机器：新 API/CSS 必须核实该版本支持情况，必要时特性检测与轻量回退；动画尊重减少动态效果设置，避免持续脚本和大型依赖。开发工具自身的版本要求不等于扩展的用户浏览器要求。
-- 扩展开发参考 GoogleChrome/modern-web-guidance 官方 chrome-extensions 与 modern-web-guidance Skill；指南不能替代本项目的隐私边界、兼容要求和实际测试。未经用户要求，不因参考指南增加权限或引入内置 AI 功能。
-- 首次安装默认不连接共享目录、不同步、不发布。共享目录必须由用户明确选择；目录自动检查或统计同步只有在用户配置并启用后才运行。
-- URL 匹配仅用于推荐流程，不代表识别网页内部状态或业务结果。录制只读取必要的控件标签、活动弹窗/标签标题、页面标题和脱敏 URL；不得读取任意页面正文、Cookie 或表单值来替代用户确认。
-- 录制不得收集输入字段值。截图由用户主动触发，只捕获一帧；截图和备注可能包含敏感信息，界面应保留可见说明。
-- 本机记录、共享流程、分类、用户评分和匿名设备统计使用清楚分离的数据格式。修改共享数据时保留严格校验、权限检查、乐观冲突保护、历史备份和回读验证。
-- 导入内容始终作为文本或结构化数据处理，禁止执行导入脚本或任意远程资源。
-- 用合成示例和隔离测试验证，不提交真实 SOP、实际网页截图、内部网络地址、开发机绝对路径或浏览器配置。
-- 修改后运行 `npm test` 和受影响的浏览器测试；发布前运行 `npm run build` 并检查产物内容。没有运行的检查不得报告为通过。
-- 保持 `dist/` 为本地生成目录，不提交构建产物。许可证以仓库根目录 `LICENSE` 为准。
-
-- 新会话先读 PROJECT-HANDOFF.md；迁移前检查结果不能代替本次实测，未完成原生授权和双机验收不得声明正式发布完成。
-
-- GitHub 首页和公开发布说明只展示正式发布版本号，不把内部开发编号写成公开版本；Chrome 规范声明须基于实际实现与验证，不能等同于 Google 认证或商店审核通过。
+- First check the premises, missing information, and evidence; distinguish facts, design choices, and assumptions. Do not overstate conclusions to agree with the user.
+- Keep Chrome Manifest V3, an offline-testable core, no vendor cloud analytics, and no remote executable code.
+- Keep Chrome 116 as the minimum supported browser and consider older computers: verify support for new APIs/CSS in that version, using feature detection and lightweight fallbacks where needed. Respect reduced-motion preferences and avoid continuously running scripts and large dependencies. Development-tool version requirements are separate from the extension's user browser requirements.
+- Refer to the official `chrome-extensions` and `modern-web-guidance` Skills from GoogleChrome/modern-web-guidance for extension development. Guidance does not replace this project's privacy boundaries, compatibility requirements, or actual testing. Do not add permissions or built-in AI features based on guidance without a user request.
+- A fresh installation must not connect to a shared directory, synchronize, or publish by default. Users must explicitly select the shared directory; automatic directory checks and statistics synchronization run only after users configure and enable them.
+- URL matching only recommends workflows; it does not identify internal webpage state or business outcomes. Recording reads only necessary control labels, active dialog/tab titles, page titles, and sanitized URLs. Do not read arbitrary page body text, cookies, or form values as a substitute for user confirmation.
+- Recording must not collect input field values. Screenshots must be explicitly triggered by the user and capture only one frame. Screenshots and notes may contain sensitive information; keep a visible notice in the interface.
+- Use clearly separate data formats for local records, shared workflows, categories, user ratings, and anonymous device statistics. Preserve strict validation, permission checks, optimistic conflict protection, history backups, and read-back verification when modifying shared data.
+- Always treat imported content as text or structured data. Never execute imported scripts or arbitrary remote resources.
+- Verify with synthetic examples and isolated tests. Do not commit real SOPs, actual webpage screenshots, internal network addresses, development-machine absolute paths, or browser profiles.
+- After changes, run `npm test` and affected browser tests. Before release, run `npm run build` and inspect the artifacts. Never report checks that were not run as passing.
+- Keep `dist/` as a locally generated directory; do not commit build artifacts. The repository root `LICENSE` governs licensing.
+- Read `PROJECT-HANDOFF.md` at the start of a new session. Pre-migration checks do not replace testing in the current environment. Do not declare a formal release complete until native permission prompts and two-device acceptance checks are complete.
+- Write GitHub explanatory documentation in English; keep the product interface multilingual. The GitHub homepage and public release notes must show only formal release version numbers, without presenting internal development numbers as public versions. Claims about Chrome requirements must be based on implementation and verification; they do not constitute Google certification or Chrome Web Store approval.

@@ -5,7 +5,7 @@
 ## Store listing
 
 - Extension name: Running SOP
-- Short description (manifest): 按工作页面匹配 SOP，录制操作、编辑截图标记，并发布到用户选择的文件夹。
+- English short description: Match SOPs to work pages, record steps, annotate screenshots and publish to a folder you choose. The package retains its existing localized manifest summary.
 - Category recommendation: Workflow & Planning (under Productivity); actual dashboard selection must be confirmed before submission.
 - Single purpose: Create and follow visual, step-by-step operating procedures beside their configured work webpages.
 - Primary listing language: English. UI: simplified Chinese, traditional Chinese, English, Spanish, Russian, Korean and Japanese. Authored SOP text is not translated.
@@ -75,7 +75,7 @@ Data is processed for the SOP function; "the developer does not receive data" mu
 - Selecting a library does not opt into statistics synchronization; new setup makes a single library check. Existing explicitly enabled settings are retained on update.
 - Current settings no longer expose statistics or background-check toggles. Stop extension activity through Chrome's extension controls if needed; historical shared files remain.
 
-Privacy policy source: PRIVACY.md. Public repository link: https://github.com/monsterkahn/RunningSOP/blob/main/PRIVACY.md . The local 1.1.0 revision still needs to be published to that URL before a 1.1.0 store submission; do not claim the public copy matches until checked.
+Privacy policy source: PRIVACY.md. Public repository link: https://github.com/monsterkahn/RunningSOP/blob/main/PRIVACY.md . The policy source is published in this repository. Recheck the live URL and match its contents to the submitted package before any store submission.
 
 ## Distribution and developer
 
@@ -90,7 +90,7 @@ Privacy policy source: PRIVACY.md. Public repository link: https://github.com/mo
 
 | Version | Date | Changes | Status |
 | --- | --- | --- | --- |
-| 1.1.0 | 2026-10-18 | Lightweight finite folder guidance, Chrome 116 directory parser correction, confirmed local draft cleanup, specification/privacy review | Local development build; not submitted |
+| 1.1.0 | 2026-10-18 | Lightweight finite folder guidance, Chrome 116 directory parser correction, confirmed local draft cleanup, specification/privacy review | Official GitHub release; not submitted to the Chrome Web Store |
 | 1.0.0 | 2026-10-17 | First public-version submission | Submitted for review per user; approval not independently checked |
 
 ## Review notes and remaining manual gates

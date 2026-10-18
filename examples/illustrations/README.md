@@ -1,1 +1,1 @@
-图片为本项目合成的教学示意，不是实际用户网站截图。样本流程仅演示本机操作，不提交业务数据。
+These images are synthetic teaching illustrations created for this project, not screenshots of real user websites. The sample workflow demonstrates local operations only and includes no business data.
