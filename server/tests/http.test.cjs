@@ -300,3 +300,104 @@ test('view and image response admission rejects before reconstructing a revision
  for(const route of ['/v1/sops/synthetic/view','/v1/sops/synthetic/images/0?revision=1']){const response=await request(route);assert.equal(response.status,503);assert.equal(response.headers.get('retry-after'),'1');}
  assert.equal(calls,0);
 });
+
+
+// Keep real HTTP framing, admission and buffering, but expose the scheduled
+// deadlines so their full bounds can be checked without a two-minute sleep.
+function captureTransferDeadlines(t) {
+  const timers=[], schedule=global.setTimeout, cancel=global.clearTimeout;
+  t.mock.method(global,'setTimeout',(callback,ms,...args)=>{
+    const handle=schedule(callback,ms,...args);
+    if(callback.name==='expire'||callback.name==='responseExpired')timers.push({callback,ms,handle,cleared:false});
+    return handle;
+  });
+  t.mock.method(global,'clearTimeout',handle=>{for(const timer of timers)if(timer.handle===handle)timer.cleared=true;return cancel(handle);});
+  return timers;
+}
+function heldUpload(base,{route='/v1/sops',length=300000,authenticated=true,chunked=false,initial='{' }={}){
+  const http=require('node:http');let complete;
+  const done=new Promise(resolve=>{complete=resolve;});
+  const req=http.request(base+route,{method:'POST',headers:{'Content-Type':'application/json','X-Running-SOP-Protocol':'1',...(authenticated?{Authorization:'Bearer synthetic_session_token_123'}:{}),...(chunked?{}:{'Content-Length':String(length)})}},res=>{res.resume();res.once('end',()=>complete(res.statusCode));});
+  req.on('error',()=>complete(0));req.write(initial);
+  return {req,done};
+}
+async function until(check){for(let i=0;i<100;i++){if(check())return;await new Promise(resolve=>setTimeout(resolve,5));}assert.fail('HTTP request did not reach the expected state');}
+
+test('guide body size budgets keep idle, absolute cap, buffer and active admission bounded',async t=>{
+  const timers=captureTransferDeadlines(t);
+  const {base,request,server}=await fixture(t,{maxConcurrent:1,maxBufferedBodyBytes:64,maxBodyBytes:16*1024*1024});
+  assert.equal(server.headersTimeout,15000);assert.equal(server.requestTimeout,120000);
+  const upload=heldUpload(base,{length:8*1024*1024});
+  await until(()=>timers.some(timer=>timer.ms===120000));
+  const absolute=timers.find(timer=>timer.ms===120000),firstIdle=timers.find(timer=>timer.ms===15000&&!timer.cleared);
+  assert.ok(firstIdle);upload.req.write(' ');await until(()=>firstIdle.cleared);
+  assert.equal(absolute.cleared,false,'Progress must not reset the absolute transfer budget');
+  assert.equal((await request('/health')).status,503);
+  absolute.callback();assert.equal(await upload.done,408);upload.req.destroy();
+  assert.equal((await request('/health')).status,200,'Absolute expiry releases active admission');
+  const stalled=heldUpload(base);await until(()=>timers.some(timer=>timer.callback.name==='expire'&&timer.ms===15000&&!timer.cleared));
+  timers.find(timer=>timer.callback.name==='expire'&&timer.ms===15000&&!timer.cleared).callback();assert.equal(await stalled.done,408);stalled.req.destroy();
+  assert.equal((await request('/v1/sops',{method:'POST',data:{guide:'x'.repeat(52)}})).status,201,'Expiry also releases buffered-body bytes');
+});
+
+test('small, unknown-length, control and unauthenticated bodies never receive the large guide budget',async t=>{
+  const timers=captureTransferDeadlines(t),{base}=await fixture(t);
+  for(const options of [{length:100},{chunked:true},{route:'/v1/sops/sample/lock',length:100},{route:'/v1/sessions',length:100,authenticated:false}]){
+    const before=timers.length,upload=heldUpload(base,options);
+    await until(()=>timers.slice(before).some(timer=>timer.callback.name==='expire'));
+    const deadlines=timers.slice(before).filter(timer=>timer.callback.name==='expire');assert.deepEqual(deadlines.map(timer=>timer.ms),[15000]);
+    deadlines[0].callback();assert.equal(await upload.done,408);upload.req.destroy();
+  }
+  const before=timers.length,unauthorized=heldUpload(base,{authenticated:false});assert.equal(await unauthorized.done,401);unauthorized.req.destroy();
+  assert.equal(timers.slice(before).some(timer=>timer.callback.name==='expire'),false,'Unauthenticated guide uploads are rejected before body admission');
+});
+
+test('complete guide responses size their deadline and release byte admission on expiry',async t=>{
+  const timers=captureTransferDeadlines(t),payload='x'.repeat(300000);
+  const {base,request,server}=await fixture(t,{maxBufferedResponseBytes:400000,store:{get:()=>({guide:{image:payload}}),lockInfo:()=>null}});
+  server.prependListener('request',(req,res)=>{if(req.url.endsWith('?hold=1'))res.end=function(){res.flushHeaders();return res;};});
+  const http=require('node:http');
+  const held=await new Promise((resolve,reject)=>{const req=http.get(base+'/v1/sops/sample?hold=1',{headers:{Authorization:'Bearer synthetic_session_token_123','X-Running-SOP-Protocol':'1'}},res=>{res.on('error',()=>{});res.pause();resolve({req,res});});req.once('error',reject);});
+  const deadline=timers.find(timer=>timer.callback.name==='responseExpired'&&!timer.cleared);
+  const bytes=Buffer.byteLength(JSON.stringify({data:{guide:{image:payload},lock:null}}));
+  assert.equal(deadline.ms,15000+Math.ceil(bytes*1000/(64*1024)));
+  assert.equal((await request('/v1/sops/sample')).status,503);deadline.callback();
+  await until(()=>deadline.cleared);assert.equal((await request('/v1/sops/sample')).status,200,'Response expiry frees its entire byte reservation');held.req.destroy();held.res.destroy();
+  const before=timers.length;await request('/health');assert.equal(timers.slice(before).find(timer=>timer.callback.name==='responseExpired').ms,15000);
+  const capFixture=await fixture(t,{store:{get:()=>({guide:{image:'x'.repeat(8*1024*1024)}}),lockInfo:()=>null,list:()=>({padding:payload})}});
+  let start=timers.length;await capFixture.request('/v1/sops/sample');assert.equal(timers.slice(start).find(timer=>timer.callback.name==='responseExpired').ms,120000,'Even oversized synthetic guide responses have a hard cap');
+  start=timers.length;await capFixture.request('/v1/sops');assert.equal(timers.slice(start).find(timer=>timer.callback.name==='responseExpired').ms,15000,'Large metadata responses never inherit a guide deadline');
+});
+
+test('explicit short guide deadlines remain strict for large requests and responses',async t=>{
+  const timers=captureTransferDeadlines(t),{base,server,request}=await fixture(t,{requestTimeoutMs:100,responseTimeoutMs:100,store:{get:()=>({guide:{image:'x'.repeat(300000)}}),lockInfo:()=>null}});
+  assert.equal(server.requestTimeout,100);assert.equal(server.headersTimeout,100);
+  const upload=heldUpload(base);assert.equal(await upload.done,408);upload.req.destroy();
+  assert.equal(timers.find(timer=>timer.callback.name==='expire').ms,100);
+  await request('/v1/sops/sample');assert.ok(timers.filter(timer=>timer.callback.name==='responseExpired').every(timer=>timer.ms===100));
+});
+
+test('real progressing known-length guide upload survives the old fifteen-second total deadline', {timeout:22000},async t=>{
+  const {base,server}=await fixture(t),http=require('node:http');
+  const payload=JSON.stringify({guide:{synthetic:'x'.repeat(300000)}}),started=performance.now();
+  const result=new Promise((resolve,reject)=>{
+    const req=http.request(base+'/v1/sops',{method:'POST',headers:{Authorization:'Bearer synthetic_session_token_123','X-Running-SOP-Protocol':'1','Content-Type':'application/json','Content-Length':Buffer.byteLength(payload)}},res=>{res.resume();res.once('end',()=>resolve(res.statusCode));});
+    req.once('error',reject);t.after(()=>req.destroy());let offset=0;
+    const send=()=>{const end=Math.min(payload.length,offset+Math.ceil(payload.length/8));req.write(payload.slice(offset,end));offset=end;if(offset===payload.length){clearInterval(timer);req.end();}};
+    const timer=setInterval(send,2000);t.after(()=>clearInterval(timer));
+  });
+  assert.equal(await result,201);assert.ok(performance.now()-started>=15000);assert.equal(server.headersTimeout,15000);
+});
+
+test('public GET and preflight reject unexpected bodies instead of inheriting long parser exposure',async t=>{
+ const origin='http://localhost',{base,request}=await fixture(t,{allowOrigins:[origin]}),http=require('node:http');
+ for(const [method,route,headers] of [['GET','/health',{'Content-Length':'1000000'}],['GET','/v1/capabilities',{'Transfer-Encoding':'chunked'}],['OPTIONS','/v1/sops',{'Content-Length':'1000000',Origin:origin}]]){
+  const result=await new Promise((resolve,reject)=>{
+   const req=http.request(base+route,{method,headers},res=>{res.resume();res.once('end',()=>resolve({status:res.statusCode,connection:res.headers.connection}));});
+   req.once('error',reject);t.after(()=>req.destroy());req.write('x');
+  });
+  assert.equal(result.status,400);assert.equal(result.connection,'close');
+ }
+ assert.equal((await request('/health',{authenticated:false})).status,200);
+ assert.equal((await request('/v1/sops',{method:'OPTIONS',authenticated:false,headers:{Origin:origin}})).status,204);
+});

@@ -27,7 +27,7 @@
     "test:release-browser": "node --test --test-concurrency=1 tests/public-browser.cjs tests/folder-browser.cjs tests/qr-browser.cjs tests/dashboard-language-browser.cjs",
     "test:server": "node server/tools/test.cjs",
     "test:team-scale": "node server/tools/scale.cjs",
-    "test:team-browser": "node --test --test-concurrency=1 tests/team-workspace-browser.cjs tests/team-library-browser.cjs tests/team-service-picker-browser.cjs tests/team-read-view-browser.cjs tests/team-library-images-browser.cjs tests/team-sidebar-images-browser.cjs",
+    "test:team-browser": "node --test --test-concurrency=1 tests/team-workspace-browser.cjs tests/team-library-browser.cjs tests/team-service-picker-browser.cjs tests/team-read-view-browser.cjs tests/team-library-images-browser.cjs tests/team-sidebar-images-browser.cjs tests/team-slow-publish-browser.cjs",
     "build:team-service": "node tools/build-team-service.cjs",
     "build:release-media": "node tools/build-release-media.cjs",
     "build:release": "npm run build && npm run build:team-service && npm run build:release-media && node tools/release-checksums.cjs"

@@ -1,0 +1,525 @@
+{
+  "kind": "current-runtime-primary-workload-recheck",
+  "recordedDate": "2026-10-19",
+  "localRuntimeCommit": "22ff1b589239c4b381d9ef298776fb3a63fcf7a4",
+  "remoteRuntimeCommit": "aa5fc7b18d7c7f08c9a084282abc116bd820bf22",
+  "sourceTree": "a441009ebbd46ed6a88853a46c444ef85eba0ad0",
+  "workloads": {
+    "gradualConnections": {
+      "kind": "isolated-local-http-load-test",
+      "node": "v26.9.0",
+      "platform": "darwin",
+      "arch": "arm64",
+      "cpuModel": "Apple M4",
+      "cpus": 10,
+      "totalMemory": 17179869184,
+      "sops": 500,
+      "clients": 75,
+      "socketPool": 75,
+      "phases": [
+        {
+          "name": "join",
+          "requests": 75,
+          "concurrency": 75,
+          "durationMs": 12.901792,
+          "p50Ms": 7.612333000000007,
+          "p95Ms": 11.345708000000002,
+          "maxMs": 11.723791000000006,
+          "responseBytes": 12750
+        },
+        {
+          "name": "indexed-match",
+          "requests": 75,
+          "concurrency": 75,
+          "durationMs": 5.209875000000011,
+          "p50Ms": 3.1147909999999968,
+          "p95Ms": 4.241125000000011,
+          "maxMs": 4.3349999999999795,
+          "responseBytes": 18975
+        },
+        {
+          "name": "read",
+          "requests": 75,
+          "concurrency": 75,
+          "durationMs": 6.571917000000013,
+          "p50Ms": 3.885124999999988,
+          "p95Ms": 5.681000000000012,
+          "maxMs": 5.941832999999974,
+          "responseBytes": 37415
+        },
+        {
+          "name": "paged-list",
+          "requests": 75,
+          "concurrency": 75,
+          "durationMs": 10.405625000000015,
+          "p50Ms": 5.804375000000022,
+          "p95Ms": 8.980000000000018,
+          "maxMs": 9.380541999999991,
+          "responseBytes": 811875
+        },
+        {
+          "name": "deep-paged-list",
+          "requests": 75,
+          "concurrency": 75,
+          "durationMs": 10.735375000000005,
+          "p50Ms": 5.61729200000002,
+          "p95Ms": 9.707290999999998,
+          "maxMs": 10.11504100000002,
+          "responseBytes": 811875
+        },
+        {
+          "name": "selective-search",
+          "requests": 75,
+          "concurrency": 75,
+          "durationMs": 8.294916999999998,
+          "p50Ms": 4.809291999999999,
+          "p95Ms": 7.505916999999982,
+          "maxMs": 7.588041000000004,
+          "responseBytes": 18825
+        },
+        {
+          "name": "broad-chinese-search",
+          "requests": 75,
+          "concurrency": 75,
+          "durationMs": 33.18866700000001,
+          "p50Ms": 17.180833000000007,
+          "p95Ms": 31.165582999999998,
+          "maxMs": 32.492042,
+          "responseBytes": 328125
+        },
+        {
+          "name": "contested-lock",
+          "requests": 75,
+          "concurrency": 75,
+          "durationMs": 4.979707999999988,
+          "p50Ms": 2.9933340000000044,
+          "p95Ms": 4.247250000000008,
+          "maxMs": 4.346209000000016,
+          "responseBytes": 5199
+        },
+        {
+          "name": "independent-locks",
+          "requests": 75,
+          "concurrency": 75,
+          "durationMs": 11.286708000000004,
+          "p50Ms": 5.780374999999992,
+          "p95Ms": 10.043458000000015,
+          "maxMs": 10.610624999999999,
+          "responseBytes": 18075
+        },
+        {
+          "name": "publish",
+          "requests": 75,
+          "concurrency": 75,
+          "durationMs": 22.036374999999992,
+          "p50Ms": 12.341458000000017,
+          "p95Ms": 20.533917000000002,
+          "maxMs": 21.138916999999964,
+          "responseBytes": 36515
+        }
+      ],
+      "limitations": [
+        "Synthetic one-step documents; not 200,000 image-heavy production SOPs.",
+        "Loopback VM/process tests do not establish physical LAN latency or old-hardware performance."
+      ],
+      "serviceSchemaVersion": 6,
+      "seedMs": 11.504915999999998,
+      "queryPlans": {
+        "match": [
+          {
+            "id": 2,
+            "parent": 0,
+            "notused": 56,
+            "detail": "SEARCH matches USING COVERING INDEX sqlite_autoindex_matches_1 (matchKey=?)"
+          }
+        ],
+        "list": [
+          {
+            "id": 4,
+            "parent": 0,
+            "notused": 211,
+            "detail": "SCAN workflows USING COVERING INDEX workflow_listing"
+          }
+        ],
+        "search": [
+          {
+            "id": 3,
+            "parent": 0,
+            "notused": 156,
+            "detail": "SCAN title_search VIRTUAL TABLE INDEX 0:M2"
+          },
+          {
+            "id": 8,
+            "parent": 0,
+            "notused": 44,
+            "detail": "SEARCH w USING COVERING INDEX sqlite_autoindex_workflows_1 (id=?)"
+          }
+        ]
+      },
+      "databaseBytes": 753664,
+      "connectionStartup": "gradual batches of 32",
+      "sustained": {
+        "requests": 1500,
+        "requestsPerActor": 20,
+        "durationMs": 71.35929200000004,
+        "p95Ms": 6.5947080000000255,
+        "maxMs": 9.937167000000045
+      },
+      "server": {
+        "stats": true,
+        "memory": {
+          "rss": 68403200,
+          "heapTotal": 14041088,
+          "heapUsed": 9196464,
+          "external": 2560777,
+          "arrayBuffers": 275551
+        },
+        "connections": 75,
+        "peakConnections": 75
+      },
+      "unexpectedFailures": 0,
+      "initialLatencyTargetMet": true,
+      "requiresOptimization": []
+    },
+    "coldConnections": {
+      "kind": "isolated-local-http-load-test",
+      "node": "v26.9.0",
+      "platform": "darwin",
+      "arch": "arm64",
+      "cpuModel": "Apple M4",
+      "cpus": 10,
+      "totalMemory": 17179869184,
+      "sops": 500,
+      "clients": 75,
+      "socketPool": 75,
+      "phases": [
+        {
+          "name": "join",
+          "requests": 75,
+          "concurrency": 75,
+          "durationMs": 21.352292000000006,
+          "p50Ms": 12.901499999999999,
+          "p95Ms": 17.11725,
+          "maxMs": 17.544708999999997,
+          "responseBytes": 12750
+        },
+        {
+          "name": "indexed-match",
+          "requests": 75,
+          "concurrency": 75,
+          "durationMs": 5.7945410000000095,
+          "p50Ms": 3.2937499999999886,
+          "p95Ms": 4.576083000000011,
+          "maxMs": 4.674290999999982,
+          "responseBytes": 18975
+        },
+        {
+          "name": "read",
+          "requests": 75,
+          "concurrency": 75,
+          "durationMs": 6.0550420000000145,
+          "p50Ms": 3.585624999999993,
+          "p95Ms": 5.282499999999999,
+          "maxMs": 5.425457999999992,
+          "responseBytes": 37415
+        },
+        {
+          "name": "paged-list",
+          "requests": 75,
+          "concurrency": 75,
+          "durationMs": 9.545208000000002,
+          "p50Ms": 5.137833999999998,
+          "p95Ms": 8.550792000000001,
+          "maxMs": 8.81408300000001,
+          "responseBytes": 811875
+        },
+        {
+          "name": "deep-paged-list",
+          "requests": 75,
+          "concurrency": 75,
+          "durationMs": 10.967041000000023,
+          "p50Ms": 5.332999999999998,
+          "p95Ms": 10.176333,
+          "maxMs": 10.254750000000001,
+          "responseBytes": 811875
+        },
+        {
+          "name": "selective-search",
+          "requests": 75,
+          "concurrency": 75,
+          "durationMs": 6.9424999999999955,
+          "p50Ms": 4.080791000000005,
+          "p95Ms": 6.1835419999999885,
+          "maxMs": 6.342207999999999,
+          "responseBytes": 18825
+        },
+        {
+          "name": "broad-chinese-search",
+          "requests": 75,
+          "concurrency": 75,
+          "durationMs": 31.084708000000006,
+          "p50Ms": 15.756416999999999,
+          "p95Ms": 29.359207999999995,
+          "maxMs": 30.525834000000003,
+          "responseBytes": 328125
+        },
+        {
+          "name": "contested-lock",
+          "requests": 75,
+          "concurrency": 75,
+          "durationMs": 5.093583000000024,
+          "p50Ms": 2.7493749999999864,
+          "p95Ms": 4.13429099999999,
+          "maxMs": 4.315084000000013,
+          "responseBytes": 5199
+        },
+        {
+          "name": "independent-locks",
+          "requests": 75,
+          "concurrency": 75,
+          "durationMs": 9.362750000000005,
+          "p50Ms": 5.0777499999999804,
+          "p95Ms": 8.49045799999999,
+          "maxMs": 8.780374999999992,
+          "responseBytes": 18075
+        },
+        {
+          "name": "publish",
+          "requests": 75,
+          "concurrency": 75,
+          "durationMs": 21.109999999999985,
+          "p50Ms": 11.912042000000014,
+          "p95Ms": 19.680042000000014,
+          "maxMs": 20.254625000000004,
+          "responseBytes": 36515
+        }
+      ],
+      "limitations": [
+        "Synthetic one-step documents; not 200,000 image-heavy production SOPs.",
+        "Loopback VM/process tests do not establish physical LAN latency or old-hardware performance."
+      ],
+      "serviceSchemaVersion": 6,
+      "seedMs": 11.084999999999997,
+      "queryPlans": {
+        "match": [
+          {
+            "id": 2,
+            "parent": 0,
+            "notused": 56,
+            "detail": "SEARCH matches USING COVERING INDEX sqlite_autoindex_matches_1 (matchKey=?)"
+          }
+        ],
+        "list": [
+          {
+            "id": 4,
+            "parent": 0,
+            "notused": 211,
+            "detail": "SCAN workflows USING COVERING INDEX workflow_listing"
+          }
+        ],
+        "search": [
+          {
+            "id": 3,
+            "parent": 0,
+            "notused": 156,
+            "detail": "SCAN title_search VIRTUAL TABLE INDEX 0:M2"
+          },
+          {
+            "id": 8,
+            "parent": 0,
+            "notused": 44,
+            "detail": "SEARCH w USING COVERING INDEX sqlite_autoindex_workflows_1 (id=?)"
+          }
+        ]
+      },
+      "databaseBytes": 753664,
+      "connectionStartup": "cold burst",
+      "sustained": {
+        "requests": 1500,
+        "requestsPerActor": 20,
+        "durationMs": 85.253375,
+        "p95Ms": 8.087208000000032,
+        "maxMs": 12.764082999999971
+      },
+      "server": {
+        "stats": true,
+        "memory": {
+          "rss": 68059136,
+          "heapTotal": 14565376,
+          "heapUsed": 9959712,
+          "external": 2568693,
+          "arrayBuffers": 283467
+        },
+        "connections": 75,
+        "peakConnections": 75
+      },
+      "unexpectedFailures": 0,
+      "initialLatencyTargetMet": true,
+      "requiresOptimization": []
+    },
+    "imageComparison": {
+      "kind": "actual-client-full-vs-text-plus-one-image",
+      "recordedAt": "2026-10-19T00:32:36.392Z",
+      "node": "v26.9.0",
+      "platform": "darwin",
+      "arch": "arm64",
+      "clients": 75,
+      "phases": [
+        {
+          "mode": "full",
+          "clients": 75,
+          "completed": 75,
+          "guideBytes": 3148224,
+          "selectedImagesPerReader": 12,
+          "elapsedMs": 3644.499583,
+          "p95Ms": 3429.187625,
+          "wireBytes": 236133880,
+          "requests": 169,
+          "imageRequests": 0,
+          "statuses": {
+            "200": 75,
+            "503": 94
+          },
+          "baseline": {
+            "stats": true,
+            "peakRss": 115376128,
+            "peakHeapUsed": 35463216,
+            "peakArrayBuffers": 6241339,
+            "peakConnections": 75,
+            "connections": 75,
+            "getCalls": 1,
+            "memory": {
+              "rss": 105316352,
+              "heapTotal": 11960320,
+              "heapUsed": 9741664,
+              "external": 2508086,
+              "arrayBuffers": 222820
+            }
+          },
+          "server": {
+            "stats": true,
+            "peakRss": 253722624,
+            "peakHeapUsed": 103723416,
+            "peakArrayBuffers": 118264156,
+            "peakConnections": 75,
+            "connections": 75,
+            "getCalls": 76,
+            "memory": {
+              "rss": 197558272,
+              "heapTotal": 15630336,
+              "heapUsed": 8699048,
+              "external": 2492154,
+              "arrayBuffers": 209555
+            }
+          }
+        },
+        {
+          "mode": "view",
+          "clients": 75,
+          "completed": 75,
+          "guideBytes": 3148224,
+          "selectedImagesPerReader": 1,
+          "textStage": {
+            "elapsedMs": 1005.6350410000005,
+            "wireBytes": 251475,
+            "requests": 75,
+            "imageRequests": 0,
+            "statuses": {
+              "200": 75
+            }
+          },
+          "elapsedMs": 1049.899708,
+          "p95Ms": 1048.1977500000003,
+          "wireBytes": 19924437,
+          "requests": 150,
+          "imageRequests": 75,
+          "statuses": {
+            "200": 150
+          },
+          "baseline": {
+            "stats": true,
+            "peakRss": 115261440,
+            "peakHeapUsed": 35459232,
+            "peakArrayBuffers": 6241339,
+            "peakConnections": 75,
+            "connections": 75,
+            "getCalls": 1,
+            "memory": {
+              "rss": 105136128,
+              "heapTotal": 11960320,
+              "heapUsed": 9717648,
+              "external": 2508086,
+              "arrayBuffers": 222820
+            }
+          },
+          "server": {
+            "stats": true,
+            "peakRss": 197591040,
+            "peakHeapUsed": 70239712,
+            "peakArrayBuffers": 15943170,
+            "peakConnections": 75,
+            "connections": 75,
+            "getCalls": 76,
+            "memory": {
+              "rss": 138887168,
+              "heapTotal": 12730368,
+              "heapUsed": 5546424,
+              "external": 2492154,
+              "arrayBuffers": 209555
+            }
+          }
+        }
+      ],
+      "payloadReduction": 0.9156222859676044,
+      "limitations": [
+        "75-client loopback default; warmed independent sockets and temporary synthetic SQLite databases, not physical LAN or older hardware.",
+        "The view phase retrieves text plus one image per reader, whereas complete reads include all twelve images. It is not an all-images speed comparison.",
+        "View generation still reconstructs and verifies the whole guide on the server; no reduced server reconstruction-cost claim.",
+        "Actual SDK under Node streams, no browser rendering or image decoding. The UI does not yet select these new methods.",
+        "Peak memory is sampled per separate fixture process; it is an observation, not a universal upper bound."
+      ]
+    }
+  },
+  "sourceFingerprints": [
+    {
+      "path": "extension/team-client.js",
+      "sha256": "d0a8aaff97e0de8e6114b05c999db8b01e003fdb88fe5cb17e603e723f9b8107"
+    },
+    {
+      "path": "server/app.cjs",
+      "sha256": "5dfcf15fcabb0c739119f4472258909084e40d067905a7185868b01a53f67161"
+    },
+    {
+      "path": "server/backup.cjs",
+      "sha256": "852eb88ef04bd4cc3209f0c217b3ea6b553be2f83cb7280b338b18c47e2709fe"
+    },
+    {
+      "path": "server/category-store.cjs",
+      "sha256": "0abec3ef8dc1f3e66a65460f3fb941783aa051270f0741bb07c47053981b7438"
+    },
+    {
+      "path": "server/cli.cjs",
+      "sha256": "0396199113cd860795ada0f2c6f15f779c9e4ca76fd95a327681e81493645fd5"
+    },
+    {
+      "path": "server/guide-assets.cjs",
+      "sha256": "2d273e931c46c9e3e7ef9642ce9dc4643410bfc9b627c805af33c79bbd2d1273"
+    },
+    {
+      "path": "server/store.cjs",
+      "sha256": "4f892e4ccdd4a899a95c6e9dc0aa20d970dac3d7ad72aed90423d55b0023992d"
+    },
+    {
+      "path": "server/tools/fixture-real-large-read.cjs",
+      "sha256": "bbdbaed822fd8e37ff5df3dbf4eb3a5ffb171d56d759d00f2709825a81055d90"
+    },
+    {
+      "path": "server/tools/read-view-load.cjs",
+      "sha256": "cdc19835b4a66f7a144aa56816c897c84341d847870dd48b693a5580ebe97b92"
+    },
+    {
+      "path": "server/tools/scale.cjs",
+      "sha256": "26832ce93604f87f0fcd6d3f62b8aa70668e2696b9ca89700740e47d6b3fc4ba"
+    }
+  ]
+}

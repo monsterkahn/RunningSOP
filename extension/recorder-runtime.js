@@ -1,7 +1,7 @@
 'use strict';
 (function (root) {
   const KEY = 'runtime-sop-recorder-v1';
-  const MAX_DRAFTS = 10, MAX_STEPS = 80, MAX_SHOT = 200 * 1024, MAX_TOTAL = 4 * 1024 * 1024;
+  const MAX_DRAFTS = 10, MAX_STEPS = 100, MAX_SHOT = 200 * 1024, MAX_TOTAL = 4 * 1024 * 1024;
   const TYPES = new Set(['click', 'field', 'manual', 'navigation']);
   const extensionEnabled = Boolean(root.chrome && root.chrome.runtime && root.chrome.storage && root.chrome.tabs && root.chrome.scripting);
   let queue = Promise.resolve();
@@ -248,7 +248,7 @@
       if(message.type==='recorder-next-step'){
         const session=state.session,draft=state.drafts.find(d=>d.id===message.id);
         if(!session?.guided||session.draftId!==message.id||!draft)throw Error('请先开始分步制作。');
-        if(draft.steps.length>=MAX_STEPS)throw Error('步骤最多 80 条，请结束录制。');
+        if(draft.steps.length>=MAX_STEPS)throw Error('步骤最多 100 条，请结束录制。');
         const url=safeWorkUrl(session.currentUrl||session.origin);
         draft.steps.push({id:makeId(),type:'manual',title:'',url,workUrl:url,where:'',action:'',expected:'',acceptance:'',trouble:'',at:now()});
         draft.updatedAt=now();await storageWrite(state);return state;
@@ -262,7 +262,7 @@
         if (Object.keys(patch).some((key) => !['title', 'steps'].includes(key))) throw Error('草稿更新字段无效。');
         if ('title' in patch) { if (typeof patch.title !== 'string' || !patch.title.trim() || patch.title.length > 160) throw Error('标题不能为空且不能超过 160 字。'); draft.title = trim(patch.title, 160); }
         if ('steps' in patch) {
-          if (!Array.isArray(patch.steps) || patch.steps.length > MAX_STEPS) throw Error('步骤最多 80 条。');
+          if (!Array.isArray(patch.steps) || patch.steps.length > MAX_STEPS) throw Error('步骤最多 100 条。');
           const steps = patch.steps.map((s) => {
             if (!s || !TYPES.has(s.type)) throw Error('步骤类型无效。');
             const out = { ...pointFields(s), id: typeof s.id === 'string' ? s.id : makeId(), type: s.type, title: field(s.title,200), url: safePageUrl(s.url || draft.origin)?.url || draft.origin, where: field(s.where,500), action: field(s.action,1500), expected: field(s.expected,1500), acceptance: field(s.acceptance,1500), trouble: field(s.trouble,1500), at: typeof s.at === 'string' ? s.at : now() };
@@ -369,7 +369,7 @@
       const event = message.event;
       if (!event || !['click', 'field', 'manual'].includes(event.type) || typeof event.title !== 'string' || typeof event.action !== 'string') return { ignored: true };
       const draft = state.drafts.find((d) => d.id === s.draftId);
-      if (!draft || draft.steps.length >= MAX_STEPS) {await pauseSession(state);throw Error('步骤已达到 80 条上限，记录已暂停，请结束并整理草稿。');}
+      if (!draft || draft.steps.length >= MAX_STEPS) {await pauseSession(state);throw Error('步骤已达到 100 条上限，记录已暂停，请结束并整理草稿。');}
       const at = now();
       if(s.guided){s.latestAction=trim(event.action,600);draft.updatedAt=at;await storageWrite(state);return {recorded:true};}
       draft.steps.push({ id: makeId(), type: event.type, title: trim(event.title, 200), url: senderPage.url, where: trim(event.where, 240), action: trim(event.action, 600), expected: '', acceptance: '', trouble: '', at });

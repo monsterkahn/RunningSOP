@@ -1,0 +1,164 @@
+{
+  "kind": "post-release-selected-image-cross-platform-validation",
+  "recordedDate": "2026-10-19",
+  "localRuntimeCommit": "22ff1b589239c4b381d9ef298776fb3a63fcf7a4",
+  "remoteRuntimeCommit": "aa5fc7b18d7c7f08c9a084282abc116bd820bf22",
+  "equalSourceTree": "a441009ebbd46ed6a88853a46c444ef85eba0ad0",
+  "branch": "codex/post120-capacity-verification",
+  "workflow": {
+    "runId": 39180665855,
+    "url": "https://github.com/monsterkahn/RunningSOP/actions/runs/39180665855",
+    "jobs": [
+      {
+        "id": 117832517774,
+        "name": "verify",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 117832517979,
+        "name": "team / service (ubuntu-24.04, 26)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 117832517996,
+        "name": "team / browser (windows-2022)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 117832518003,
+        "name": "windows / windows (windows-2025)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 117832518022,
+        "name": "team / service (windows-2022, 26)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 117832518031,
+        "name": "team / service (macos-14, 26)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 117832518043,
+        "name": "team / container",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 117832518053,
+        "name": "windows / windows (windows-2022)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 117832518059,
+        "name": "team / browser (ubuntu-24.04)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 117832518063,
+        "name": "team / browser (macos-14)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 117832518079,
+        "name": "team / service (ubuntu-24.04, 24)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 117832518081,
+        "name": "team / service (windows-2022, 24)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 117832518108,
+        "name": "team / service (macos-14, 24)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 117833152301,
+        "name": "release",
+        "status": "completed",
+        "conclusion": "skipped"
+      }
+    ]
+  },
+  "packagedRuntime": {
+    "build": "npm run build from isolated git archive, not the user installation directory",
+    "artifacts": [
+      {
+        "name": "running-sop-extension-v1.2.0.zip",
+        "sha256": "5dd535b74863099e539a7c4d24e873268ec7fbdd81748302f8df77048e062ae1",
+        "zipIntegrity": "passed"
+      },
+      {
+        "name": "running-sop-github-v1.2.0.zip",
+        "sha256": "e405f9824efc6d100b8f3a7d3b6e5e5101468fd65ed58470099f385ee897fcd6",
+        "zipIntegrity": "passed"
+      },
+      {
+        "name": "running-sop-webstore-v1.2.0.zip",
+        "sha256": "75bada96181df3eb8927b895e2d64902f36a5c8ba963e3b416cda9cfa16735ba",
+        "zipIntegrity": "passed"
+      }
+    ],
+    "allRuntimeEntriesByteMatched": 66,
+    "browserSuites": [
+      {
+        "browser": "Chromium 151.0.7922.34",
+        "teamPassed": 24,
+        "originalPassed": 10
+      },
+      {
+        "browser": "Chrome for Testing 116.0.5845.96",
+        "teamPassed": 24,
+        "originalPassed": 10
+      }
+    ]
+  },
+  "windowsCoreNote": "Both Windows jobs reported 162 tests, 161 passed, 0 failed and one pre-existing Linux-specific skipped check. Team browser suites on all three operating systems each reported 24 passed, 0 failed.",
+  "publishedAssetsUnchanged": [
+    {
+      "name": "running-sop-extension-v1.2.0.zip",
+      "digest": "sha256:2fbeab363d6919125858bffbda21b1cca93b2d6faea97030f55557882d5e965c"
+    },
+    {
+      "name": "running-sop-github-v1.2.0.zip",
+      "digest": "sha256:772dad4e3d7e76fb9cad5f7e7972aaef1fbf0c3464b8a469c8f9f63ba79d2bcf"
+    },
+    {
+      "name": "running-sop-media-v1.2.0.zip",
+      "digest": "sha256:7f17ec65361469e95f4570c344c646ffd246b0abb5b3786b1beb3a250ea774cd"
+    },
+    {
+      "name": "running-sop-team-service-v1.2.0-experimental.zip",
+      "digest": "sha256:dad3f7eff258190a0463d18cec04674a44f35517f81bf4cf8d243d951c4be602"
+    },
+    {
+      "name": "running-sop-webstore-v1.2.0.zip",
+      "digest": "sha256:32c55352bfd48fee390bb14ba300215e0115eb511f174fa77b2cc051ccea0a79"
+    },
+    {
+      "name": "SHA256SUMS.txt",
+      "digest": "sha256:50ef6918f07a2ba83675f0c3d3260ee0cede321237e776d1b0719dc21df210a8"
+    }
+  ],
+  "limitations": [
+    "Isolated synthetic test profiles and same-host HTTP/SQLite; native permissions mocked.",
+    "No physical two-device LAN/NAS/TLS acceptance or arbitrary old-hardware performance claim.",
+    "Validation packages retain the repository version but are development-only; no new release or store submission.",
+    "The release job was skipped on the development branch."
+  ]
+}

@@ -3,6 +3,14 @@
 const http = require('node:http');
 const { createHash, timingSafeEqual } = require('node:crypto');
 const MAX_BODY_BYTES = 4 * 1024 * 1024 + 65536;
+// Only large, authenticated complete-guide transfers receive extra wall time.
+// Operator-supplied nondefault deadlines remain strict, including short tests.
+const DEFAULT_TRANSFER_TIMEOUT_MS = 15000;
+const MAX_GUIDE_TRANSFER_MS = 120000;
+function guideTransferTimeout(bytes, timeoutMs) {
+  if (timeoutMs !== DEFAULT_TRANSFER_TIMEOUT_MS || !Number.isSafeInteger(bytes) || bytes <= 256 * 1024) return timeoutMs;
+  return Math.min(MAX_GUIDE_TRANSFER_MS, timeoutMs + Math.ceil(bytes * 1000 / (64 * 1024)));
+}
 const ID = /^[a-z0-9][a-z0-9-]{0,79}$/;
 
 function failure(status, code, message) { return Object.assign(new Error(message), { status, code }); }
@@ -13,22 +21,25 @@ function integer(value, name, max = Number.MAX_SAFE_INTEGER) {
   if (!/^[1-9]\d*$/.test(value || '') || !Number.isSafeInteger(Number(value)) || Number(value) > max) throw failure(400, 'INVALID_REQUEST', `Invalid ${name}.`);
   return Number(value);
 }
-function readBody(req, limit, timeoutMs, budget) {
+function readBody(req, limit, timeoutMs, budget, totalTimeoutMs = timeoutMs) {
   return new Promise((resolve, reject) => {
     let size = 0, settled = false; const chunks = [];
     const finish = (error, value) => {
-      if (settled) return; settled = true; clearTimeout(timer);
+      if (settled) return; settled = true; clearTimeout(timer); clearTimeout(idleTimer);
       budget.bytes -= size; chunks.length = 0;
       if (error) { error.closeConnection = true; req.pause(); reject(error); } else resolve(value);
     };
-    const timer = setTimeout(() => finish(failure(408, 'REQUEST_TIMEOUT', 'Request timed out.')), timeoutMs); timer.unref();
+    const expire = () => finish(failure(408, 'REQUEST_TIMEOUT', 'Request timed out.'));
+    let idleTimer;
+    const progress = () => { if (totalTimeoutMs > timeoutMs) { clearTimeout(idleTimer); idleTimer = setTimeout(expire, timeoutMs); idleTimer.unref(); } };
+    const timer = setTimeout(expire, totalTimeoutMs); timer.unref(); progress();
     if (!/^application\/json(?:\s*;\s*charset=utf-8)?$/i.test(req.headers['content-type'] || '')) { finish(failure(415, 'CONTENT_TYPE', 'Use application/json.')); return; }
     if (Number(req.headers['content-length']) > limit) { finish(failure(413, 'BODY_TOO_LARGE', 'Request body is too large.')); return; }
     req.on('data', chunk => {
       if (settled) return;
       if (size + chunk.length > limit) { finish(failure(413, 'BODY_TOO_LARGE', 'Request body is too large.')); return; }
       if (budget.bytes + chunk.length > budget.limit) { finish(failure(503, 'BUSY', 'Service body buffer is full.')); return; }
-      size += chunk.length; budget.bytes += chunk.length; chunks.push(chunk);
+      size += chunk.length; budget.bytes += chunk.length; chunks.push(chunk); if (chunk.length) progress();
     });
     req.once('aborted', () => finish(failure(400, 'ABORTED', 'Request aborted.')));
     req.once('error', () => finish(failure(400, 'INVALID_REQUEST', 'Unable to read request.')));
@@ -59,12 +70,12 @@ function createTeamServer({ store, joinCode, allowOrigins = [], maxBodyBytes = M
   const cleanup = setInterval(() => { const timestamp = now(); for (const [key, bucket] of buckets) if (timestamp - bucket.start >= rateWindowMs) buckets.delete(key); }, Math.max(1000, rateWindowMs)); cleanup.unref();
   const server = http.createServer(async (req, res) => {
     res.setHeader('Cache-Control', 'no-store'); res.setHeader('X-Content-Type-Options', 'nosniff'); res.setHeader('Content-Security-Policy', "default-src 'none'; frame-ancestors 'none'");
-    const send = (status, body) => {
+    const send = (status, body, completeGuide = false) => {
       if (res.destroyed || res.writableEnded) return;
       let serialized=JSON.stringify(body),bytes=Buffer.byteLength(serialized);
       if(bufferedResponses+bytes>maxBufferedResponseBytes){status=503;serialized=JSON.stringify({error:{code:'BUSY',message:'Service response buffer is full.'}});res.setHeader('Retry-After','1');bytes=0;}
       bufferedResponses+=bytes;let released=false;
-      const responseDeadline = setTimeout(() => res.destroy(), responseTimeoutMs); responseDeadline.unref();
+      const responseDeadline = setTimeout(function responseExpired() { res.destroy(); }, completeGuide && status < 300 ? guideTransferTimeout(bytes, responseTimeoutMs) : responseTimeoutMs); responseDeadline.unref();
       const release=()=>{if(!released){released=true;clearTimeout(responseDeadline);bufferedResponses-=bytes;}};
       res.once('finish',release);res.once('close',release);
       res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' }); res.end(serialized);
@@ -74,6 +85,7 @@ function createTeamServer({ store, joinCode, allowOrigins = [], maxBodyBytes = M
       const origin = req.headers.origin;
       if (origin && !origins.has(origin)) throw failure(403, 'ORIGIN_DENIED', 'Origin is not allowed.');
       if (origin) { res.setHeader('Access-Control-Allow-Origin', origin); res.setHeader('Vary', 'Origin'); }
+      if (['GET','OPTIONS'].includes(req.method) && (Number(req.headers['content-length']) > 0 || req.headers['transfer-encoding'])) throw failure(400, 'INVALID_REQUEST', 'This request does not accept a body.');
       if (req.method === 'OPTIONS') {
         if (!origin) throw failure(403, 'ORIGIN_DENIED', 'Origin is required.');
         res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
@@ -95,7 +107,8 @@ function createTeamServer({ store, joinCode, allowOrigins = [], maxBodyBytes = M
       if (req.method === 'GET' && path === '/v1/capabilities') { send(200, { data: { protocolVersion: 1, serverVersion: '0.1.0', experimental: true, minClientProtocol: 1, maxClientProtocol: 1, limits: { maxBodyBytes, maxPageSize: 100 }, features: ['editing-leases','history','categories',...(store.getView&&store.getImage?['read-view-images']:[])] } }); return; }
       if (!path.startsWith('/v1/')) throw failure(404, 'NOT_FOUND', 'Route not found.');
       if (req.headers['x-running-sop-protocol'] !== '1') throw failure(426, 'PROTOCOL_MISMATCH', 'Protocol version 1 is required.');
-      const body = (guide = false) => readBody(req, guide ? maxBodyBytes : Math.min(8192, maxBodyBytes), requestTimeoutMs, budget);
+      const body = (guide = false) => readBody(req, guide ? maxBodyBytes : Math.min(8192, maxBodyBytes), requestTimeoutMs, budget,
+        guide && actor && !req.headers['transfer-encoding'] ? guideTransferTimeout(Number(req.headers['content-length']), requestTimeoutMs) : requestTimeoutMs);
       if (req.method === 'POST' && path === '/v1/sessions') {
         const data = await body();
         if (typeof data.joinCode !== 'string' || !equalSecret(data.joinCode, joinCode)) throw failure(401, 'INVALID_JOIN_CODE', 'Invalid join code.');
@@ -105,7 +118,7 @@ function createTeamServer({ store, joinCode, allowOrigins = [], maxBodyBytes = M
       const page = () => ({ cursor: url.searchParams.get('cursor') || undefined, limit: url.searchParams.has('limit') ? integer(url.searchParams.get('limit'), 'limit', 100) : undefined });
       const idempotencyKey = req.headers['idempotency-key'];
       if (idempotencyKey !== undefined && (typeof idempotencyKey !== 'string' || !/^[A-Za-z0-9_-]{8,128}$/.test(idempotencyKey))) throw failure(400, 'INVALID_REQUEST', 'Invalid idempotency key.');
-      let result, status = 200;
+      let result, status = 200, completeGuide = false;
       if (path === '/v1/categories' && req.method === 'GET') result = store.listCategories({actor,...page(),...(url.searchParams.has('parentId')?{parentId:url.searchParams.get('parentId')||null}:{})});
       else if (path === '/v1/categories' && req.method === 'POST') { const data=await body(); result=store.createCategory(data.category,{actor,idempotencyKey}); status=201; }
       else if (path === '/v1/category-audit' && req.method === 'GET') result=store.categoryAudit({actor,...page(),categoryId:url.searchParams.get('categoryId')||undefined,workflowId:url.searchParams.get('workflowId')||undefined});
@@ -117,7 +130,7 @@ function createTeamServer({ store, joinCode, allowOrigins = [], maxBodyBytes = M
         const id=path.split('/')[3],data=await body();result=store.assignCategory(id,data.categoryId,{actor,expectedCategoryRevision:data.expectedCategoryRevision,idempotencyKey});
       }
       else if (path === '/v1/sops' && req.method === 'GET') {if(url.searchParams.has('uncategorized')&&url.searchParams.get('uncategorized')!=='1')throw failure(400,'INVALID_REQUEST','Invalid category filter.');result = store.list({ ...page(), query: url.searchParams.get('query') || '', category: url.searchParams.get('category') || '',uncategorized:url.searchParams.get('uncategorized')==='1' });}
-      else if (path === '/v1/sops' && req.method === 'POST') { const data = await body(true); result = store.create(data.guide, { actor, idempotencyKey }); status = 201; }
+      else if (path === '/v1/sops' && req.method === 'POST') { const data = await body(true); result = store.create(data.guide, { actor, idempotencyKey }); status = 201; completeGuide = true; }
       else if (req.method==='GET' && /^\/v1\/sops\/[a-z0-9][a-z0-9-]{0,79}\/(?:view|images\/[^/]+(?:\/issues\/[^/]+)?)$/.test(path)) {
         const parts=path.split('/'),id=parts[3],options={revision:url.searchParams.has('revision')?integer(url.searchParams.get('revision'),'revision'):undefined};
         if(parts[4]==='images'){
@@ -136,9 +149,9 @@ function createTeamServer({ store, joinCode, allowOrigins = [], maxBodyBytes = M
         if (!action && req.method === 'GET') {
           const options={revision:url.searchParams.has('revision')?integer(url.searchParams.get('revision'),'revision'):undefined};
           if(store.estimatedReadBytes&&bufferedResponses+store.estimatedReadBytes(id,options)>maxBufferedResponseBytes)throw failure(503,'BUSY','Service response buffer is full.');
-          result={...store.get(id,options),lock:store.lockInfo(id)};
+          result={...store.get(id,options),lock:store.lockInfo(id)}; completeGuide = true;
         }
-        else if (!action && req.method === 'PUT') { const data = await body(true); result = store.publish(id, data.guide, { actor, token: data.token, fence: data.fence, expectedRevision: data.expectedRevision, idempotencyKey }); }
+        else if (!action && req.method === 'PUT') { const data = await body(true); result = store.publish(id, data.guide, { actor, token: data.token, fence: data.fence, expectedRevision: data.expectedRevision, idempotencyKey }); completeGuide = true; }
         else if (action === 'history' && req.method === 'GET') result = store.history(id, page());
         else if (action === 'lock' && req.method === 'POST') {
           // Consume a supplied action envelope before responding, including on
@@ -149,7 +162,7 @@ function createTeamServer({ store, joinCode, allowOrigins = [], maxBodyBytes = M
         else if (action === 'lock' && ['PATCH', 'DELETE'].includes(req.method)) { const data = await body(); result = store[req.method === 'PATCH' ? 'renewLock' : 'releaseLock'](id, { actor, token: data.token, fence: data.fence }); if (req.method === 'PATCH') result = { ...result, serverTime: store.now ? store.now() : now(), leaseMs: store.leaseMs }; }
         else throw failure(404, 'NOT_FOUND', 'Route not found.');
       }
-      send(status, { data: result === undefined ? null : result });
+      send(status, { data: result === undefined ? null : result }, completeGuide);
     } catch (error) {
       if(error.status===503)res.setHeader('Retry-After','1');
       if (error.status === 429) res.setHeader('Retry-After', String(Math.ceil(rateWindowMs / 1000)));
@@ -161,7 +174,10 @@ function createTeamServer({ store, joinCode, allowOrigins = [], maxBodyBytes = M
   });
   server.maxConnections = maxConnections;
   server.once('close', () => clearInterval(cleanup));
-  server.requestTimeout = requestTimeoutMs; server.headersTimeout = requestTimeoutMs; server.keepAliveTimeout = 5000; server.maxRequestsPerSocket = 100;
+  // Node's parser has one server-wide body deadline. The application enforces
+  // the original total/idle limits per route; its larger guide budget would be
+  // defeated by a 15-second parser deadline. Header admission stays unchanged.
+  server.requestTimeout = requestTimeoutMs === DEFAULT_TRANSFER_TIMEOUT_MS ? MAX_GUIDE_TRANSFER_MS : requestTimeoutMs; server.headersTimeout = requestTimeoutMs; server.keepAliveTimeout = 5000; server.maxRequestsPerSocket = 100;
   server.on('clientError', (_error, socket) => { socket.end('HTTP/1.1 400 Bad Request\r\nConnection: close\r\nContent-Length: 0\r\n\r\n'); });
   return server;
 }

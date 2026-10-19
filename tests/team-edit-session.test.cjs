@@ -21,3 +21,31 @@ test('private durable pending request restores exact retry after controller disp
  const options={client,saveDraft:async()=>{},savePending:async value=>{stored=structuredClone(value);},monotonicNow:()=>0,setTimeout:()=>1,clearTimeout:()=>{}};
  const first=create(options);await first.start('synthetic',guide);await assert.rejects(first.publish());assert.ok(stored);await first.dispose();const second=create(options);second.restorePending(stored);assert.equal(second.snapshot().phase,'uncertain');await second.retryPublish();assert.deepEqual(attempts[0],attempts[1]);assert.equal(stored,null);
 });
+
+const largeDraft={...guide,notice:'x'.repeat(300000)};
+test('large publication renews a nearly expired lease before its first upload',async()=>{
+ const s=setup();await s.api.start('synthetic',largeDraft);s.setClock(20100);await s.api.publish();
+ assert.equal(s.calls.filter(c=>c[0]==='renew').length,1);assert.equal(s.calls.filter(c=>c[0]==='publish').length,1);assert.ok(s.calls.findIndex(c=>c[0]==='renew')<s.calls.findIndex(c=>c[0]==='publish'));assert.equal(s.api.snapshot().phase,'published');
+ const healthy=setup();await healthy.api.start('synthetic',largeDraft);await healthy.api.publish();assert.equal(healthy.calls.filter(c=>c[0]==='renew').length,0);
+});
+test('failed large-upload lease refresh retains the draft and never sends or marks a publication uncertain',async()=>{
+ const s=setup({async renewLock(){throw Object.assign(Error('offline'),{code:'network_error'});}});await s.api.start('synthetic',largeDraft);s.setClock(20100);
+ await assert.rejects(s.api.publish(),{code:'lease_refresh_failed'});assert.equal(s.api.snapshot().phase,'lost');assert.equal(s.api.snapshot().hasPendingPublish,false);assert.equal(s.calls.some(c=>c[0]==='publish'),false);assert.deepEqual(s.drafts.at(-1).d,largeDraft);
+});
+test('uncertain large publication replays exact request without renewing the old lease',async()=>{
+ let attempts=0;const sent=[];const s=setup({async publish(id,g,o){sent.push({id,g,o:{lease:o.lease,expectedRevision:o.expectedRevision,idempotencyKey:o.idempotencyKey}});if(++attempts===1)throw Object.assign(Error('response lost'),{code:'timeout'});return {id,revision:6};}});
+ await s.api.start('synthetic',largeDraft);s.setClock(20100);await assert.rejects(s.api.publish(),{code:'timeout'});assert.equal(s.api.snapshot().phase,'uncertain');assert.equal(s.calls.filter(c=>c[0]==='renew').length,1);
+ s.setClock(999999);await s.api.retryPublish();assert.deepEqual(sent[0],sent[1]);assert.equal(s.calls.filter(c=>c[0]==='renew').length,1);
+});
+test('account invalidation during a pre-upload renewal prevents the large publication',async()=>{
+ let release;const s=setup({renewLock:()=>new Promise(resolve=>{release=resolve;})});await s.api.start('synthetic',largeDraft);s.setClock(20100);
+ const publishing=s.api.publish();while(!release)await new Promise(resolve=>setImmediate(resolve));await s.api.invalidate('replacement');release(s.lease);
+ await assert.rejects(publishing,{code:'configuration_changed'});assert.equal(s.calls.some(c=>c[0]==='publish'),false);assert.equal(s.api.snapshot().phase,'invalidated');
+});
+
+test('pre-upload draft persistence is serialized and must finish before any renewal',async()=>{
+ let persistGate,release,hold=false,renewals=0,publishes=0,clock=0;
+ const api=create({client:{endpoint:'synthetic',acquireLock:async()=>({token:'lease',fence:1,baseRevision:1,serverTime:0,expiresAt:30000,leaseMs:30000}),renewLock:async()=>{renewals++;return {token:'lease',fence:1,baseRevision:1,serverTime:0,expiresAt:30000,leaseMs:30000};},newIdempotencyKey:()=> 'same-key',publish:async()=>{publishes++;return {id:'synthetic',revision:2};}},saveDraft:async()=>{if(hold){persistGate=true;await new Promise(resolve=>{release=resolve;});hold=false;}},monotonicNow:()=>clock,setTimeout:()=>1,clearTimeout:()=>{}});
+ await api.start('synthetic',largeDraft);clock=20000;hold=true;const first=api.publish();while(!persistGate)await new Promise(resolve=>setImmediate(resolve));
+ await assert.rejects(api.publish({...largeDraft,title:'Concurrent'}),{code:'busy'});assert.equal(renewals,0);release();await first;assert.equal(renewals,1);assert.equal(publishes,1);
+});

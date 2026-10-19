@@ -33,28 +33,46 @@
     const fetcher = config.fetch || globalThis.fetch, crypto = config.crypto || globalThis.crypto;
     const timeout = config.timeoutMs === undefined ? 8000 : config.timeoutMs;
     if (!Number.isFinite(timeout) || timeout < 1 || timeout > 120000) throw error('invalid_timeout');
+    // A complete authenticated SOP may keep progressing past the normal deadline.
+    // Its idle deadline stays short and its total transfer remains bounded.
+    const fullReadTimeout = config.fullReadTimeoutMs === undefined ? 120000 : config.fullReadTimeoutMs;
+    if (!Number.isFinite(fullReadTimeout) || fullReadTimeout < 1 || fullReadTimeout > 120000) throw error('invalid_timeout');
+    const largeWriteTimeout = config.largeWriteTimeoutMs;
+    if (largeWriteTimeout !== undefined && (!Number.isFinite(largeWriteTimeout) || largeWriteTimeout < 1 || largeWriteTimeout > 180000)) throw error('invalid_timeout');
     const maxCacheBytes = config.maxCacheBytes === undefined ? 8 * 1024 * 1024 : config.maxCacheBytes;
     if (!Number.isSafeInteger(maxCacheBytes) || maxCacheBytes < 0 || maxCacheBytes > 32 * 1024 * 1024) throw error('invalid_cache_limit');
     const now = config.now || Date.now, cache = new Map(), limit = Math.max(0, Math.min(100, config.cacheLimit === undefined ? 20 : config.cacheLimit));
     function key(value) { if (value !== undefined && !/^[A-Za-z0-9_-]{8,128}$/.test(value)) throw error('invalid_idempotency_key'); return value || crypto.randomUUID(); }
-    async function requestOnce(path, method, body, opts = {}, anonymous = false, writeKey) {
+    async function requestOnce(path, method, body, opts = {}, anonymous = false, writeKey, fullRead = false, guideWrite = false) {
+      const serialized = body === undefined ? undefined : JSON.stringify(body);
+      const writeBytes = guideWrite && token && !anonymous ? new TextEncoder().encode(serialized).byteLength : 0;
+      const largeWrite = guideWrite && ['POST','PUT'].includes(method) && writeBytes > 256 * 1024;
+      // Fetch exposes no upload progress here. Budget only large canonical writes
+      // for upload plus the verified full-guide echo; keep an absolute cap.
+      const writeBudget = largeWrite ? (largeWriteTimeout === undefined ? Math.min(180000, timeout + Math.ceil(writeBytes * 2000 / 65536)) : largeWriteTimeout) : timeout;
       const controller = new AbortController(); let timedOut = false;
       const abort = () => controller.abort();
       if (opts.signal) { if (opts.signal.aborted) throw error('aborted'); opts.signal.addEventListener('abort', abort, {once:true}); }
-      const timer = setTimeout(() => { timedOut = true; controller.abort(); }, timeout);
+      const expire = () => { timedOut = true; controller.abort(); };
+      let timer = setTimeout(expire, writeBudget), totalTimer;
+      const progressive = largeWrite || fullRead && !anonymous && !!token && method === 'GET';
+      if (progressive) totalTimer = setTimeout(expire, largeWrite ? writeBudget : fullReadTimeout);
+      const progress = () => { clearTimeout(timer); timer = setTimeout(expire, timeout); };
       try {
         const headers = {'Accept':'application/json','X-Running-SOP-Protocol':'1'};
         if (!anonymous && token) headers.Authorization = 'Bearer ' + token;
         if (body !== undefined) headers['Content-Type'] = 'application/json';
         if (writeKey) headers['Idempotency-Key'] = writeKey;
         let response;
-        try { response = await fetcher(endpoint + path, {method,headers,body:body === undefined ? undefined : JSON.stringify(body),credentials:'omit',redirect:'error',cache:'no-store',signal:controller.signal}); }
+        try { response = await fetcher(endpoint + path, {method,headers,body:serialized,credentials:'omit',redirect:'error',cache:'no-store',signal:controller.signal}); }
         catch (_) { throw error(timedOut ? 'timeout' : controller.signal.aborted ? 'aborted' : 'network_error'); }
         if (!/^application\/json(?:\s*;|$)/i.test(response.headers.get('content-type') || '')) throw error('invalid_content_type');
         if (Number(response.headers.get('content-length')) > MAX) throw error('response_too_large');
+        if (progressive && response.ok) progress();
+        else if (largeWrite) progress(); // One short total deadline for an error body.
         if (!response.body || typeof response.body.getReader !== 'function') throw error('invalid_response');
         const reader = response.body.getReader(), chunks = []; let size = 0;
-        try { while (true) { const part = await reader.read(); if (part.done) break; size += part.value.byteLength; if (size > MAX) throw error('response_too_large'); chunks.push(part.value); } }
+        try { while (true) { const part = await reader.read(); if (controller.signal.aborted) throw error(timedOut ? 'timeout' : 'aborted'); if (part.done) break; size += part.value.byteLength; if (size > MAX) throw error('response_too_large'); if (progressive && response.ok && part.value.byteLength) progress(); chunks.push(part.value); } }
         catch (e) { await reader.cancel().catch(() => {}); if (controller.signal.aborted) throw error(timedOut ? 'timeout' : 'aborted'); throw error(e && e.code === 'response_too_large' ? 'response_too_large' : 'invalid_response'); }
         const bytes = new Uint8Array(size); let offset = 0; for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.byteLength; }
         let envelope; try { envelope = JSON.parse(new TextDecoder('utf-8', {fatal:true}).decode(bytes)); } catch (_) { throw error('invalid_json'); }
@@ -62,16 +80,16 @@
         if (!response.ok) { const code = object(envelope.error) && /^[a-zA-Z0-9_-]{1,64}$/.test(envelope.error.code) ? envelope.error.code : 'http_error'; if (response.status === 401 || response.status === 403) cache.clear(); const failure=error(code,response.status);const retry=Number(response.headers.get('retry-after'));failure.retryAfterMs=Number.isFinite(retry)&&retry>0?Math.min(5000,retry*1000):1000;throw failure; }
         if (!object(envelope.data)) throw error('invalid_envelope');
         return envelope.data;
-      } finally { clearTimeout(timer); if (opts.signal) opts.signal.removeEventListener('abort', abort); }
+      } finally { clearTimeout(timer); clearTimeout(totalTimer); controller.abort(); if (opts.signal) opts.signal.removeEventListener('abort', abort); }
     }
-    async function request(path,method,body,opts={},anonymous=false,writeKey){
+    async function request(path,method,body,opts={},anonymous=false,writeKey,fullRead=false,guideWrite=false){
       // Only authenticated reads retry. Lease operations and publication never
       // repeat automatically, even when their response is uncertain.
       const safe=!!token&&!anonymous&&(method==='GET'||method==='POST'&&path==='/v1/matches');
       const started=performance.now();let networkRetries=0;
       for(let attempt=0;;attempt++){
         if(opts.signal?.aborted)throw error('aborted');
-        try{return await requestOnce(path,method,body,opts,anonymous,writeKey);}
+        try{return await requestOnce(path,method,body,opts,anonymous,writeKey,fullRead,guideWrite);}
         catch(e){
           const network=e.code==='network_error',busy=e.status===503&&e.code==='BUSY';
           if(!safe||opts.retry===false||!network&&!busy||attempt>=7||network&&networkRetries++>=4)throw e;
@@ -149,13 +167,13 @@
     async function getSop(sopId, opts = {}) {
       id(sopId); if (opts.revision !== undefined) revision(opts.revision);
       const path = '/v1/sops/' + sopId + (opts.revision === undefined ? '' : '?revision=' + opts.revision);
-      try { const data = await verified(await request(path,'GET',undefined,opts),sopId,opts.revision); cache.delete(path); const bytes = new TextEncoder().encode(JSON.stringify(data)).byteLength; if (limit && bytes <= maxCacheBytes) cache.set(path,{data,at:now(),bytes}); let totalBytes = Array.from(cache.values()).reduce((sum,item) => sum + item.bytes,0); while(cache.size > limit || totalBytes > maxCacheBytes) { const oldest = cache.keys().next().value; totalBytes -= cache.get(oldest).bytes; cache.delete(oldest); } return {...JSON.parse(JSON.stringify(data)),cache:{stale:false}}; }
+      try { const data = await verified(await request(path,'GET',undefined,opts,false,undefined,true),sopId,opts.revision); if (opts.signal?.aborted) throw error('aborted'); cache.delete(path); const bytes = new TextEncoder().encode(JSON.stringify(data)).byteLength; if (limit && bytes <= maxCacheBytes) cache.set(path,{data,at:now(),bytes}); let totalBytes = Array.from(cache.values()).reduce((sum,item) => sum + item.bytes,0); while(cache.size > limit || totalBytes > maxCacheBytes) { const oldest = cache.keys().next().value; totalBytes -= cache.get(oldest).bytes; cache.delete(oldest); } return {...JSON.parse(JSON.stringify(data)),cache:{stale:false}}; }
       catch (e) { const cached = cache.get(path); if (opts.allowStale === true && cached && ['network_error','timeout'].includes(e.code)) return {...JSON.parse(JSON.stringify(cached.data)),cache:{stale:true,verifiedAt:cached.at}}; throw e; }
     }
     async function write(path, guide, opts, extra, method = 'POST') {
       try { CatalogEngine.validateGuide(guide); } catch (_) { throw error('invalid_guide'); }
       const writeKey = key(opts.idempotencyKey);
-      try { const data = await request(path,method,{guide,...extra},opts,false,writeKey); const result = await verified(data,guide.workflowId,extra.expectedRevision === undefined ? 1 : extra.expectedRevision + 1); cache.clear(); return {...result,idempotencyKey:writeKey}; }
+      try { const data = await request(path,method,{guide,...extra},opts,false,writeKey,false,true); const result = await verified(data,guide.workflowId,extra.expectedRevision === undefined ? 1 : extra.expectedRevision + 1); if (opts.signal?.aborted) throw error('aborted'); cache.clear(); return {...result,idempotencyKey:writeKey}; }
       catch (e) { e.idempotencyKey = writeKey; throw e; }
     }
     function leaseData(d) { if (!text(d.token,2048) || !object(d.owner) || !text(d.owner.id,128) || !text(d.owner.name,80) || !Number.isSafeInteger(d.fence) || d.fence < 1 || !Number.isFinite(d.expiresAt)) throw error('invalid_lease'); revision(d.baseRevision); return {token:d.token,fence:d.fence,expiresAt:d.expiresAt,owner:{id:d.owner.id,name:d.owner.name},baseRevision:d.baseRevision,serverTime:d.serverTime,leaseMs:d.leaseMs}; }

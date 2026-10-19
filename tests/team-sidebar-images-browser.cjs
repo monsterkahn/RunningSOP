@@ -5,7 +5,7 @@ const {TeamStore}=require('../server/store.cjs'),{createTeamServer}=require('../
 const extension=process.env.RUNTIME_SOP_EXTENSION||path.resolve(__dirname,'../extension');
 const imagePath=/\/v1\/sops\/[^/]+\/images\//;
 const pause=ms=>new Promise(resolve=>setTimeout(resolve,ms));
-async function fixture(run,{legacy=false,corrupt=false}={}){
+async function fixture(run,{legacy=false,corrupt=false,realNetwork=false}={}){
  const directory=fs.mkdtempSync(path.join(os.tmpdir(),'sop-sidebar-images-'));let context,store,server;
  try{
   context=await chromium.launchPersistentContext(path.join(directory,'profile'),{channel:'chromium',headless:!process.env.RUNTIME_SOP_CHROME,...(process.env.RUNTIME_SOP_CHROME?{executablePath:process.env.RUNTIME_SOP_CHROME}:{}),args:[...(process.env.RUNTIME_SOP_CHROME?['--headless=new']:[]),`--disable-extensions-except=${extension}`,`--load-extension=${extension}`,'--no-first-run','--no-default-browser-check']});
@@ -38,10 +38,10 @@ async function fixture(run,{legacy=false,corrupt=false}={}){
   page.on('request',request=>{if(!request.url().startsWith(endpoint))return;requests.push(new URL(request.url()).pathname+new URL(request.url()).search);if(imagePath.test(request.url())){activeImages++;maxImages=Math.max(maxImages,activeImages);}});
   const completed=request=>{if(request.url().startsWith(endpoint)&&imagePath.test(request.url()))activeImages--;};page.on('requestfinished',completed);page.on('requestfailed',completed);
   // Keep actual HTTP responses in flight long enough to expose unbounded queues.
-  await page.route(imagePath,async route=>{const response=await route.fetch();await pause(75);await route.fulfill({response}).catch(()=>{});});
+  if(!realNetwork)await page.route(imagePath,async route=>{const response=await route.fetch();await pause(75);await route.fulfill({response}).catch(()=>{});});
   await page.goto(origin+'/workspace.html');await page.waitForFunction(()=>document.documentElement.dataset.workspaceReady==='true');
   const change=async(url,id=12345)=>page.evaluate(async({url,id})=>{window.syntheticTab={id,url,title:'Synthetic work'};await WorkspaceApp.refresh();},{url,id});
-  await run({page,options,requests,store,actor,guide,image,endpoint,change,getMax:()=>maxImages});
+  await run({context,page,options,requests,store,actor,guide,image,endpoint,change,getMax:()=>maxImages});
  }finally{if(context)await context.close();if(server){server.closeAllConnections();await new Promise(resolve=>server.close(resolve));}if(store)store.close();fs.rmSync(directory,{recursive:true,force:true});}
 }
 const imageRequests=requests=>requests.filter(url=>imagePath.test(url));
@@ -67,7 +67,7 @@ test('sidebar corrupt advertised view fails closed',{timeout:60000},()=>fixture(
 
 test('sidebar Edit obtains the complete verified guide and preserves unseen images',{timeout:60000},()=>fixture(async({page,requests,image,guide})=>{
  await readReady(page);assert.equal(fullRequests(requests).length,0);assert.equal(imageRequests(requests).some(url=>url.includes('/issues/')),false);
- await page.locator('#edit-sop').click();await page.locator('#editor').waitFor({state:'visible'});assert.ok(fullRequests(requests).length>=1,'Editing must obtain a complete verified guide');
+ await page.locator('#edit-sop').click();await page.locator('#editor').waitFor({state:'visible'});assert.equal(fullRequests(requests).length,1,'A fresh Edit must obtain and reuse one complete verified guide');
  const saved=(await drafts(page)).find(d=>d.title===guide.title);assert.ok(saved);assert.equal(saved.steps.length,24);
  for(const step of saved.steps)assert.equal(step.image,image);assert.equal(saved.steps[0].issues.length,2);for(const issue of saved.steps[0].issues)assert.equal(issue.image,image);
  assert.equal(saved.steps[23].image,image,'The other-address image must survive despite never being read');assert.deepEqual(saved.steps[0].imageMarks,guide.steps[0].imageMarks);
@@ -127,4 +127,61 @@ test('sidebar repeatedly selecting issues reuses verified images and keeps annot
   await page.locator('#steps .issue-choice').nth(choice).click();await page.locator('#steps .issue-panel img').waitFor();assert.ok(await page.locator('#steps .issue-panel .image-marks-overlay svg').count(),'Selected issue annotations survive holder reuse');
  }
  assert.equal(imageRequests(requests).filter(url=>url.includes('/issues/')).length,2,'Each selected issue image is fetched once across repeated choices');assert.ok(await page.locator('#steps > .step').first().locator('.image-marks-overlay svg').count(),'Step annotations remain present');
+}));
+
+// Actual browser transport emulation: no route interception, response rewriting,
+// SDK timeout override or service capability substitution is used here.
+test('slow browser network completes verified full reads and full Edit while selected images stay lightweight',{timeout:90000},()=>fixture(async({context,page,endpoint,requests})=>{
+ await readReady(page);const cdp=await context.newCDPSession(page);await cdp.send('Network.enable');
+ await cdp.send('Network.emulateNetworkConditions',{offline:false,latency:120,downloadThroughput:64*1024,uploadThroughput:64*1024});
+ try{
+  const result=await page.evaluate(async endpoint=>{
+   const record=await RunningSOPTeamSettings.read(),client=RunningSOPTeamClient.create({endpoint,token:record.token});
+   const begin=performance.now();let complete;
+   let full;try{full=await client.getSop('images-a',{retry:false});complete='verified';}catch(error){complete=error.code;}
+   const fullMs=performance.now()-begin,viewStart=performance.now();
+   const view=await client.readView('images-a',{retry:false});
+   const selected=await client.readImage('images-a',view.images.find(ref=>ref.step===0&&ref.issue===undefined),{revision:view.revision,retry:false});
+   return {complete,fullMs,selectedMs:performance.now()-viewStart,steps:view.guide.steps.length,imageBytes:selected.image.length,revision:view.revision,fullImages:full?.guide.steps.filter(step=>step.image).length,fullIssueImages:full?.guide.steps[0].issues.filter(issue=>issue.image).length};
+  },endpoint);
+  assert.equal(result.complete,'verified');assert.ok(result.fullMs>=8000,'A progressing full transfer must survive the old total deadline');assert.equal(result.fullImages,24);assert.equal(result.fullIssueImages,2);
+  assert.equal(result.steps,24);assert.equal(result.revision,2);assert.ok(result.imageBytes>20000);
+  assert.ok(result.selectedMs>=200,'Browser transport throttling must actually delay the verified selected read');
+  assert.ok(result.selectedMs<result.fullMs,'Selecting one image still transfers less data than the full guide');
+  const beforeEditReads=fullRequests(requests).length,editStart=Date.now();await page.locator('#edit-sop').click();await page.locator('#editor').waitFor({state:'visible',timeout:60000});await page.locator('#team-lease-status').waitFor({state:'visible'});
+  const saved=(await drafts(page)).find(d=>d.title==='Synthetic images A');assert.equal(saved.steps.length,24);assert.equal(saved.steps.filter(step=>step.image).length,24);assert.equal(saved.steps[0].issues.filter(issue=>issue.image).length,2);result.completeEditMs=Date.now()-editStart;result.editFullReads=fullRequests(requests).length-beforeEditReads;assert.equal(result.editFullReads,1);
+  console.log('SLOW_NETWORK_EVIDENCE '+JSON.stringify(result));
+ }finally{await cdp.send('Network.emulateNetworkConditions',{offline:false,latency:0,downloadThroughput:-1,uploadThroughput:-1});await cdp.detach();}
+},{realNetwork:true}));
+
+test('browser disconnection retains a complete edited draft and publishes only on explicit recovery',{timeout:60000},()=>fixture(async({context,page,store,image})=>{
+ await readReady(page);await page.locator('#edit-sop').click();await page.locator('#editor').waitFor({state:'visible'});await page.locator('#team-lease-status').waitFor({state:'visible'});
+ await page.locator('#edit-action').fill('Synthetic offline draft retained');await page.locator('#preview-publish').click();await page.locator('#confirm-publish').check();
+ const expected=await page.evaluate(()=>WorkspaceApp.buildGuide());
+ const cdp=await context.newCDPSession(page);await cdp.send('Network.enable');
+ await cdp.send('Network.emulateNetworkConditions',{offline:true,latency:0,downloadThroughput:-1,uploadThroughput:-1});
+ try{
+  await page.locator('#publish-nas').click();await page.waitForFunction(()=>!document.querySelector('#publish-nas').disabled);
+  assert.match(await page.locator('#publish-status').textContent(),/unknown|retry/i);assert.equal(store.get('images-a').revision,2);
+  const saved=(await drafts(page)).find(d=>d.title==='Synthetic images A');assert.ok(saved.steps.some(s=>s.action==='Synthetic offline draft retained'));
+  assert.equal(saved.steps.length,24);for(const step of saved.steps)assert.equal(step.image,image);assert.equal(saved.steps[0].issues[0].image,image);
+  await cdp.send('Network.emulateNetworkConditions',{offline:false,latency:0,downloadThroughput:-1,uploadThroughput:-1});
+  await pause(2500);assert.equal(store.get('images-a').revision,2,'Restoring transport does not automatically publish');
+  await page.locator('#publish-nas').click();await page.waitForFunction(()=>document.querySelector('#publish-status').textContent.includes('Published to the team'));
+  const result=store.get('images-a');assert.equal(result.revision,3);assert.deepEqual(result.guide,expected);assert.equal(store.lockInfo('images-a'),null);
+ }finally{await cdp.send('Network.emulateNetworkConditions',{offline:false,latency:0,downloadThroughput:-1,uploadThroughput:-1});await cdp.detach();}
+},{realNetwork:true}));
+
+
+test('publication racing the verified Edit copy is rejected by the real lease revision',{timeout:60000},()=>fixture(async({page,requests,store,actor,guide,image,endpoint})=>{
+ await readReady(page);let changed=false;
+ await page.route(endpoint+'/v1/sops/images-a/lock',async route=>{
+  if(route.request().method()==='POST'&&!changed){changed=true;const lease=store.acquireLock('images-a',{actor});store.publish('images-a',{...guide,version:'3'},{actor,...lease,expectedRevision:2,idempotencyKey:'copy-lease-race'});}
+  await route.continue();
+ });
+ await page.locator('#edit-sop').click();await page.waitForFunction(()=>!document.querySelector('#edit-sop').disabled);
+ assert.equal(changed,true);assert.equal(store.get('images-a').revision,3);assert.equal(fullRequests(requests).length,1);
+ assert.equal(await page.locator('#editor').isVisible(),false);assert.equal(store.lockInfo('images-a'),null,'A lease acquired on the newer revision must be released');
+ assert.match(await page.locator('#view-status').textContent(),/revision changed/i);
+ const saved=(await drafts(page)).find(d=>d.title==='Synthetic images A');assert.ok(saved);assert.equal(saved.steps.length,24);for(const step of saved.steps)assert.equal(step.image,image);for(const issue of saved.steps[0].issues)assert.equal(issue.image,image);
 }));

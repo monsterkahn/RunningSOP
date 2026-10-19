@@ -1,0 +1,82 @@
+{
+  "date": "2026-10-19",
+  "scope": "Development-only complete authenticated SOP read deadlines; no published package replacement.",
+  "baselineCommit": "ce2296df978abc1ef63e8fb74ab73e0dbc55bb27",
+  "policy": {
+    "connectionOrIdleMs": 8000,
+    "successfulCompleteReadHardMs": 120000,
+    "settings": "timeoutMs and fullReadTimeoutMs may be shortened in SDK tests; no new user setting.",
+    "progress": "Only successful authenticated getSop responses reset the idle deadline on validated headers and nonempty body chunks.",
+    "unchanged": "Other requests retain their original total timeout; timeout errors never retry automatically; writes never automatically repeat.",
+    "cancellation": "Abort unread response bodies on exit; after asynchronous canonical hash verification check external cancellation before cache insertion."
+  },
+  "checks": {
+    "core": 170,
+    "sdk": 27,
+    "server": 46,
+    "teamCurrent": 26,
+    "team116": 26,
+    "originalCurrent": 10,
+    "original116": 10,
+    "interopCurrent": 6,
+    "interop116": 6
+  },
+  "browsers": [
+    "Chromium 151.0.7922.34",
+    "Chrome 116.0.5845.96"
+  ],
+  "transport": {
+    "method": "Real browser CDP emulation; no response rewriting or timeout overrides",
+    "minimumLatencyMs": 120,
+    "bytesPerSecondEachDirection": 65536,
+    "current": {
+      "complete": "verified",
+      "fullMs": 11218.70000000298,
+      "selectedMs": 801.6000000089407,
+      "steps": 24,
+      "imageBytes": 27667,
+      "revision": 2,
+      "fullImages": 24,
+      "fullIssueImages": 2,
+      "completeEditMs": 23007
+    },
+    "chrome116": {
+      "complete": "verified",
+      "fullMs": 11242.29999999702,
+      "selectedMs": 829.3000000119209,
+      "steps": 24,
+      "imageBytes": 27667,
+      "revision": 2,
+      "fullImages": 24,
+      "fullIssueImages": 2,
+      "completeEditMs": 23020
+    },
+    "previous": "Previous exact fixture failed the old default full-read deadline at ~8 seconds; evidence in team-interop-network-2026-10-19.json."
+  },
+  "independentRegression": {
+    "method": "Temporary complete extension source copy with only team-client.js restored to pre-fix source",
+    "expectedFailed": 2,
+    "failures": [
+      "Continuously progressing complete read times out under old policy",
+      "Cancellation during hashing does not reject under old policy"
+    ],
+    "fixedSdkPassed": 27
+  },
+  "artifactInspection": {
+    "build": "npm run build in an isolated archived source copy with current runtime overlay",
+    "zipIntegrityChecked": 3,
+    "webStoreEntriesEqualCurrentRuntime": 66,
+    "officialInstallationZipSha256Preserved": "2fbeab363d6919125858bffbda21b1cca93b2d6faea97030f55557882d5e965c"
+  },
+  "sourceSha256": {
+    "extension/team-client.js": "07b629a28f8af69a172c0e152a570db573d1f8b023f8c83c831bb511f323e75c",
+    "tests/team-client.test.cjs": "dd83d7e0e0eceb076ae31666fce415b0887136e7e89e8343f55dc3aa7b44808e",
+    "tests/team-sidebar-images-browser.cjs": "1ea4b5ea2d3a8e455a73b129edefed9093074c3c56caa0b480175d4b5f2ad1df"
+  },
+  "limits": [
+    "Loopback browser transport simulation does not prove physical LAN, old hardware, TLS, native prompts or NAS acceptance.",
+    "No refreshed remote OS matrix is claimed for this runtime yet.",
+    "Complete Edit still performs two full transfers (~23 seconds under this simulation); version conflict validation must be preserved when reducing that duplication.",
+    "Slow large publication transfers were not established by the slow-read test; mutation timing policy remains unchanged."
+  ]
+}
