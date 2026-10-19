@@ -1,5 +1,41 @@
 # Changelog
 
+## 1.3.3 · 2026-10-20 — GitHub distribution
+
+- Omit cleared or untouched empty steps when publishing, and number the remaining steps consecutively. Refuse publication if every step is empty; partially completed steps still require valid instructions.
+- After verified folder or team publication, remove only the unchanged corresponding local draft and display the exact published SOP steps. Preserve drafts on failed or uncertain writes and preserve newer concurrent edits.
+- Include the previous publication-reading and candidate-selection fixes.
+- Bundle the latest grouped screenshot toolbar: zoom, annotation and undo/clear icons, vertical separators, Save notes and Exit.
+- Include the SOP overview, exact retained-version reading, local step feedback and support-panel changes developed after v1.2.0.
+- Generate versioned introduction media using the package version, avoiding old-version archive names.
+- Preserve the explicitly deferred native-permission, physical two-device and HTTPS acceptance checks; this distribution is not a Chrome Web Store submission.
+
+
+## 1.3.2 · 2026-10-19 — Local installation candidate
+
+- Retained three48px support-method slots and added two inactive light-gray coffee-cup placeholders beside PayPal.
+- Added queued folder-target fencing and distinct post-commit local-state warnings, preserving explicit uncertain-publication recovery.
+- Successful publication returns to reading the corresponding SOP; failures preserve the editor and its content for explicit retry.
+- Screenshot annotation tools use icons with accessible names. Numbered markers and boxes can be dragged and nudged with the keyboard. Boxes use subtle rounded corners.
+- Reading provides step-level feedback tied to the exact SOP version. These records stay on the device and are not part of folder statistics or team synchronization.
+- Retains the three equal-width PayPal/support slots, 48px collapsed height, and the v1.3.1 account disclosure and collaboration controls.
+- Chrome 116 and Manifest V3 remain the baseline. No new permissions or team API changes are introduced. This is a local package preparation, not a GitHub publication or store submission; current verification is recorded separately.
+
+## 1.3.1 · 2026-10-19 — Local installation package
+
+- PayPal displays its logo initially; clicking or keyboard activation reveals the existing account locally.
+- Removed the duplicate team collaboration heading while preserving the accessible group name. Connect and Disconnect now share dimensions and visual styles, with distinct disabled states.
+- Retains the v1.3.0 SOP overview and read-only retained history. No permissions, storage formats or team API changes. This package is not a GitHub publication or store submission.
+
+## 1.3.0 · 2026-10-19 — Local candidate, not published
+
+- Added an explicit **View SOP overview** entry in Settings, with folder/team routing, categories, search, paging and setup guidance before connection. No shared index file is generated.
+- Added read-only viewing of retained SOP versions in the team library and an explicitly authorized folder. Historical text, images and annotations stay tied to the selected version, with a historical notice and return to latest action.
+- History reading does not change the current publication, add roles or approval flows, or grant management/restore permissions. Missing or invalid historical content is reported rather than substituted from the latest version.
+- Retained the post-v1.2.0 hardening for verified separate-image reads, older-service compatibility, cancellation, bounded slow transfers, explicit publication replay, complete 100-step editing and language initialization. See [the development audit](docs/TEAM-COMPLETION-AUDIT.md) for the earlier verification scope.
+- This is the current local candidate package, not a GitHub release or a Chrome Web Store submission. Published v1.2.0 assets remain unchanged. Current candidate checks must be recorded separately; earlier results do not validate the added history paths.
+- Chrome 116 and Manifest V3 remain the extension baseline. Native permissions, physical two-device NAS/HTTPS acceptance and team statistics remain user-deferred, not passed. See [Version history](docs/VERSION-HISTORY.md) for retention and read-only boundaries.
+
 ## 1.2.0 · 2026-10-19 — GitHub release
 
 - Added a saved team-service address picker with add, rename, edit, selection and deletion; connection remains explicit.

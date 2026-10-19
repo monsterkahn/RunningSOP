@@ -23,6 +23,12 @@
   function parse(raw, label) {
     try { return JSON.parse(raw); } catch (_) { fail(label + ' JSON 无效。'); }
   }
+  function verifyPublication(event, workflowId, sha256, version) {
+    if (!event || event.format !== 'runtime-sop-publication' || event.schemaVersion !== 1 ||
+        event.workflowId !== workflowId || event.sha256 !== sha256 || event.version !== version ||
+        !(event.previousSha256 === null || typeof event.previousSha256 === 'string' && /^[a-f0-9]{64}$/.test(event.previousSha256) && event.previousSha256 !== sha256) ||
+        !(event.publishedAt === null || typeof event.publishedAt === 'string' && event.publishedAt.length <= 40 && Number.isFinite(Date.parse(event.publishedAt)))) fail('现有发布历史指纹冲突。');
+  }
   async function boundedBytes(file, limit) {
     if (!Number.isSafeInteger(file.size) || file.size < 0 || file.size > limit) fail('文件超过读取上限。');
     const content = typeof file.arrayBuffer === 'function' ? new Uint8Array(await file.arrayBuffer()) : bytes(await file.text());
@@ -174,7 +180,14 @@
     async function publishOnce(guideInput, publishOptions = {}) {
       const handle = await getHandle();
       if (!handle) fail('请先选择 存储器 的 upload 或 sop 文件夹。');
+      async function verifyTarget(){
+        const current=await getHandle(),expected=publishOptions.expectedDirectoryHandle||handle;
+        const same=async(a,b)=>Boolean(a&&b&&(typeof a.isSameEntry==='function'?await a.isSameEntry(b):a===b));
+        if(!await same(handle,expected)||!await same(handle,current))fail('存储位置在发布期间发生变化，请核对原文件夹后重试。');
+      }
+      await verifyTarget();
       await ensureWritePermission(handle);
+      await verifyTarget();
       if (!engine) fail('目录校验器尚未加载。');
       const guide = engine.validateGuide(guideInput);
       if (guide.workflowId === 'youtube-upload') fail('指南身份不能覆盖 YouTube 工作流。');
@@ -190,9 +203,10 @@
       if (existingTarget && (typeof publishOptions.expectedSha !== 'string' || publishOptions.expectedSha.toLowerCase() !== existingTarget.sha256)) {
         fail('此指南已存在，但编辑基准指纹缺失或已过期；请重新读取目录后再发布。');
       }
+      let previousBody = null, previousGuide = null;
       if(existingTarget) {
-        const oldRaw=await readText(handle,existingTarget.file);
-        await verifyExisting(oldRaw,existingTarget,handle);
+        previousBody = await readText(handle,existingTarget.file);
+        previousGuide = await verifyExisting(previousBody,existingTarget,handle);
       }
       const packed=await SOPAssets.pack(guide,{id:guide.workflowId,viewer:'guide'},cryptoObject);
       const serialized=JSON.stringify(packed.document),docHash=await sha256(serialized,cryptoObject);
@@ -218,9 +232,27 @@
 
       // Write immutable content first. A pre-existing hash path is accepted only
       // when its exact bytes match. The catalog remains the final pointer write.
+      // Preserve legacy documents before advancing the pointer. Do not repack:
+      // history fingerprints refer to the exact original body and image descriptors.
+      if (existingTarget) {
+        await writeNew(handle, `workflows/${guide.workflowId}/versions/${existingTarget.sha256}.json`, previousBody);
+        const baselinePath = `publication-history/${guide.workflowId}/${existingTarget.sha256}.json`;
+        let baseline;
+        try { baseline = await readText(handle, baselinePath); }
+        catch (error) { if (error.name !== 'NotFoundError') throw error; }
+        if (baseline === undefined) {
+          await writeNew(handle, baselinePath, JSON.stringify({format:'runtime-sop-publication',schemaVersion:1,
+            workflowId:guide.workflowId,sha256:existingTarget.sha256,version:previousGuide.version,
+            publishedAt:null,previousSha256:null},null,2)+'\n');
+        } else {
+          const event = parse(baseline, '现有发布历史');
+          verifyPublication(event, guide.workflowId, existingTarget.sha256, previousGuide.version);
+        }
+      }
       for(const asset of packed.assets)await writeNew(handle,asset.file,asset.bytes);
       await writeNew(handle, releasePath, serialized);
       if (await readText(handle, 'catalog.json') !== originalCatalogRaw) fail('目录在发布期间发生变化；已保留不可变正文，请重新检查后再发布。');
+      await verifyTarget();
       await replaceText(handle, 'catalog.json', catalogRaw);
       if(await readText(handle,'catalog.json')!==catalogRaw)fail('其他设备在发布期间改写了目录，请重新读取目录确认。');
       let historyWarning='';
@@ -228,7 +260,7 @@
         const eventPath='publication-history/'+guide.workflowId+'/'+docHash+'.json';
         let existing;try{existing=await readText(handle,eventPath);}catch(e){if(e.name!=='NotFoundError')throw e;}
         if(!existing)await writeNew(handle,eventPath,JSON.stringify(event,null,2)+'\n');
-        else {const old=JSON.parse(existing);if(old.workflowId!==event.workflowId||old.sha256!==event.sha256||old.version!==event.version)throw Error('发布历史指纹冲突。');}
+        else {const old=JSON.parse(existing);verifyPublication(old,event.workflowId,event.sha256,event.version);}
       }catch(e){historyWarning='SOP 已发布，但更新历史未能记录：'+e.message;}
       return { historyWarning, workflowId: guide.workflowId, file: releasePath, sha256: docHash, catalogVersion: catalog.version };
     }

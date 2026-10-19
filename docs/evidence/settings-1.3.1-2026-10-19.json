@@ -1,0 +1,45 @@
+{
+  "version": "1.3.1",
+  "date": "2026-10-19",
+  "status": "local installation package; not uploaded to GitHub or Chrome Web Store",
+  "changes": [
+    "PayPal logo is a native keyboard-operable disclosure; account starts collapsed and opens locally.",
+    "Single collaboration heading; fieldset labelled by the visible summary.",
+    "Connect/Disconnect use equal widths and common styles; disabled state retained."
+  ],
+  "checks": {
+    "core": {
+      "passed": 190,
+      "failed": 0,
+      "logSha256": "7e17dbb01b91b15eb3c85ca65f8ac8bb00df8e02f0625163c293f25b38aed3e5"
+    },
+    "packagedCurrent": {
+      "passed": 10,
+      "failed": 0,
+      "logSha256": "efd5f057f6f50f9cd78ed8999123ba22ce6071d15828c98b3bbc818f2c739e7c"
+    },
+    "packagedChrome116": {
+      "passed": 10,
+      "failed": 0,
+      "logSha256": "d2af529da7a7bae74d58209a0c678e1a2dc76aeda353d017361930e1be35b0e3"
+    }
+  },
+  "runtimeFilesByteVerified": 70,
+  "sourceSha256": {
+    "extension/options.html": "a89533bf3dcb189b1aa96aae40f631145fa2d280a535262d6246f5fe9414deac",
+    "extension/options.css": "ea506530decc872a56dac220c0779497d769dfa5c9bc31ade357eb7625a5c107",
+    "extension/manifest.json": "98ff232b77945b2e1bbc0a51c741a271a9313718350899911fd8aa73b295d085",
+    "extension/release-notes.js": "a6352ebac0cbc336909e8760783f81190bf02637107f1241166c6f8e62c0c63f",
+    "tests/public-browser.cjs": "a543ce3c4080e02a0180ad1397ecdb08bca1128346b1ea6a0996963cf74aaf86"
+  },
+  "installationZipSha256": "51856924fa249f8ac2bd005f4e0297bf79fafce657970bc84edb942028fc1391",
+  "webStoreZipSha256": "ab3444790ccfd110733359f123ee71e6786797de2ed21844a06d5a173a6569dc",
+  "visualInspection": [
+    "Packaged settings: collapsed and expanded PayPal, single team heading and equal connection buttons."
+  ],
+  "limits": [
+    "macOS arm64, Chromium151 and actual Chrome116.",
+    "OS-native permission prompts, physical two-device NAS/SMB, native Windows hardware and HTTPS deployment remain unverified.",
+    "No new permissions, account lookup, payment processing or remote script execution."
+  ]
+}

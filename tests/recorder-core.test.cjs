@@ -182,5 +182,16 @@ function loadBackgroundMock() {
   const ended=await mock.send('recorder-stop');
   assert.equal(ended.data.session,null);
   assert.equal(ended.data.drafts.find(d=>d.id===guidedId).title,'Renamed while recording');
+  // Successful publication may delete only its unchanged draft, atomically.
+  const beforeCleanup=JSON.parse(JSON.stringify(ended.data.drafts.find(d=>d.id===guidedId)));
+  await mock.send('recorder-update',{id:guidedId,patch:{title:'New work after publication started'}});
+  const staleCleanup=await mock.send('recorder-delete',{id:guidedId,expectedDraft:beforeCleanup});
+  assert.match(staleCleanup.error,/新修改/);
+  const currentCleanup=(await mock.send('recorder-get')).data.drafts.find(d=>d.id===guidedId);
+  const remainingIds=mock.getStored().drafts.filter(d=>d.id!==guidedId).map(d=>d.id);
+  // Storage/message property ordering is not a content change.
+  const reordered=Object.fromEntries(Object.entries(currentCleanup).reverse());
+  const cleaned=await mock.send('recorder-delete',{id:guidedId,expectedDraft:reordered});
+  assert(cleaned.data,cleaned.error);assert.deepEqual(Array.from(cleaned.data.drafts,d=>d.id),Array.from(remainingIds));
   console.log('Recorder core checks passed.');
 })().catch(error => { console.error(error); process.exitCode = 1; });

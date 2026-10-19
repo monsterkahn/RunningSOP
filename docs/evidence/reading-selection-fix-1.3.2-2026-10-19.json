@@ -1,0 +1,44 @@
+{
+  "version": "1.3.2",
+  "date": "2026-10-19",
+  "status": "local workspace.js replacement; original installation archives preserved; no upload",
+  "checks": {
+    "core": {
+      "passed": 199,
+      "failed": 0,
+      "logSha256": "e5821c85bd934c35d990ec80f74ae5d349e25ec68a7f380998734b3fb8d90c1d"
+    },
+    "current": {
+      "passed": 11,
+      "failed": 0,
+      "logSha256": "6f336422c203739ba3751579453cafb3f97c23e84d34a11ead27576413b7d25e"
+    },
+    "Chrome116": {
+      "passed": 11,
+      "failed": 0,
+      "logSha256": "ddd787d3d29bec3c9b1bbc8cd9ba7a87afa77ff818a01b92858a2ace82e874d0"
+    },
+    "teamFreshLaunchCurrent": {
+      "passed": 2,
+      "failed": 0,
+      "logSha256": "5531bc42e125796db62b163b20fc7cbcfe6c7290cc50d2bd9e5bccd9281d2cf9"
+    },
+    "teamFreshLaunch116": {
+      "passed": 2,
+      "failed": 0,
+      "logSha256": "1ecc75fbdd0b3ee4dbc1e1ff127507afa919bd44fd7aa843424b2fc04f4a99a2"
+    }
+  },
+  "workspaceSha256": "838645be9386aa35df43aca3334873be28e81c53e6c45a0e47f481c070d15ee8",
+  "patchZipSha256": "50df388c7086703afa4ce99fb900ec88d60f9b291bbb278556754fffeb2b095a",
+  "behavior": [
+    "A local editing copy with identical linked workflow ID and SHA is folded into the current published reading choice; team copies additionally match service and actor.",
+    "Published SOP opens directly on fresh launch and refresh; its local copy remains available through View draft.",
+    "Different titles or identical titles alone do not identify workflows. Unrelated drafts and genuinely different SOPs remain separate choices.",
+    "Uncertain publication whose linked SHA is older remains separate, preserving explicit idempotent recovery."
+  ],
+  "limitations": [
+    "No access to the user actual SOP library or native browser profile was used. Reproduction uses synthetic native folders and a real local team service.",
+    "The original1.3.2 ZIP must receive this workspace.js replacement; it was not silently replaced."
+  ]
+}

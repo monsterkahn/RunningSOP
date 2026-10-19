@@ -1,6 +1,12 @@
 # Chrome Web Store Listing — Running SOP
 
-> Last updated: 2026-10-18. Local review of GitHub release v1.2.0; this document is not a store submission or approval.
+> Last updated: 2026-10-20. Current GitHub distribution: v1.3.3. This document is preparation material, not a Chrome Web Store submission or approval.
+
+Version 1.3.3 includes read-only retained-version viewing and the Settings SOP overview. Publication skips cleared empty steps, renumbers retained steps, rejects empty SOPs, deletes only the corresponding unchanged draft after verified publication and opens the exact published reader. Failed or uncertain writes preserve the draft.
+
+The screenshot editor uses bundled SVG icons with localized accessible names and hover hints. Zoom, annotation and undo/clear groups have vertical separators and extra spacing. Save notes and Exit replace the previous cancel/save/close layout; Exit discards unsaved marks. Rounded boxes and numbered marks support drag/keyboard adjustment, and version-bound step feedback stays local. PayPal account details expand on demand beside two inactive coffee placeholders. Fresh installations do not connect or synchronize automatically, and permissions remain unchanged.
+
+The current verification record is docs/RELEASE-REVIEW-1.3.3.md. Use the newly generated v1.3.3 images for store preparation; no existing store listing or package is submitted or replaced by this GitHub release. Native permissions, physical two-device storage and HTTPS acceptance remain deferred.
 
 ## Store listing
 
@@ -91,7 +97,9 @@ Privacy policy source: PRIVACY.md. Public repository link: https://github.com/mo
 
 | Version | Date | Changes | Status |
 | --- | --- | --- | --- |
-| 1.2.0 | 2026-10-18 | Optional experimental team service and library; existing folder mode remains default | GitHub release; not submitted to the Chrome Web Store |
+| 1.3.2 | 2026-10-19 | Publication returns to SOP reading; graphic, movable screenshot marks; local step feedback | Local installation candidate; no GitHub/store upload |
+| 1.3.0 | 2026-10-19 | Read-only retained SOP history; post-release performance and compatibility hardening | Local candidate only; not published to GitHub or submitted to the store |
+| 1.2.0 | 2026-10-19 | Optional experimental team service and library; existing folder mode remains default | GitHub release; not submitted to the Chrome Web Store |
 | 1.1.1 | 2026-10-18 | Case-insensitive library discovery, bounded shared reads, Windows package verification | GitHub update; not submitted to the Chrome Web Store |
 | 1.1.0 | 2026-10-18 | Lightweight finite folder guidance, Chrome 116 directory parser correction, confirmed local draft cleanup, specification/privacy review | Official GitHub release; not submitted to the Chrome Web Store |
 | 1.0.0 | 2026-10-17 | First public-version submission | Submitted for review per user; approval not independently checked |
@@ -109,3 +117,20 @@ Public documentation convention: GitHub README uses official release numbering o
 ## Unreleased compatibility hardening — 2026-10-18
 
 The Windows stability branch corrects case-insensitive folder discovery, preserves hashed example bytes across Git checkouts, and bounds shared-storage reads. No permission, privacy disclosure, product description or screenshot change is required for these fixes. This work has not been submitted as a new store package. Automated results and outstanding native/real-device checks are recorded in docs/COMPATIBILITY-REVIEW.md.
+
+
+## Post-release development review notes
+
+The development branch adds capability-gated separate-image reading to the team library and side panel. It retains complete reads for older team services and obtains a complete, hash-verified guide before editing. Screenshot reading guards cancel stale account/reading requests without changing recording capture behavior. No new permission, remote executable code, vendor analytics or collection purpose is added. Product listing descriptions above are unchanged; these implementation notes do not describe a newly submitted store package. Rebuild and inspect the next proposed package, and complete the deferred native-permission/deployment acceptance before making broader compatibility claims.
+
+## Local v1.3.0 candidate review
+
+The local candidate adds read-only historical SOP viewing in the team library and an explicitly authorized folder. The selected version retains its text, images and annotations, with a historical notice and return to latest action. Reading history grants no category, publishing, restore or other management permission and adds no roles or approval process. No arbitrary remote imports, executable resources, new permission or analytics purpose is introduced. Fresh installations still require explicit storage selection and do not connect or synchronize automatically. See [Version history](docs/VERSION-HISTORY.md) for retained-file and validation limits.
+
+Keep the listing’s exact English short description unchanged. This document prepares review material; it does not claim that a v1.3.0 package has been uploaded, submitted or approved. Preserve published v1.2.0 assets. Native permission prompts, physical two-device NAS/HTTPS acceptance and team statistics remain user-deferred. Inspect the newly built candidate and its actual checks before making submission or compatibility claims.
+
+Local settings-only replacement (2026-10-19, version unchanged): three equal support-method slots in one row, two empty placeholders, and a48px collapsed PayPal control. Only options.html and options.css are distributed in the replacement ZIP; no new release or submission. Core190 tests and six public browser scenarios passed; three-slot widths320/390/1280 and local disclosure were also checked in current Chromium and actual Chrome116.
+
+The v1.3.2 support area retains three equal48px slots: PayPal account disclosure and two inactive light-gray coffee-cup placeholders. These placeholders neither accept payments nor imply another payment method is available.
+
+Local v1.3.2 reading-selection replacement (2026-10-19): folds a verified same-ID/same-hash local editing copy into its published SOP reading choice, retaining View draft. Team copies also require the same service and actor. Unrelated same-title drafts and uncertain publication recovery remain separate. Delivered as workspace.js replacement; existing installation archives and version numbers remain unchanged. Core199 and affected folder/team/history browser checks passed on current Chromium and actual Chrome116; no upload or store submission.

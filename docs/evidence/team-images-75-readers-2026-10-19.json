@@ -1,0 +1,201 @@
+{
+  "kind": "real-sqlite-image-guide-normal-readers",
+  "node": "v26.9.0",
+  "platform": "darwin",
+  "clients": 75,
+  "guideBytes": 3148224,
+  "assetRows": 12,
+  "assetBytes": 2359296,
+  "responseBudgetBytes": 33554432,
+  "childHeapLimitMiB": 256,
+  "retryPolicy": {
+    "implementedInExtension": true,
+    "maxAttempts": 8,
+    "deadlineMs": 30000,
+    "retryStatuses": [
+      503
+    ],
+    "delay": "Retry-After minimum 1s plus exponential jitter capped at4s"
+  },
+  "baseline": {
+    "stats": true,
+    "peakRss": 118685696,
+    "peakHeapUsed": 35166928,
+    "peakArrayBuffers": 9589412,
+    "peakConnections": 76,
+    "connections": 76,
+    "getCalls": 2,
+    "memory": {
+      "rss": 109297664,
+      "heapTotal": 14581760,
+      "heapUsed": 9529528,
+      "external": 2494821,
+      "arrayBuffers": 209555
+    }
+  },
+  "phases": [
+    {
+      "name": "normal-consuming-no-retry",
+      "clients": 75,
+      "completed": 10,
+      "incomplete": 65,
+      "attempts": 75,
+      "statusCounts": {
+        "200": 10,
+        "503": 65
+      },
+      "failures": {
+        "503": 65
+      },
+      "transferredBytes": 31488190,
+      "elapsedMs": 155.57012500000002,
+      "completedP95Ms": 155.52558300000004,
+      "server": {
+        "stats": true,
+        "peakRss": 227540992,
+        "peakHeapUsed": 90260776,
+        "peakArrayBuffers": 117087004,
+        "peakConnections": 76,
+        "connections": 76,
+        "getCalls": 12,
+        "memory": {
+          "rss": 198262784,
+          "heapTotal": 43565056,
+          "heapUsed": 38029392,
+          "external": 2494821,
+          "arrayBuffers": 209555
+        }
+      }
+    },
+    {
+      "name": "normal-consuming-benchmark-get-retry",
+      "clients": 75,
+      "completed": 75,
+      "incomplete": 0,
+      "attempts": 164,
+      "statusCounts": {
+        "200": 75,
+        "503": 89
+      },
+      "failures": {},
+      "transferredBytes": 236133530,
+      "elapsedMs": 3565.266333,
+      "completedP95Ms": 3489.098417,
+      "server": {
+        "stats": true,
+        "peakRss": 289062912,
+        "peakHeapUsed": 125805072,
+        "peakArrayBuffers": 129279196,
+        "peakConnections": 76,
+        "connections": 75,
+        "getCalls": 87,
+        "memory": {
+          "rss": 215990272,
+          "heapTotal": 32145408,
+          "heapUsed": 24542048,
+          "external": 10360071,
+          "arrayBuffers": 8076371
+        }
+      }
+    },
+    {
+      "name": "actual-extension-client-bounded-retry",
+      "clients": 75,
+      "completed": 75,
+      "incomplete": 0,
+      "statusCounts": {
+        "200": 75,
+        "503": 72
+      },
+      "failures": {},
+      "elapsedMs": 3902.827083,
+      "completedP95Ms": 3537.9243749999996,
+      "server": {
+        "stats": true,
+        "peakRss": 289062912,
+        "peakHeapUsed": 125805072,
+        "peakArrayBuffers": 129279196,
+        "peakConnections": 76,
+        "connections": 75,
+        "getCalls": 162,
+        "memory": {
+          "rss": 207667200,
+          "heapTotal": 12992512,
+          "heapUsed": 5680744,
+          "external": 2493255,
+          "arrayBuffers": 209555
+        }
+      }
+    }
+  ],
+  "limitations": [
+    "One synthetic schema4 guide with 12 distinct JPEG-shaped 192KiB byte arrays; no actual image decoding or business screenshots.",
+    "Independent warmed sockets matching the stated client count; same host loopback, not physical LAN.",
+    "Normal readers stream/hash/discard responses; one real TeamClient verifies content with cache disabled. This does not measure 500 browser caches.",
+    "The third phase uses the actual extension client and a streaming HTTP adapter over the existing per-user socket; no browser rendering or image decoding.",
+    "Reported peak memory is observed, not a universal bound."
+  ],
+  "recordedDate": "2026-10-19",
+  "sourceFingerprints": [
+    {
+      "path": "extension/team-client.js",
+      "sha256": "c766abdee61206474f55e871f5d394750d757a922e4088b8c8192a4569a8f7d1"
+    },
+    {
+      "path": "server/app.cjs",
+      "sha256": "46bd186ab9ab11dc188533e890c78a99548670753048c94a93e2d339ec89669b"
+    },
+    {
+      "path": "server/backup.cjs",
+      "sha256": "852eb88ef04bd4cc3209f0c217b3ea6b553be2f83cb7280b338b18c47e2709fe"
+    },
+    {
+      "path": "server/category-store.cjs",
+      "sha256": "0abec3ef8dc1f3e66a65460f3fb941783aa051270f0741bb07c47053981b7438"
+    },
+    {
+      "path": "server/cli.cjs",
+      "sha256": "0396199113cd860795ada0f2c6f15f779c9e4ca76fd95a327681e81493645fd5"
+    },
+    {
+      "path": "server/guide-assets.cjs",
+      "sha256": "9da9c19ec271c5bf4a113481e4d40879bb63abfb89c322fd1690cd67dd119d37"
+    },
+    {
+      "path": "server/store.cjs",
+      "sha256": "80e0ee6b639d744f6a25e1dc1f840c4b4bf3425680690044d10e3966febb630a"
+    },
+    {
+      "path": "server/tools/backup.cjs",
+      "sha256": "7c9698c7bc3c12223550f791c7a57d2f7e289e8755832e00bde660d2d953e3e4"
+    },
+    {
+      "path": "server/tools/fixture-large-response.cjs",
+      "sha256": "43555f961bd001990fd6bec1b2931930e48f06534ca714f957463340b9b985fe"
+    },
+    {
+      "path": "server/tools/fixture-real-large-read.cjs",
+      "sha256": "bbdbaed822fd8e37ff5df3dbf4eb3a5ffb171d56d759d00f2709825a81055d90"
+    },
+    {
+      "path": "server/tools/fixture-service.cjs",
+      "sha256": "fe261f69773fb223986d4aaee862698a907e3bc4abfd56c44e299874cf163f24"
+    },
+    {
+      "path": "server/tools/large-response.cjs",
+      "sha256": "4eabd7fb44114df7eba0768a49f67c8fca358bb137fc4f2c6fd4588c0800192a"
+    },
+    {
+      "path": "server/tools/real-large-read.cjs",
+      "sha256": "659ede7b06a4c9c24ce7f7281c5b1a242e93f6a997cea4c14600a4668b1fd1b4"
+    },
+    {
+      "path": "server/tools/scale.cjs",
+      "sha256": "26832ce93604f87f0fcd6d3f62b8aa70668e2696b9ca89700740e47d6b3fc4ba"
+    },
+    {
+      "path": "server/tools/test.cjs",
+      "sha256": "7c88ecf3ff583cac1d5988cb902528e181e9f7d3b2f266ee5e0b35dbdbfab550"
+    }
+  ]
+}

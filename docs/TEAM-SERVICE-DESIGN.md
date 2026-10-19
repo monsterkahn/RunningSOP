@@ -1,6 +1,6 @@
 # Team service: design and acceptance ledger
 
-Status: experimental development, not a published product release. The user revised the planning workload on 2026-10-18: approximately 500 people in an organization, about 500 active SOPs, and an assumed 15% novice population (75 people). Use 75 simultaneous readers as the primary burst test, not as a measured concurrency value or an enforced product cap. Existing folder mode remains the default. The earlier 200,000-SOP/500-connection results remain historical stress evidence; they are no longer the primary acceptance workload. A working foundation alone is not completion.
+Status: the opt-in team service is published as an experimental component of v1.2.0. Publication is separate from completion of the full deployment acceptance ledger below. The user revised the planning workload on 2026-10-18: approximately 500 people in an organization, about 500 active SOPs, and an assumed 15% novice population (75 people). Use 75 simultaneous readers as the primary burst test, not as a measured concurrency value or an enforced product cap. Existing folder mode remains the default. The earlier 200,000-SOP/500-connection results remain historical stress evidence; they are no longer the primary acceptance workload. A working foundation alone is not completion.
 
 ## Decision process
 
@@ -35,20 +35,23 @@ Classification is metadata, separate from stable SOP identity and work-address m
 
 | Requirement | Evidence required before completion | Current state |
 | --- | --- | --- |
-| Primary catalog: about 500 active SOPs | Matching, classification, pagination, realistic steps/issues/images; count historical revisions separately | 500-SOP/75-client fixture passes; realistic taxonomy/UX pending |
-| 500-person organization, 75-reader planning burst | Separate-process requests with 75 independent identities and sockets; retain prior 500-client stress evidence | 75-reader text/image workloads pass with bounded read retries; field concurrency unmeasured |
-| Reliable editing lock | Competing clients, expiry/takeover, stale release, lost-response retry and restart tests | Foundation tests |
-| Mixed client versions | Protocol negotiation, unsupported-version failures and data migration tests | Foundation tests |
-| Chrome 116 and current | Real extension connection, reading, editing, publication and recovery in both browsers | Real HTTP workspace/library scenarios pass in both; native prompts remain outstanding |
-| Windows/macOS/Linux | Service tests and actual packaged extension flows on OS matrix | Six service combinations, three OS team browsers and container startup passed remote run 39127823019; later changes require final run |
-| Classification at scale | Category CRUD, movement, stable IDs and indexed filters | Store/API and real-service library UI verified; aggregate counts and bulk operations remain optional evaluation |
-| UI understandable | Compact settings, owner/busy status, reconnect and preserved drafts; seven UI languages | In progress |
-| Storage efficiency | Separate assets, immutable revisions, integrity checks, measured large-image memory | Pending |
-| Recovery | Consistent backup/restore, migration rollback, interrupted publication and process termination | Verified snapshot/restore, live WAL and killed-process tests; browser recovery in progress |
-| Installation | Versioned service artifacts, container/desktop instructions, clean-start and upgrade tests | In progress |
-| Existing folder mode | Existing core/browser tests remain green with team mode disabled | 145 core tests and 10 existing plus 3 team scenarios per browser passed before the latest account/package additions |
-| Privacy/security | Least privilege, bounded input/cache, trusted origins, sessions, no remote execution or vendor telemetry | In progress |
-| Real deployments | Native permission dialogs, representative hardware, HTTPS/NAS/SMB and two-device checks | Not yet verified |
+| Primary catalog: about 500 active SOPs | Matching, classification, pagination, realistic steps/issues/images; count historical revisions separately | Combined real SDK/HTTP fixture: 500 guides, 3,750 steps, 1,000 pictured issue branches, 24 categories. All 500 canonical guides verified; synthetic JPEG reuse explicitly counted. |
+| 500-person organization, 75-reader planning burst | Separate-process requests with 75 independent identities and sockets; retain prior 500-client stress evidence | Fresh gradual/cold 75-client bursts plus rich categorized reads pass. 1,500 follow-up reads and zero unexpected failures; same-host observations, not field concurrency. |
+| Reliable editing lock | Competing clients, expiry/takeover, stale release, lost-response retry and restart tests | 52 service tests and real browser Edit/publication races; stale writers rejected and exact lost-confirmation replay preserves one commit. |
+| Mixed client versions | Protocol negotiation, unsupported-version failures and data migration tests | Independent official v1.2.0 source vs development clients/services: all four combinations and competing leases pass in current Chrome and actual Chrome116. |
+| Chrome 116 and current | Real extension connection, reading, editing, publication and recovery in both browsers | 29 team scenarios, 10 original scenarios and six actual-version interoperation cases per browser; full Edit and near-limit 100-step publication verified separately. The latest language correction passes refreshed OS CI. |
+| Windows/macOS/Linux | Service tests and actual packaged extension flows on OS matrix | Run39202716289 passes all13 verification jobs on the corrected source: six service combinations, three OS team browsers, two Windows package checks, Linux verification and container. Run39184422081 retains the earlier macOS28/29 failure evidence. |
+| Classification at scale | Category CRUD, movement, stable IDs and indexed filters | Store/API and real-service library UI; combined rich fixture verifies exact paged category/search membership and unchanged canonical bytes/revisions after six renames and 75 assignments. Bulk operations remain optional. |
+| UI understandable | Compact settings, owner/busy status, reconnect and preserved drafts; seven UI languages | Real settings/library/sidebar scenarios cover seven languages, narrow layout, category/history navigation, lock loss and preserved drafts. Language initialization order now explicitly forced in regression; no usability-study claim. |
+| Storage efficiency | Separate assets, immutable revisions, integrity checks, measured large-image memory | Binary asset deduplication and exact history hashes; selected-image reads/decodes bounded to two; real SDK byte comparison and browser JPEG/annotation checks. Server still reconstructs full views; no eliminated server-cost claim. |
+| Recovery | Consistent backup/restore, migration rollback, interrupted publication and process termination | Actual WAL snapshots/restored restart, corrupt/live-target rejection, abrupt process kill, lease takeover and confirmed-commit response loss pass. No automatic mutation retry. |
+| Installation | Versioned service artifacts, container/desktop instructions, clean-start and upgrade tests | Isolated extension and experimental service ZIPs built/inspected; clean package/browser and remote container/OS checks. Service requires separately installed Node24+ or container with a local database, independent of NAS brand. |
+| Existing folder mode | Existing core/browser tests remain green with team mode disabled | Current local core180 and original-browser10 per browser; fresh install has no shared service or background synchronization. Windows core179 plus one Linux-specific skip, not180 passes. |
+| Privacy/security | Least privilege, bounded input/cache, trusted origins, sessions, no remote execution or vendor telemetry | ManifestV3/bundled code, optional work-site origins, private sessions, no recorded form values, explicit one-frame screenshots, strict byte/admission/cache/hash/identity checks. UI language fix adds no permissions or network requests. |
+| Constrained configurations | Actual constrained runs rather than inferred machine specifications | Chrome116/current CPU4 + 128MiB V8 old-space setting pass slow publish and lost-confirmation recovery. Separate heap-constrained500/75 service run passes; simulated limits, not physical hardware certification. |
+| Real deployments | Native permission dialogs, representative hardware, HTTPS/NAS/SMB and two-device checks | Explicitly deferred by the user; not passed. Team statistics are also deferred. Do not describe synthetic verification as production acceptance. |
+
+Current evidence: [bounded publication](evidence/team-bounded-publication-2026-10-19.json), [actual versions/network](evidence/team-interop-network-2026-10-19.json), [primary workload](evidence/post120-primary-load-2026-10-19.json), and [rich/constrained audit supplement](evidence/team-completion-audit-supplement-2026-10-19.json). The earlier macOS failure is recorded rather than hidden; the corrected source passes its final matrix. See the [final automated audit](TEAM-COMPLETION-AUDIT.md) and [exact CI evidence](evidence/team-final-cross-platform-2026-10-19.json).
 
 ## Initial workload specification
 
@@ -124,3 +127,39 @@ The optional experimental service ZIP has an explicit source allowlist and its o
 The clean source-ZIP startup scenario passes locally on Node 24 and Node 26, including database/configuration creation and trusted-parent IPC shutdown. The service test suite now contains 44 passing tests; the core suite contains 148. Updated remote package-startup results must be recorded before claiming Windows extraction acceptance.
 
 Final automated checkpoint: GitHub runtime commit `fb70640f689e00c801d4d86c45fda36444119445` (tree `4b349cde2136c6e3ac6e2abd941e60d014548d01`, equal to local `ba08f5c`) passed all 10 team jobs in run `39128728309`, including the 44-test service suite and extracted-package startup on six OS/Node combinations, three OS browser scenarios and container startup. Existing extension run `39128728341` also passed, including both Windows package checks; release was skipped on this development branch. See `docs/evidence/team-final-ci-2026-10-18.json` (relative to the repository root). Duplicate push run `39128725376` was canceled. This proves only those automated environments; trusted HTTPS, real two-device/NAS/native-permission acceptance and team statistics/dashboard remain unfinished. The queued v1.2.0 release has not been made.
+
+
+## Post-publication capacity verification — 2026-10-19
+
+The authorized v1.2.0 GitHub publication completed at commit `ad9ca7ac2383e9b67febe260548674dc0759285f`, workflow [39144707756](https://github.com/monsterkahn/RunningSOP/actions/runs/39144707756). All Linux/macOS/Windows service/browser jobs, both Windows package jobs, the container job and the release asset verification passed. This does not discharge the deferred physical-deployment checks.
+
+A new inspection found that `real-large-read.cjs` reported incomplete readers but did not fail its process. Its exit status could therefore be mistaken for acceptance. The tool now writes the report and then requires zero incomplete readers in both bounded-retry phases. The initial no-retry phase intentionally measures admission rejections and is not required to have zero busy responses. A separate fault-injection run replaced the actual extension clients' reads with explicit failures: both clients were recorded as incomplete and the process exited 1 with the expected acceptance assertion. The ordinary 75-client run exited 0. No released runtime bytes were changed.
+
+Fresh source-fingerprinted evidence:
+
+- `evidence/team-scale-500-sops-75-readers-2026-10-19.json`: 500 synthetic SOPs and 75 independent authenticated clients, correct match/read/list/search results, exactly one winner for a contested lock, all independent publications reaching revision 2, and 1,500 follow-up reads. Read p95 7.1 ms, broad search p95 32.0 ms, publication p95 20.9 ms. The proposed sub-second read/search target passed on this host.
+- `evidence/team-images-75-readers-2026-10-19.json`: 3,148,224-byte guide with 12 synthetic image payloads. Ten initial readers completed and 65 received explicit busy responses. Both bounded recovery phases completed all 75 readers; actual extension clients took about 3.90 seconds, with 72 intermediate 503 responses and zero terminal failures. Peak sampled server RSS was 289,062,912 bytes across the experiment, not an upper memory bound.
+
+These are loopback tests on macOS/arm64, Node 26, with warmed connections. They do not model physical network latency, real browser image decoding, arbitrary old computers or NAS filesystems. They justify keeping admission and bounded retry; they also confirm that image-heavy burst latency and whole-guide transfer remain useful next optimization candidates. Any change to that protocol must preserve canonical integrity checks, historical revisions, old-client compatibility and opt-in storage behavior. Team statistics, trusted HTTPS/native permission and physical two-device acceptance remain deferred by the user; the full goal is not marked complete.
+
+
+## Separate-image reading foundation — 2026-10-19
+
+The next experiment adds opt-in read-only SDK methods and additive protocol-1 endpoints. It leaves the actual library/side-panel UI on the original complete-guide path. A 75-reader actual-SDK comparison transferred 19.9 MB for text plus one selected image, versus 236.1 MB for complete twelve-image guides; completion times were 1.08 s and 3.54 s. This is deliberately a different-image-coverage comparison, not a claim that all images download faster. Views still reconstruct and verify the full guide on the server. Exact-revision image hashes bind selected images to their verified views, including history and noncanonical base64 padding. Details and remaining UI acceptance work: `TEAM-READ-VIEW.md`. No released assets were changed.
+
+
+## Actual library UI checkpoint — 2026-10-19
+
+The development team-library now uses capability-gated views and exact-revision images. Actual browser network assertions establish bounded nearby/open-section fetching, old-service full-read compatibility and preview reuse; they do not extrapolate the earlier SDK transfer percentages to every user session. A review found an account-change window during image decoding. Detached staging plus a persisted identity recheck closes it; a deliberately unsafe temporary copy fails the dedicated regression. All 11 affected team-browser scenarios pass on Chrome 116 and current Chromium, with 157 passing core tests. See `evidence/team-library-images-ui-2026-10-19.json`. The side-panel reading path still loads full guides, and formal deployment acceptance remains unproven.
+
+
+## Sidebar and guarded screenshot checkpoint — 2026-10-19
+
+The development side panel now uses negotiated text views and selected images, while Edit fetches full canonical data and preserves unseen step/issue images. Atomic content/provenance refresh, an independent Edit identity guard, and exact revision/hash comparisons close a partial-copy race found during review. Per-slot issue holders prevent repeated selection from accumulating detached figures. Optional screenshot viewing guards preserve native gesture timing and cancel only the matching reading view. Core162/service46 and 24 team plus 10 original browser scenarios on each of Chrome 116/current Chromium passed; source-fingerprinted evidence is `evidence/team-sidebar-images-ui-2026-10-19.json`. Final packaged-runtime and refreshed OS-matrix checks are next, not assumed from earlier source-only checks.
+
+
+## Packaged and multi-OS verification — 2026-10-19
+
+The exact extracted development runtime passed all 34 browser scenarios in current Chromium and Chrome 116. All 66 runtime ZIP entries matched the tested source. The identical remote source tree passed workflow [39180665855](https://github.com/monsterkahn/RunningSOP/actions/runs/39180665855): all 13 verification jobs succeeded and release was skipped. This includes 24 team scenarios on each OS and the Windows package matrix; Windows core results are 161 pass/one existing Linux-specific skip. See `evidence/post120-cross-platform-2026-10-19.json`.
+
+The current server/client source passed the primary 500-SOP/75-client workload with both gradual and cold socket startup, including all publications, lock-contention invariants and 1,500 follow-up reads. The actual SDK image comparison completed all 75 clients in both modes (1.05 s selected-image mode versus 3.64 s full mode). Coverage differs: selected mode fetches one of twelve images. Original source-fingerprinted reports are in `evidence/post120-primary-load-2026-10-19.json`. Actual released/development interoperability and constrained-network simulations are the next evidence gaps to inspect; deferred physical acceptance is still not proven.

@@ -1,0 +1,31 @@
+{
+  "version": "1.3.3",
+  "version_changed": false,
+  "date": "2026-10-19",
+  "runtime_sha256": {
+    "image-marks.js": "c0419ac3a41439ec762dd1fcad23e058e1533ebd1758cd2a2e78de65bbf507af",
+    "screenshot-viewer.html": "21042af446eef4d1d05dd57b3934029c0ae69302ba808cf2e879cd3698f9bee0",
+    "screenshot-viewer.css": "fe579b0686af5508e33f1c88affc7eacae4ac01fdae1dd1fbad22a058fc706d6",
+    "screenshot-viewer.js": "73ad97a56153146bdc684bd4533cded6126c987e606ec0e550da759633400a12",
+    "workspace.html": "bf2d349e6665248dd05922f8122e4b01e5116a0e26f4e8bdf953ca17bcc0e831",
+    "workspace.css": "f9deee9a637f597b3bc9ced64b888fe0114d60e5ce841b2a9d632ba0f868eeaa",
+    "screenshot-editor.js": "cec0a1788065eff07c3e8abd4585b31b337d5378c364f672b2ff2bbf1845eaae"
+  },
+  "patch_sha256": "01fe62353657889eae6515c5ae269198797b3c3414ce67cc4bb8a8d61ec5f175",
+  "checks": {
+    "core_before_final_icon_label_polish": 199,
+    "source_browser_per_browser_before_final_icon_label_polish": 8,
+    "final_source_annotation_per_browser": 2,
+    "final_extracted_patch_annotation_per_browser": 2,
+    "browsers": [
+      "Chromium151",
+      "Chrome116"
+    ],
+    "widths_without_horizontal_overflow": [
+      390,
+      760,
+      1280
+    ]
+  },
+  "scope": "local seven-file replacement; no build/release/store upload; earlier ZIPs preserved"
+}

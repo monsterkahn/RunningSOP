@@ -25,7 +25,11 @@ if(typeof document!=='undefined')root.SOPIcons?.apply(document);
     root.WorkspaceI18n?.setLanguage(next.language);root.WorkspaceI18n?.apply(document);root.SOPReleaseNotes?.render($('release-notes'),root.WorkspaceI18n?.getLanguage());
     renderLanguage(next.language);
   }
-  function renderLanguage(language){$('language-auto').title=tr('跟随浏览器语言');for(const code of ['auto','zh','zh-TW','en','es','ru','ko','ja'])$('language-'+code).setAttribute('aria-pressed',String(language===code));const resolved=root.WorkspaceI18n.resolveLanguage(language);document.documentElement.lang=resolved==='zh'?'zh-CN':resolved;}
+  function renderLibraryEntry(){
+    const code=root.WorkspaceI18n?.getLanguage()||'en',labels={en:['View SOP overview','Browse SOPs and retained versions.'],zh:['查看 SOP 总表','浏览 SOP 与已保留的历史版本。'],'zh-TW':['查看 SOP 總表','瀏覽 SOP 與已保留的歷史版本。'],es:['Ver resumen de SOP','Explora SOP y versiones conservadas.'],ru:['Обзор SOP','SOP и сохранённые версии.'],ko:['SOP 전체 보기','SOP와 보관된 버전을 확인하세요.'],ja:['SOP 一覧を見る','SOP と保存された版を確認できます。']}[code]||['View SOP overview','Browse SOPs and retained versions.'];
+    if($('open-folder-library'))$('open-folder-library').textContent=labels[0];if($('folder-library-help'))$('folder-library-help').textContent=labels[1];
+  }
+  function renderLanguage(language){$('language-auto').title=tr('跟随浏览器语言');for(const code of ['auto','zh','zh-TW','en','es','ru','ko','ja'])$('language-'+code).setAttribute('aria-pressed',String(language===code));const resolved=root.WorkspaceI18n.resolveLanguage(language);document.documentElement.lang=resolved==='zh'?'zh-CN':resolved;renderLibraryEntry();document.dispatchEvent(new Event('workspace-language-change'));}
   function send(type,settings){return new Promise((resolve,reject)=>chrome.runtime.sendMessage({type,...(settings?{settings}:{})},response=>{const error=chrome.runtime.lastError;if(error)return reject(Error(error.message));if(response?.error)return reject(Error(response.error));resolve(response); }));}
   async function refreshCatalog(){
     try{
@@ -37,6 +41,8 @@ if(typeof document!=='undefined')root.SOPIcons?.apply(document);
       $('source-name').textContent=selected?(info.displayName||info.name||tr('SOP 文件夹')):tr('尚未选择文件夹');
       $('source-end-icon').innerHTML=root.SOPIcons.svg(selected?info.icon:'folder');
       $('source-appearance').hidden=!selected;
+      if($('folder-library-entry'))$('folder-library-entry').hidden=false;
+      renderLibraryEntry();
       $('source-count').hidden=!selected;
       if(selected){
         const count=result.status?.workflowCount;

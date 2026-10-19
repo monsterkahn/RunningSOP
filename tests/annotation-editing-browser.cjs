@@ -1,0 +1,37 @@
+'use strict';
+const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
+const {chromium}=require(process.env.RUNTIME_SOP_PLAYWRIGHT||'playwright');
+const root=process.env.RUNTIME_SOP_EXTENSION||path.resolve(__dirname,'../extension');
+async function fixture(run){const browser=await chromium.launch({channel:'chromium',headless:!process.env.RUNTIME_SOP_CHROME,...(process.env.RUNTIME_SOP_CHROME?{executablePath:process.env.RUNTIME_SOP_CHROME,args:['--headless=new']}: {})});try{const page=await browser.newPage({viewport:{width:1200,height:850}});await run(page);}finally{await browser.close();}}
+const near=(actual,expected)=>assert.ok(Math.abs(actual-expected)<.0001,`${actual} != ${expected}`);
+async function drag(page,surface,a,b){const r=await page.locator(surface).boundingBox();await page.mouse.move(r.x+r.width*a[0],r.y+r.height*a[1]);await page.mouse.down();await page.mouse.move(r.x+r.width*b[0],r.y+r.height*b[1],{steps:5});await page.mouse.up();}
+const initial=[{type:'number',x:.3,y:.3},{type:'rect',x:.45,y:.45,x2:.7,y2:.65}];
+async function checkTools(page){for(const id of ['move','number','arrow','rect']){const button=page.locator('#marks-'+id);assert.equal((await button.textContent()).trim(),'');assert.equal(await button.locator('svg').count(),1);assert.ok(await button.getAttribute('aria-label'));}}
+test('fallback editor selects and moves annotations with pointer capture, keyboard, undo, cancel and exact saved geometry',{timeout:30000},()=>fixture(async page=>{
+ const html=fs.readFileSync(path.join(root,'workspace.html'),'utf8'),dialog=html.match(/<dialog id="marks-dialog"[\s\S]*?<\/dialog>/)[0];
+ await page.setContent('<style>#marks-dialog{width:1000px}#marks-surface{position:relative;width:900px;line-height:0;touch-action:none}#marks-img{width:100%}#marks-overlay{position:absolute;inset:0;pointer-events:none}svg{width:100%;height:100%}.marks-tool svg{width:24px;height:24px}</style>'+dialog);
+ await page.addScriptTag({path:path.join(root,'image-marks.js')});await page.addScriptTag({path:path.join(root,'screenshot-editor.js')});
+ await page.evaluate(initial=>{const c=document.createElement('canvas');c.width=1000;c.height=500;c.getContext('2d').fillRect(0,0,1000,500);window.testImage=c.toDataURL('image/png');window.start=()=>{window.result='pending';ScreenshotEditor.open({image:testImage,imageMarks:initial}).then(value=>window.result=value);};window.start();},initial);
+ await page.locator('#marks-dialog').waitFor();await checkTools(page);await page.locator('#marks-move').click();
+ await drag(page,'#marks-surface',[.3,.3],[.4,.4]);await page.keyboard.press('ArrowRight');await page.keyboard.press('Shift+ArrowDown');
+ await page.locator('#marks-save').click();await page.waitForFunction(()=>Array.isArray(window.result));let result=await page.evaluate(()=>window.result);near(result[0].x,.401);near(result[0].y,.42);assert.deepEqual(result[1],initial[1]);
+ await page.evaluate(()=>start());await page.locator('#marks-dialog').waitFor();await page.locator('#marks-move').click();await drag(page,'#marks-surface',[.55,.55],[.9,.9]);await page.locator('#marks-undo').click();await page.locator('#marks-save').click();await page.waitForFunction(()=>Array.isArray(window.result));assert.deepEqual(await page.evaluate(()=>result),initial);
+ await page.evaluate(()=>start());await page.locator('#marks-dialog').waitFor();await page.locator('#marks-move').click();await drag(page,'#marks-surface',[.3,.3],[.5,.5]);await page.locator('#marks-exit').click();await page.waitForFunction(()=>window.result===null);
+}));
+test('on-page viewer moves boxes and numbers without panning, clamps edges, rolls back cancelled drag and saves rounded rendering',{timeout:30000},()=>fixture(async page=>{
+ await page.route('https://annotation.example.test/**',async route=>{const name=new URL(route.request().url()).pathname.slice(1);if(!/^[a-z-]+\.(?:js|css|html)$/.test(name))return route.abort();await route.fulfill({path:path.join(root,name)});});
+ await page.addInitScript(initial=>{const c=document.createElement('canvas');c.width=1000;c.height=500;c.getContext('2d').fillRect(0,0,1000,500);const image=c.toDataURL('image/png');window.saved=[];window.chrome={tabs:{getCurrent:async()=>({id:5})},storage:{local:{get:async()=>({})},session:{get:async key=>({[key]:{mode:'edit',tabId:5,expiresAt:Date.now()+10000,step:{image,imageMarks:initial}}}),set:async value=>{const item=Object.values(value)[0];if(Object.hasOwn(item,'result'))window.saved.push(item.result);}}}};},initial);
+ await page.goto('https://annotation.example.test/screenshot-viewer.html?token=synthetic-token-132&mode=edit');await page.waitForFunction(()=>document.querySelector('#picture').naturalWidth===1000);await checkTools(page);await page.locator('#marks-move').click();
+ const transform=await page.locator('#stage').getAttribute('style');await drag(page,'#picture',[.55,.55],[.9,.9]);assert.equal(await page.locator('#stage').getAttribute('style'),transform);await page.keyboard.press('ArrowLeft');await page.keyboard.press('Shift+ArrowUp');await page.locator('#save').click();await page.waitForFunction(()=>window.saved.length===1);let result=await page.evaluate(()=>saved[0]);near(result[1].x,.749);near(result[1].x2,.999);near(result[1].y,.78);near(result[1].y2,.98);
+ await page.locator('#undo').click();await page.locator('#undo').click();await page.locator('#undo').click();await page.locator('#save').click();await page.waitForFunction(()=>window.saved.length===2);assert.deepEqual(await page.evaluate(()=>saved[1]),initial);
+ await drag(page,'#picture',[.3,.3],[.5,.5]);await page.locator('#undo').click();await page.locator('#save').click();await page.waitForFunction(()=>window.saved.length===3);assert.deepEqual(await page.evaluate(()=>saved[2]),initial);
+ assert.equal(await page.locator('#overlay rect[rx="8"]').count(),2);assert.equal(await page.locator('#overlay [stroke-dasharray]').count(),0);
+ // A cancelled pointer drag rolls back and does not become an undo entry.
+ await page.locator('#marks-move').click();const r=await page.locator('#picture').boundingBox();await page.mouse.move(r.x+r.width*.3,r.y+r.height*.3);await page.mouse.down();await page.mouse.move(r.x+r.width*.4,r.y+r.height*.4);await page.locator('#viewport').dispatchEvent('pointercancel');await page.mouse.up();await page.locator('#save').click();await page.waitForFunction(()=>window.saved.length===4);assert.deepEqual(await page.evaluate(()=>saved[3]),initial);
+ assert.equal(await page.locator('#cancel').count(),0);assert.equal(await page.locator('.tool-group').count(),3);
+ for(const id of ['fit','actual','zoom-out','zoom-in','undo','clear']){const b=page.locator('#'+id);assert.equal(await b.locator('svg').count(),1);assert.equal((await b.textContent()).trim(),'');assert.ok(await b.getAttribute('aria-label'));}
+ for(const width of [390,760,1280]){await page.setViewportSize({width,height:850});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);for(const b of await page.locator('.toolbar button').all()){const box=await b.boundingBox();assert.ok(box.x>=0&&box.x+box.width<=width);}}
+ if(process.env.RUNTIME_SOP_TOOLBAR_PREVIEW)await page.screenshot({path:process.env.RUNTIME_SOP_TOOLBAR_PREVIEW});
+ await page.locator('#close-viewer').click();await page.waitForFunction(()=>window.saved.length===5);assert.equal(await page.evaluate(()=>saved[4]),null);
+
+}));

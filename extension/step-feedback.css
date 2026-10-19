@@ -1,0 +1,19 @@
+.sop-feedback-passage{position:relative;padding-right:38px;border-radius:5px;transition:background-color .12s}
+.sop-feedback-passage:hover,.sop-feedback-passage:focus-within{background-color:#eaf1ff}
+.sop-step-feedback-trigger{position:absolute;right:0;top:0;width:32px;height:32px;padding:6px;border:1px solid #ccd9f1;border-radius:50%;color:#2860c6;background:#fff;cursor:pointer;opacity:.6;display:grid;place-items:center}
+.sop-feedback-passage:hover>.sop-step-feedback-trigger,.sop-step-feedback-trigger:focus-visible{opacity:1}
+.sop-step-feedback-trigger svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.sop-step-feedback-trigger:focus-visible{outline:2px solid #2860c6;outline-offset:2px}
+.sop-step-feedback-dialog{box-sizing:border-box;width:min(440px,calc(100vw - 24px));max-height:calc(100vh - 24px);overflow:auto;padding:20px;border:1px solid #ccd9f1;border-radius:12px;color:#26354c;background:#fff}
+.sop-step-feedback-dialog::backdrop{background:#17243a60}
+.sop-step-feedback-dialog h2{margin:0 0 16px;font-size:18px}
+.sop-step-feedback-dialog label{display:block;margin:12px 0;font-size:14px}
+.sop-step-feedback-dialog select,.sop-step-feedback-dialog textarea{display:block;box-sizing:border-box;width:100%;margin-top:6px;padding:9px;border:1px solid #c8d2e2;border-radius:6px;background:#fff;color:inherit;font:inherit}
+.sop-step-feedback-privacy,.sop-step-feedback-scope{font-size:12px;line-height:1.5;color:#5e6877}
+.sop-step-feedback-actions{display:flex;gap:8px;margin:12px 0}
+.sop-step-feedback-dialog button{min-height:36px;padding:6px 12px;border:1px solid #bfcfe8;border-radius:6px;background:#f3f7ff;color:#235bbd;cursor:pointer;font:inherit;font-size:13px}
+.sop-step-feedback-dialog button:disabled{opacity:.55;cursor:default}
+.sop-step-feedback-dialog [role=status]{font-size:13px;line-height:1.5}
+@media(prefers-reduced-motion:reduce){.sop-feedback-passage{transition:none}}
+@media(hover:none){.sop-step-feedback-trigger{opacity:1}}
+.sop-step-feedback-context{font-size:13px;line-height:1.5;overflow-wrap:anywhere;color:#385071}

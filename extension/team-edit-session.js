@@ -44,11 +44,11 @@
       catch (e) { return await lost(e,current); }
       finally { busy = false; activeController = undefined; }
     }
-    async function renew() {
+    async function renew(persistDraft = false) {
       allowed(); if (phase !== 'editing') throw failure('not_editing');
       if (clock() >= deadline) return lost(failure('lease_expired'),epoch);
       busy = true; stopTimer(); const current = epoch; activeController = new AbortController();
-      try { const sentAt = clock(); const renewed = await client.renewLock(sopId,lease,{signal:activeController.signal}); checkEpoch(current); if (renewed.token !== lease.token || renewed.fence !== lease.fence || renewed.baseRevision !== lease.baseRevision) throw failure('lease_changed'); acceptLease(renewed,sentAt); schedule(); emit(); return snapshot(); }
+      try { if (persistDraft) { await persist(); checkEpoch(current); } const sentAt = clock(); const renewed = await client.renewLock(sopId,lease,{signal:activeController.signal}); checkEpoch(current); if (renewed.token !== lease.token || renewed.fence !== lease.fence || renewed.baseRevision !== lease.baseRevision) throw failure('lease_changed'); acceptLease(renewed,sentAt); schedule(); emit(); return snapshot(); }
       catch (e) { return await lost(e,current); }
       finally { busy = false; activeController = undefined; }
     }
@@ -67,6 +67,14 @@
       allowed(); if (phase !== 'editing' || !lease) throw failure('not_editing');
       if (value !== undefined) draft = clone(value);
       if (clock() >= deadline) return lost(failure('lease_expired'),epoch);
+      // Refresh a nearly expired lease before a large first upload.
+      // An uncertain replay must retain its original lease/key and never renew after a possibly committed publish.
+      const guideBytes = new TextEncoder().encode(JSON.stringify(draft)).byteLength;
+      const uploadBudget = Math.min(120000, 8000 + Math.ceil(guideBytes * 1000 / 65536));
+      if (guideBytes > 256 * 1024 && deadline - clock() < uploadBudget) {
+        try { await renew(true); } catch (error) { if (error.code === 'configuration_changed') throw error; throw failure('lease_refresh_failed'); }
+        allowed(); if (phase !== 'editing' || !lease) throw failure('not_editing');
+      }
       pending = {guide:clone(draft),lease:clone(lease),expectedRevision:lease.baseRevision,key:client.newIdempotencyKey()};
       return sendPublish();
     }

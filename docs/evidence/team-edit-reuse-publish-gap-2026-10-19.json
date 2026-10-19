@@ -1,0 +1,102 @@
+{
+  "date": "2026-10-19",
+  "scope": "Development-only reuse of the canonical full guide within one Edit operation; slow-publication characterization is an unresolved limitation.",
+  "baselineCommit": "f8ae9f0511343d176c70f74bb6356b9dd5ed755d",
+  "behavior": {
+    "freshEditFullTransfers": 1,
+    "reuse": "Only the exact full SDK result just fetched/verified by this Edit action. Not a persistent cache or partial reading view.",
+    "guards": [
+      "Persisted account/target rechecked before use",
+      "Exact workflow ID, revision and original canonical SHA compared against draft link",
+      "Real editing lease acquired, its baseRevision compared with full-guide revision",
+      "Newer lease revision rejects Edit, releases acquired lease and preserves complete draft",
+      "Reopening an existing draft without a fresh result still obtains a fresh complete guide"
+    ]
+  },
+  "checks": {
+    "core": 170,
+    "teamCurrent": 27,
+    "team116": 27,
+    "interopCurrent": 6,
+    "interop116": 6,
+    "publishCharacterizationCurrent": 1,
+    "publishCharacterization116": 1
+  },
+  "slowEdit": {
+    "method": "Actual CDP 64KiB/s upload/download and120ms latency; no response rewriting",
+    "current": {
+      "complete": "verified",
+      "fullMs": 11230,
+      "selectedMs": 814.3999999910593,
+      "steps": 24,
+      "imageBytes": 27667,
+      "revision": 2,
+      "fullImages": 24,
+      "fullIssueImages": 2,
+      "completeEditMs": 11948,
+      "editFullReads": 1
+    },
+    "chrome116": {
+      "complete": "verified",
+      "fullMs": 11250.40000000596,
+      "selectedMs": 840.0999999940395,
+      "steps": 24,
+      "imageBytes": 27667,
+      "revision": 2,
+      "fullImages": 24,
+      "fullIssueImages": 2,
+      "completeEditMs": 11917,
+      "editFullReads": 1
+    },
+    "previous": "~23 seconds and two full Edit transfers; source-fingerprinted earlier evidence in team-progressive-read-2026-10-19.json"
+  },
+  "slowPublication": {
+    "current": {
+      "guideBytes": 726243,
+      "requestBytes": 726338,
+      "elapsedMs": 8121.577791999999,
+      "outcome": "timeout; publication response unknown",
+      "revisionAfterTimeout": 2,
+      "preservedPending": true,
+      "automaticRetries": 0,
+      "status": "Publish response unknown. Press Publish again to retry the same saved request.",
+      "recoveryMs": 169.08458299999984,
+      "recoveryRevision": 3,
+      "recovery": "explicit retry after restoring transport"
+    },
+    "chrome116": {
+      "guideBytes": 726243,
+      "requestBytes": 726338,
+      "elapsedMs": 8117.537375,
+      "outcome": "timeout; publication response unknown",
+      "revisionAfterTimeout": 2,
+      "preservedPending": true,
+      "automaticRetries": 0,
+      "status": "Publish response unknown. Press Publish again to retry the same saved request.",
+      "recoveryMs": 153.26729199999863,
+      "recoveryRevision": 3,
+      "recovery": "explicit retry after restoring transport"
+    },
+    "interpretation": "Test passes by proving current deadline/retention/idempotent recovery behavior. Publication at throttled bandwidth does NOT succeed.",
+    "next": "Evaluate bounded time budgets for large guide upload/response, accounting for server body deadlines and lease expiry. Preserve manual retry, exact keys, strict body/hash/fencing and cancellation."
+  },
+  "independentRegression": "Removing only the lease baseRevision comparison in a complete temporary runtime copy fails the real racing-publication test because stale Edit opens.",
+  "artifactInspection": {
+    "build": "npm run build in isolated archived source plus working changes",
+    "zipIntegrityChecked": 3,
+    "webStoreRuntimeEntriesEqualWorkingBytes": 66,
+    "officialInstallerSha256Unchanged": "2fbeab363d6919125858bffbda21b1cca93b2d6faea97030f55557882d5e965c"
+  },
+  "sourceSha256": {
+    "extension/workspace.js": "50b9594bcad4931bb2bc7bb4c22e878b910b6649837409679672e0ecc5927225",
+    "extension/team-client.js": "07b629a28f8af69a172c0e152a570db573d1f8b023f8c83c831bb511f323e75c",
+    "tests/team-sidebar-images-browser.cjs": "4be8902e78b5f9741561c00a7d5865f1a84ccbcfd6a2fa0ad6d9b3984f6e6d59",
+    "tests/team-slow-publish-browser.cjs": "b116e8fbb802412e1d06add515a4c10e6720551e18870b66dd5c786f0a6ef9d9"
+  },
+  "limits": [
+    "No public package changes, new formal release or store submission.",
+    "No refreshed remote OS matrix claimed for this checkpoint.",
+    "Loopback synthetic network emulation does not replace physical LAN/NAS/HTTPS/native-permission/hardware acceptance.",
+    "Publication characterization is deliberately not in the normal team browser script; update it to assert successful throttled publication when implementing a fix."
+  ]
+}

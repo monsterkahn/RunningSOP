@@ -6,9 +6,11 @@
 
 ![Running SOP: Clear steps. Right where you work.](docs/assets/running-sop-social-preview.png)
 
-**Version: v1.2.0** · [Download](https://github.com/monsterkahn/RunningSOP/releases/latest)
+**Release: v1.3.3** · [Download](https://github.com/monsterkahn/RunningSOP/releases/latest)
 
 Create step-by-step guides with screenshots, follow them beside your work, and share SOPs through a folder you choose.
+
+Version **1.3.3** adds retained-version reading and an SOP overview, clearer screenshot editing, and a safer publication flow. Cleared steps are skipped and the remaining steps are numbered consecutively; an entirely empty SOP cannot be published. Verified publication removes the corresponding unchanged local draft and opens the published steps directly. Other drafts, failed or uncertain writes, and newer concurrent edits are preserved. The previous v1.2.0 release assets remain available. This GitHub release does not submit or replace a Chrome Web Store package. See [Version history](docs/VERSION-HISTORY.md) and [Release review](docs/RELEASE-REVIEW-1.3.3.md).
 
 ## What it does
 
@@ -48,7 +50,11 @@ New installations have no shared endpoint and do not enable background synchroni
 
 Open your work page, start recording, name the SOP and edit STEP 1. Step titles are optional. Write the instructions, add screenshots and markers, and specify reporting or approval requirements where needed. **Next step** saves the current step before continuing. Review the result before publishing to storage.
 
-Screenshots and manually entered notes can contain sensitive information. Check them before saving or sharing. Unpublished drafts stay in this browser; the current recording interface has no backup-export control. See [Guided recording](docs/GUIDED-RECORDING.md).
+Screenshots and manually entered notes can contain sensitive information. Check them before saving or sharing. After verified publication, the corresponding unchanged draft is removed and the published SOP is shown. Cleared steps are omitted; partially completed steps still require valid instructions. Other unpublished drafts stay in this browser; the current recording interface has no backup-export control. See [Guided recording](docs/GUIDED-RECORDING.md).
+
+## Read a retained version in the local candidate
+
+In Settings, choose **View SOP overview** to browse categories, search and read the current library. It follows the enabled team connection, otherwise your explicitly authorized folder. Open an SOP’s version history and choose a retained version. The reader shows that version’s text, images and annotations, identifies it as historical, and provides a return to latest action. History reading does not grant management, publishing or restore permissions, add approval workflows, or change the current published version. Missing or invalid historical content is reported rather than replaced with current content. Folder history depends on retained publication records, version documents, images and any supported catalog backups; it cannot reconstruct deleted material. See [Version history](docs/VERSION-HISTORY.md).
 
 ## Chrome standards statement
 
@@ -72,11 +78,11 @@ GitHub explanatory documentation and public release notes are maintained in Engl
 
 - [Privacy](PRIVACY.md): processed data, storage and sharing boundaries.
 - [Security](SECURITY.md): trust boundaries and private vulnerability reporting.
-- [Release review](docs/RELEASE-REVIEW-1.2.0.md): actual test results and limitations.
+- [Release review](docs/RELEASE-REVIEW-1.3.3.md): actual test results and limitations.
 - [Chrome Web Store metadata](CHROMEWEBSTORE.md): permissions and disclosure preparation.
 - [Release checklist](docs/RELEASE-CHECKLIST.md): build, package and manual acceptance checks.
 
-The local v1.2.0 candidate passed 153 core tests and 14 browser scenarios each on Chrome 116 and the current tested Chromium. The unchanged team-service runtime has 44 passing tests on Node.js 24/26. Earlier runtime CI passed the recorded package checks. GitHub publication is gated on the release commit's configured CI checks. Native operating-system authorization and real two-device acceptance remain outstanding; the team service's HTTPS deployment is also unverified. See the release review for exact scope and limits.
+The v1.3.3 release review records current core, service, browser and package verification. Native operating-system authorization, physical two-device NAS/HTTPS acceptance and team statistics remain user-deferred; automated results do not establish that these checks passed or that Google approved the extension.
 
 ## Development
 

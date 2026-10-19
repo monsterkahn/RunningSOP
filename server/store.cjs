@@ -2,7 +2,7 @@
 const {DatabaseSync}=require('node:sqlite');
 const {randomBytes,randomUUID,createHash}=require('node:crypto');
 const {validateGuide}=require('../extension/catalog-engine.js');
-const {compactGuide,reconstructGuide}=require('./guide-assets.cjs');
+const {compactGuide,reconstructGuide,readGuideImage}=require('./guide-assets.cjs');
 class ServiceError extends Error { constructor(status,code,message){super(message);this.status=status;this.code=code;} }
 const fail=(s,c,m)=>{throw new ServiceError(s,c,m);};
 const hash=s=>createHash('sha256').update(s).digest('hex');
@@ -44,6 +44,20 @@ class TeamStore {
  create(guide,{actor,idempotencyKey}={}){const n=this.normalize(guide);return this.tx(()=>{actor=this.actor(actor);return this.idem(actor,idempotencyKey,['create',n.json],()=>{if(this.q('SELECT id FROM workflows WHERE id=?').get(n.guide.workflowId))fail(409,'already_exists','SOP already exists');return this.write(n.guide.workflowId,n,1);});});}
  estimatedReadBytes(id,{revision}={}){const current=this.row(id);const row=this.q("SELECT coalesce(wireBytes,CASE WHEN substr(guide,1,60) LIKE '%team-guide-assets-v1%' THEN 4194304 ELSE length(CAST(guide AS BLOB)) END) AS bytes FROM revisions WHERE id=? AND revision=?").get(id,revision??current.revision);if(!row)fail(404,'not_found','Revision not found');return row.bytes+1024;}
  get(id,{revision}={}){const r=this.row(id);if(revision!==undefined&&(!Number.isSafeInteger(revision)||revision<1))fail(400,'invalid_revision','Invalid revision');return this.result(id,revision??r.revision);}
+ getView(id,options={}){
+  const full=this.get(id,options),guide=JSON.parse(JSON.stringify(full.guide)),images=[];
+  const strip=(target,step,issue)=>{if(target.image!==undefined){images.push({step,...(issue===undefined?{}:{issue}),sha256:hash(target.image),...(target.imageAt===undefined?{}:{imageAt:target.imageAt}),...(target.imageMarks===undefined?{}:{imageMarks:target.imageMarks})});}delete target.image;delete target.imageAt;delete target.imageMarks;};
+  guide.steps.forEach((step,index)=>{strip(step,index);(step.issues||[]).forEach((issue,i)=>strip(issue,index,i));});
+  return {id:full.id,revision:full.revision,sha256:full.sha256,viewSha256:hash(JSON.stringify({guide,images})),guide,images};
+ }
+ getImage(id,{revision,step,issue}={}){
+  if(!Number.isSafeInteger(revision)||revision<1)fail(400,'invalid_revision','Exact revision required');
+  if(!Number.isSafeInteger(step)||step<0||step>=100||issue!==undefined&&(!Number.isSafeInteger(issue)||issue<0||issue>=10))fail(400,'invalid_index','Invalid image index');
+  this.row(id);const row=this.q('SELECT guide,sha256 FROM revisions WHERE id=? AND revision=?').get(id,revision);if(!row)fail(404,'not_found','Revision not found');
+  let image;try{image=readGuideImage(this.db,row.guide,row.sha256,id,step,issue);}catch{fail(500,'stored_integrity','Stored guide or image failed integrity verification');}
+  if(image===null)fail(404,'not_found','Image not found');
+  return {id,revision,step,...(issue===undefined?{}:{issue}),sha256:hash(image),image};
+ }
  cursor(value){if(!value)return null;try{const v=JSON.parse(Buffer.from(value,'base64url').toString());if(!Array.isArray(v)||v.length!==2||!Number.isSafeInteger(v[0])||typeof v[1]!=='string'||v[1].length>80)throw Error();return v;}catch{fail(400,'invalid_cursor','Invalid cursor');}}
  limit(n){if(!Number.isSafeInteger(n)||n<1||n>200)fail(400,'invalid_limit','Limit must be between 1 and 200');return n;}
  list({query='',category='',cursor='',limit=50,uncategorized=false}={}){

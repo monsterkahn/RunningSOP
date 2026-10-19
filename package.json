@@ -1,6 +1,6 @@
 {
   "name": "runtime-sop",
-  "version": "1.2.0",
+  "version": "1.3.3",
   "private": true,
   "description": "Local-first Chrome workflow recorder and shared SOP reader",
   "author": {
@@ -27,10 +27,12 @@
     "test:release-browser": "node --test --test-concurrency=1 tests/public-browser.cjs tests/folder-browser.cjs tests/qr-browser.cjs tests/dashboard-language-browser.cjs",
     "test:server": "node server/tools/test.cjs",
     "test:team-scale": "node server/tools/scale.cjs",
-    "test:team-browser": "node --test --test-concurrency=1 tests/team-workspace-browser.cjs tests/team-library-browser.cjs tests/team-service-picker-browser.cjs",
+    "test:team-browser": "node --test --test-concurrency=1 tests/team-workspace-browser.cjs tests/team-library-browser.cjs tests/team-service-picker-browser.cjs tests/team-read-view-browser.cjs tests/team-library-images-browser.cjs tests/team-sidebar-images-browser.cjs tests/team-slow-publish-browser.cjs",
     "build:team-service": "node tools/build-team-service.cjs",
     "build:release-media": "node tools/build-release-media.cjs",
-    "build:release": "npm run build && npm run build:team-service && npm run build:release-media && node tools/release-checksums.cjs"
+    "build:release": "npm run build && npm run build:team-service && npm run build:release-media && node tools/release-checksums.cjs",
+    "test:history-browser": "node --test --test-concurrency=1 tests/library-history-browser.cjs tests/workspace-history-browser.cjs",
+    "test:interaction-browser": "node --test --test-concurrency=1 tests/annotation-editing-browser.cjs tests/step-feedback-browser.cjs tests/publish-reading-browser.cjs"
   },
   "devDependencies": {
     "playwright": "1.62.1"

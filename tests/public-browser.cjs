@@ -95,6 +95,12 @@ test('fresh extension install is private by default and About shows release iden
     assert.equal(await page.locator('#section-about').evaluate(e=>getComputedStyle(e).textAlign),'center');
     assert.equal(await page.locator('.about-author>div').first().evaluate(e=>getComputedStyle(e).alignItems),'center');
 
+    const paypal=page.locator('#paypal-account');assert.equal(await paypal.getAttribute('open'),null);assert.equal(await paypal.locator('.support-account').isVisible(),false);
+    await paypal.locator('summary').focus();await page.keyboard.press('Enter');assert.equal(await paypal.locator('.support-account').isVisible(),true);assert.equal(await paypal.locator('.support-account').textContent(),'gwangphug@gmail.com');await page.keyboard.press('Space');assert.equal(await paypal.locator('.support-account').isVisible(),false);
+    await page.locator('#team-settings>summary').click();assert.equal(await page.locator('#team-settings [data-team-text="0"]').count(),1);assert.equal(await page.locator('#team-settings legend').count(),0);
+    const styles=await page.locator('.team-buttons button').evaluateAll(nodes=>nodes.map(node=>{const s=getComputedStyle(node),r=node.getBoundingClientRect();return{width:r.width,height:r.height,background:s.backgroundColor,border:s.border,color:s.color,font:s.font,borderRadius:s.borderRadius};}));assert.deepEqual(styles[0],styles[1]);
+    for(const width of [320,390,1280]){await page.setViewportSize({width,height:800});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);}await page.locator('#team-settings>summary').click();
+
     const beforeURL = page.url();
     const beforeTabs = context.pages().length;
     await page.locator('#about-updates').click();
@@ -138,8 +144,16 @@ test('fresh extension install is private by default and About shows release iden
     assert.equal(cleared.steps.length,2);assert.equal(cleared.steps[0].workUrl,draft.steps[0].workUrl);
     assert.equal(cleared.steps[0].image,undefined);assert.equal(cleared.steps[0].pointType,'normal');assert.deepEqual(cleared.steps[0].issues,[]);
     assert.equal(cleared.steps[1].action,'Keep the other step.');
+    const publishable=await page.evaluate(()=>WorkspaceApp.buildGuide());assert.equal(publishable.steps.length,1);assert.equal(publishable.steps[0].id,'step-1');assert.deepEqual(publishable.steps[0].actions,['Keep the other step.']);
+    await page.locator('#preview-publish').click();await page.locator('#publish-view').waitFor({state:'visible'});assert.equal(await page.locator('#publish-view').isVisible(),true);assert.match(await page.locator('#publish-summary').textContent(),/1/);await page.locator('#publish-back').click();
+    await page.locator('#edit-steps button').nth(1).click();await page.locator('#clear-step').click();await page.waitForFunction(()=>!document.querySelector('#clear-step').disabled);await page.locator('#preview-publish').click();await page.waitForFunction(()=>document.querySelector('#editor-status').textContent===WorkspaceI18n.t('没有可发布的内容'));
+    assert.equal(await page.locator('#editor').isVisible(),true);assert.equal(await page.locator('#publish-view').isVisible(),false);assert.ok(await page.locator('#editor-status').textContent());
+    assert.equal((await page.evaluate(async()=>(await chrome.runtime.sendMessage({type:'recorder-get'})).data.drafts[0].steps)).length,2);
+    await page.locator('#edit-title').fill('Incomplete step must be retained');await page.locator('#preview-publish').click();await page.waitForFunction(()=>document.querySelector('#editor-status').textContent.includes('操作说明'));assert.match(await page.locator('#editor-status').textContent(),/操作说明/);assert.equal(await page.locator('#editor').isVisible(),true);
+
+
     assert.equal(await page.locator('#backup-editor,#backup-file,#export-guide,#save-draft').count(),0);
-    assert.equal(await page.locator('#preview-publish').evaluate(e=>getComputedStyle(e).backgroundColor),'rgb(33, 134, 93)');
+    await page.mouse.move(0,0);await page.waitForFunction(()=>getComputedStyle(document.querySelector('#preview-publish')).backgroundColor==='rgb(33, 134, 93)');assert.equal(await page.locator('#preview-publish').evaluate(e=>getComputedStyle(e).backgroundColor),'rgb(33, 134, 93)');
 
     assert.match(await page.locator('#large-picture .image-marks-overlay').innerHTML(),/>1<\/text>/);
 
@@ -239,6 +253,16 @@ test('guided recording edits STEP 1, advances explicitly and preserves approval 
  try{
   context=await chromium.launchPersistentContext(path.join(temp,'profile'),{channel:'chromium',headless:!process.env.RUNTIME_SOP_CHROME,...(process.env.RUNTIME_SOP_CHROME?{executablePath:process.env.RUNTIME_SOP_CHROME}:{}),args:[...(process.env.RUNTIME_SOP_CHROME?['--headless=new']:[]),`--disable-extensions-except=${staged}`,`--load-extension=${staged}`]});
   const worker=context.serviceWorkers()[0]||await context.waitForEvent('serviceworker');const id=new URL(worker.url()).host;
+  // Finish the genuine install-triggered settings navigation before creating
+  // work tabs: Chrome116 may otherwise reuse the new panel tab for onboarding.
+  let onboarding;
+  for(let attempt=0;attempt<100;attempt++){
+    onboarding=context.pages().find(page=>page.url()===`chrome-extension://${id}/options.html`);
+    if(onboarding)break;
+    await new Promise(resolve=>setTimeout(resolve,50));
+  }
+  assert.ok(onboarding,'guided fixture must finish initial settings opening');
+  await onboarding.waitForLoadState('domcontentloaded');
   await context.route('https://example.test/**',route=>route.fulfill({contentType:'text/html',body:'<title>Synthetic work</title><button id="work">Prepare report</button>'}));
   const work=await context.newPage();await work.goto('https://example.test/work');
   const panel=await context.newPage();await panel.goto(`chrome-extension://${id}/workspace.html`);

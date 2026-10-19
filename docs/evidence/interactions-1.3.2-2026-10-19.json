@@ -1,0 +1,93 @@
+{
+  "version": "1.3.2",
+  "date": "2026-10-19",
+  "status": "local installation package; not a GitHub publication or Chrome Web Store submission",
+  "checks": {
+    "core": {
+      "passed": 199,
+      "failed": 0,
+      "logSha256": "785ee55f8ac520bea63c9007ed5a1892ba7bd2ab67c225380baf3156017a0ca8"
+    },
+    "service": {
+      "passed": 52,
+      "failed": 0,
+      "logSha256": "b6407617d9eaaa08fc8ce2d86aafeec23e0a42dd0ec94791d5d65aa5658263f0"
+    },
+    "sourceBrowserCurrent": {
+      "passed": 51,
+      "failed": 0,
+      "logSha256": "4e033623bc8af791f5be2ed2347e2dad2508b3a2abf255e02ddae3ea2b166dc1"
+    },
+    "sourceBrowser116": {
+      "passed": 51,
+      "failed": 0,
+      "logSha256": "dc554014bd095585aa9edfe1a9044d35a3f88bfb1a584da296056fbeef5f83c7"
+    },
+    "packagedBrowserCurrent": {
+      "passed": 20,
+      "failed": 0,
+      "logSha256": "cbdb252a3fed7a3cd8090f348c4d85ae47529b0bca9352f59c74f22f93eb81ec"
+    },
+    "packagedBrowser116": {
+      "passed": 20,
+      "failed": 0,
+      "logSha256": "4a3d354b0e8bdcc182d85aa823ad04a5ece1449bbd7c438683b3b7b7f58dd0a9"
+    },
+    "packagedCommitFaultCurrent": {
+      "passed": 2,
+      "failed": 0,
+      "logSha256": "f5188f6e51b28bf2e95e0e7b67fd7d25003af9dafc0e2bcd7c3f70c72d401e7f"
+    },
+    "packagedCommitFault116": {
+      "passed": 2,
+      "failed": 0,
+      "logSha256": "289e086b54563ed037e26d981f97cf16f44dcb9b52454738290b2d7fd3957b98"
+    }
+  },
+  "browsers": [
+    "Chromium151.0.7922.34",
+    "Chrome116.0.5845.96"
+  ],
+  "host": "macOS arm64",
+  "sourceSha256": {
+    "extension/manifest.json": "6718322c5826d844d43376de4dcb4ce1726ae524b31a85101df7b069362eb642",
+    "extension/workspace.html": "103bbb3bd6695dbb9c0be995acafe44699b1e1562cc5e87b902a51fec3054ffd",
+    "extension/workspace.js": "4fd0067646d12598fca6c72e0b5b6164fc59d8de380bd5134a95ce573d66affa",
+    "extension/workspace.css": "13045e2014311753acc63f9a5657715eb7c7f7323ddf4b82755dc753acbf3a08",
+    "extension/screenshot-editor.js": "d23865f7e1a97d5dca41ae0b9dd5744981970faf09130522a8f799fcf5441336",
+    "extension/screenshot-viewer.js": "db530d6fa86012589cd57fc84d85cb2e3980ed6a449deecf1d18dbbaeecadf8e",
+    "extension/screenshot-viewer.css": "6c246e1876afd5855ce896a003a54fee2a2ab6e5bcbfd8781f3922cee7dd874e",
+    "extension/image-marks.js": "d961ec3f1d890a5d6cee3e53973434df6be61b1a00c73f318f8543d7c5397093",
+    "extension/nas-publisher.js": "7c3c3170f48b2cfcd16a9ed204d6bbbdc5237494710b7b53d83f206bf05f6a73",
+    "extension/step-feedback.js": "b6f32b4c3d31b1d0313055fca729f5200108544da928eed2d10aa1d4bbcfbaf2",
+    "extension/step-feedback.css": "31d159c00234381f3058162ad00027c65e80e5f24f90aaa23f127c63153a615b",
+    "extension/options.html": "c89f71913132a6e1ca6dbb557ff31ff04e5b392bf22f51f2ad1c57d3813a757a",
+    "extension/options.css": "5ac9711d7535c0451706e8feda2132ded643c6f2c2e17eb890212a39fe42c67a",
+    "extension/ui-icons.js": "b212efcf70ab11b58e444a749b46b85f49383fe86e334bb13144d41af14c8cbf",
+    "extension/release-notes.js": "f008f73d0da57f2426defc3a7eba0883a788d548464946823e355a460a8ada31"
+  },
+  "packaging": {
+    "runtimeFilesByteEqual": 72,
+    "installationZipSha256": "ebbaa956a37be11ffc515d544bb341c06d501f1ed4d11885c1e810ebb08f9d53",
+    "webStoreZipSha256": "99e9b90678bb1e7c407e39a97f4a3325dd1981e731be81a0ca85db5dfcea73e2"
+  },
+  "verifiedBehaviors": [
+    "Exact acknowledged folder/team publication replaces publish preview with current SOP reading, without local-draft rematch.",
+    "Failed or uncertain commit keeps draft and explicit retry; local edit-link quota failure after commit displays published warning and current reading.",
+    "Directory selection changing while queued prevents publishing into a newly selected directory.",
+    "Icon-only annotation tools; number/rectangle dragging and1px/Shift10px keyboard movement; undo and pointer cancellation; rounded8px saved geometry; schema unchanged.",
+    "Local per-passage feedback bound to source fingerprint, exact revision, SOP,step and passage; no server submission; scope reset/cancellation,seven locales and explicit JSON export.",
+    "Three48px support slots: collapsed PayPal account and two inactive gray coffee-cup placeholders."
+  ],
+  "visualEvidence": [
+    "dist/verification-v1.3.2/evidence/annotation-tools.png",
+    "dist/verification-v1.3.2/evidence/paypal-coffee.png",
+    "dist/verification-v1.3.2/evidence/published-reading.png"
+  ],
+  "limitations": [
+    "OS-native permission prompts,physical two-device NAS/SMB,HTTPS deployment,native Windows hardware not accepted here.",
+    "Updated CI includes new interaction browser tests, but remote1.3.2 CI was not run.",
+    "Team statistics/feedback upload remain absent; passage feedback stays local until explicit export.",
+    "Source51-scenario suites precede final contextual-label polish; extracted-package20 scenarios and two commit-fault scenarios cover the delivered runtime. Counts overlap, not unique total coverage."
+  ]
+}

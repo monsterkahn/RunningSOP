@@ -1,0 +1,27 @@
+{
+  "date": "2026-10-19",
+  "version": "1.3.2",
+  "kind": "local replacement patch; no publication",
+  "runtime": {
+    "workspace.js": "6aba3c693f8c46f8d8984629aac013c1e0ea471ba4b2fd39580c2ca7cdca8b7d",
+    "recorder-runtime.js": "77856bfab4dde98b7e9ad20df7e12411528a23b7cdffd7a25c21a56720e93fe4"
+  },
+  "patch": {
+    "name": "running-sop-v1.3.2-publish-cleanup-fix.zip",
+    "sha256": "e17267937db78cf1ab511571f46bc149a22a0088391dd4682091b75c7872d962"
+  },
+  "checks": {
+    "core": 199,
+    "final_source_per_browser": 4,
+    "exact_extracted_patch_per_browser": 4,
+    "browsers": [
+      "Chromium 151",
+      "Chrome for Testing 116"
+    ],
+    "isolated_build": "passed; ZIP integrity checked; previous distribution archives preserved"
+  },
+  "limits": [
+    "No native permission or physical two-device acceptance performed",
+    "No GitHub or Web Store upload"
+  ]
+}

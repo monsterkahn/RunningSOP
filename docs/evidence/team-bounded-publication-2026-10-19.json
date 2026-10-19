@@ -1,0 +1,348 @@
+{
+  "date": "2026-10-19",
+  "scope": "Development-only bounded full-guide publication and aligned100-step editing; no new public release.",
+  "baselineCommit": "07048fc958a9939d1abe58ebeca8132118af2efc",
+  "policy": {
+    "guideThresholdBytes": 262144,
+    "clientLargeGuideBudget": "min180s, normal deadline +2*serialized request bytes/(64KiB/s); fixed absolute cap, successful response8s idle",
+    "serverLargeGuidePhases": "Authenticated known-length guide body and successful full canonical reply: min120s,15s+bytes/(64KiB/s). Large upload additionally keeps15s idle.",
+    "unchanged": "Small/control/session/unknown-length bodies and metadata keep their original limits. Explicit server timeout overrides remain strict. No byte/admission/headers limits increased.",
+    "parser": "Node global body parser120s is necessary; application enforces route deadlines, headers remain15s. Public GET/OPTIONS reject unexpected bodies immediately.",
+    "lease": "If a large first upload is likely to outlast remaining lease, persist draft and renew under the existing busy/epoch guard. Healthy leases avoid extra requests; uncertain replay never renews or changes its original body/key.",
+    "recording": "Local step count100 now matches canonical format100; total draft byte cap remains4MiB."
+  },
+  "checks": {
+    "core": 180,
+    "server": 52,
+    "sdkAndSession": 46,
+    "teamCurrent": 29,
+    "team116": 29,
+    "originalCurrent": 10,
+    "original116": 10,
+    "interopCurrent": 6,
+    "interop116": 6,
+    "maximumCurrent": 1,
+    "maximum116": 1
+  },
+  "browsers": [
+    "Chromium151.0.7922.34",
+    "Chrome116.0.5845.96"
+  ],
+  "normalSlowPublication": {
+    "current": {
+      "maximal": false,
+      "guideBytes": 726243,
+      "requestBytes": 726338,
+      "elapsedMs": 22449.878167,
+      "outcome": "verified publication",
+      "revision": 3,
+      "attempts": 1,
+      "pendingCleared": true
+    },
+    "chrome116": {
+      "maximal": false,
+      "guideBytes": 726243,
+      "requestBytes": 726338,
+      "elapsedMs": 22486.054,
+      "outcome": "verified publication",
+      "revision": 3,
+      "attempts": 1,
+      "pendingCleared": true
+    }
+  },
+  "nearMaximumSlowPublication": {
+    "current": {
+      "maximal": true,
+      "guideBytes": 4129408,
+      "requestBytes": 4129503,
+      "elapsedMs": 126378.478916,
+      "outcome": "verified publication",
+      "revision": 3,
+      "attempts": 1,
+      "pendingCleared": true
+    },
+    "chrome116": {
+      "maximal": true,
+      "guideBytes": 4129408,
+      "requestBytes": 4129503,
+      "elapsedMs": 126476.010791,
+      "outcome": "verified publication",
+      "revision": 3,
+      "attempts": 1,
+      "pendingCleared": true
+    }
+  },
+  "transport": "Actual CDP64KiB/s each direction and120ms latency; slow success does not intercept responses. Lost-confirmation recovery uses explicit route fault injection after a genuine commit.",
+  "streamingServer": "A real authenticated known-length upload lasting16s completes past the old15s total. Scheduled deadline/cap/idle and reservation release are separately tested.",
+  "regressions": [
+    "Previous SDK fails the new progressing large-write test for timeout",
+    "Removing the new public-body guard causes400 assertion to fail with200",
+    "Initial100-step browser Edit failed against the old80-step local cap; same near-maximum fixture now edits and publishes on both browsers"
+  ],
+  "primaryLoad": {
+    "kind": "isolated-local-http-load-test",
+    "node": "v26.9.0",
+    "platform": "darwin",
+    "arch": "arm64",
+    "sops": 500,
+    "clients": 75,
+    "socketPool": 75,
+    "phases": [
+      {
+        "name": "join",
+        "requests": 75,
+        "concurrency": 75,
+        "durationMs": 11.891625000000005,
+        "p50Ms": 6.721417000000002,
+        "p95Ms": 10.485582999999991,
+        "maxMs": 10.685249999999996,
+        "responseBytes": 12750
+      },
+      {
+        "name": "indexed-match",
+        "requests": 75,
+        "concurrency": 75,
+        "durationMs": 5.246250000000003,
+        "p50Ms": 3.248334,
+        "p95Ms": 4.240083999999996,
+        "maxMs": 4.340208000000018,
+        "responseBytes": 18975
+      },
+      {
+        "name": "read",
+        "requests": 75,
+        "concurrency": 75,
+        "durationMs": 6.083833999999996,
+        "p50Ms": 3.4949159999999893,
+        "p95Ms": 5.343917000000005,
+        "maxMs": 5.501166000000012,
+        "responseBytes": 37415
+      },
+      {
+        "name": "paged-list",
+        "requests": 75,
+        "concurrency": 75,
+        "durationMs": 10.297042000000005,
+        "p50Ms": 5.749791000000016,
+        "p95Ms": 8.843541000000016,
+        "maxMs": 9.221249999999998,
+        "responseBytes": 811875
+      },
+      {
+        "name": "deep-paged-list",
+        "requests": 75,
+        "concurrency": 75,
+        "durationMs": 11.038958000000008,
+        "p50Ms": 5.6117089999999905,
+        "p95Ms": 10.013958000000002,
+        "maxMs": 10.415999999999997,
+        "responseBytes": 811875
+      },
+      {
+        "name": "selective-search",
+        "requests": 75,
+        "concurrency": 75,
+        "durationMs": 7.21629200000001,
+        "p50Ms": 4.156457999999986,
+        "p95Ms": 6.132833000000005,
+        "maxMs": 6.297167000000002,
+        "responseBytes": 18825
+      },
+      {
+        "name": "broad-chinese-search",
+        "requests": 75,
+        "concurrency": 75,
+        "durationMs": 33.671166,
+        "p50Ms": 17.068833000000012,
+        "p95Ms": 31.67066700000001,
+        "maxMs": 32.986042,
+        "responseBytes": 328125
+      },
+      {
+        "name": "contested-lock",
+        "requests": 75,
+        "concurrency": 75,
+        "durationMs": 4.995209000000017,
+        "p50Ms": 2.629250000000013,
+        "p95Ms": 4.135874999999999,
+        "maxMs": 4.273541999999992,
+        "responseBytes": 5199
+      },
+      {
+        "name": "independent-locks",
+        "requests": 75,
+        "concurrency": 75,
+        "durationMs": 12.604458999999991,
+        "p50Ms": 6.855250000000012,
+        "p95Ms": 11.284458,
+        "maxMs": 11.94841599999998,
+        "responseBytes": 18075
+      },
+      {
+        "name": "publish",
+        "requests": 75,
+        "concurrency": 75,
+        "durationMs": 21.362792000000013,
+        "p50Ms": 12.148500000000013,
+        "p95Ms": 19.981499999999983,
+        "maxMs": 20.596708000000007,
+        "responseBytes": 36515
+      }
+    ],
+    "sustained": {
+      "requests": 1500,
+      "requestsPerActor": 20,
+      "durationMs": 72.191958,
+      "p95Ms": 6.441624999999988,
+      "maxMs": 9.875083000000018
+    },
+    "unexpectedFailures": 0,
+    "initialLatencyTargetMet": true
+  },
+  "artifacts": {
+    "isolatedBuild": true,
+    "extensionZipIntegrityChecked": 3,
+    "webStoreRuntimeEntriesEqualSource": 66,
+    "extractedRuntimeTeamBrowserPassedEach": 29,
+    "experimentalServiceZipIntegrityChecked": true,
+    "serviceAppEqualsSource": true,
+    "officialInstallerSha256Unchanged": "2fbeab363d6919125858bffbda21b1cca93b2d6faea97030f55557882d5e965c"
+  },
+  "sourceSha256": {
+    "extension/team-client.js": "f60dd1bdf8fcbb5df63164cce89c2d915eb014077ba51be9e4207670646df25e",
+    "extension/team-edit-session.js": "278ebcf5e3d61af56ec50b129d62423fcad2fd26bb2fd2dd6eed8b1281f06fe8",
+    "extension/recorder-runtime.js": "f7a91c0bce2f9fc955a864228d2b068a46df6092741037d37c77794d3d845898",
+    "extension/workspace-i18n.js": "8393b6bd17fee3d669de1728d4d27bfabf98aba4c251020221edddefed2e7f88",
+    "extension/traditional-zh.js": "679634d7a7033fb666af8cb79e48867fe9d632de2b2169abc0b9e1729864f206",
+    "server/app.cjs": "24c52235cd799b0596c0214928ffb5d5397ea5c8f462853a2d9a6104305ef5d8",
+    "server/tests/http.test.cjs": "0c72c3223a73f0f66660d80b76a1631dbb69116a639a620a49d9027e5b3dcccd",
+    "tests/team-client.test.cjs": "7ce7eda5cdc532a4f05b1e2eeee9cd52d3201e9bef19f7e2f06edd105635e819",
+    "tests/team-edit-session.test.cjs": "6035a4f7f00eab58463c20ff9a37043154a8f8783d1266c5d92fe8d0d8e5a85a",
+    "tests/team-slow-publish-browser.cjs": "e12a89c62cef4297c1c2625a680f76be19daeff6a692b14a40ce66ab7b1fd58f",
+    "package.json": "1ab15ea3bd8b1d0c8f58cf62646fee5c48ffd0db342b73a108f5b082ce601e17"
+  },
+  "limits": [
+    "Same-host synthetic transport/load tests do not verify physical network/NAS/TLS/native prompts/old hardware.",
+    "New remote OS/Node checks have not yet run for this source.",
+    "Budgets assume a bounded reference rate, not guaranteed completion on every network or custom short lease. Expired leases still reject writes and preserve drafts.",
+    "Unknown-length streaming proxy uploads and explicit short operator timeouts intentionally remain strict.",
+    "Maximum-size stress uses148 synthetic JPEG images; test waits for one exact commit and verified canonical echo."
+  ],
+  "primaryLoadCold": {
+    "connectionStartup": "cold burst",
+    "sops": 500,
+    "clients": 75,
+    "socketPool": 75,
+    "phases": [
+      {
+        "name": "join",
+        "requests": 75,
+        "concurrency": 75,
+        "durationMs": 22.09795799999999,
+        "p50Ms": 13.814916999999994,
+        "p95Ms": 18.16254099999999,
+        "maxMs": 18.51899999999999,
+        "responseBytes": 12750
+      },
+      {
+        "name": "indexed-match",
+        "requests": 75,
+        "concurrency": 75,
+        "durationMs": 5.5417500000000075,
+        "p50Ms": 2.9906660000000045,
+        "p95Ms": 4.251082999999994,
+        "maxMs": 4.345249999999993,
+        "responseBytes": 18975
+      },
+      {
+        "name": "read",
+        "requests": 75,
+        "concurrency": 75,
+        "durationMs": 6.123667000000012,
+        "p50Ms": 3.610500000000002,
+        "p95Ms": 5.343833999999987,
+        "maxMs": 5.4836659999999995,
+        "responseBytes": 37415
+      },
+      {
+        "name": "paged-list",
+        "requests": 75,
+        "concurrency": 75,
+        "durationMs": 9.507207999999991,
+        "p50Ms": 5.107458000000008,
+        "p95Ms": 8.524875000000009,
+        "maxMs": 8.818292000000014,
+        "responseBytes": 811875
+      },
+      {
+        "name": "deep-paged-list",
+        "requests": 75,
+        "concurrency": 75,
+        "durationMs": 10.506459000000007,
+        "p50Ms": 5.397458999999998,
+        "p95Ms": 9.032291000000015,
+        "maxMs": 9.740834000000007,
+        "responseBytes": 811875
+      },
+      {
+        "name": "selective-search",
+        "requests": 75,
+        "concurrency": 75,
+        "durationMs": 6.336667000000006,
+        "p50Ms": 3.615165999999988,
+        "p95Ms": 5.554708000000005,
+        "maxMs": 5.729709000000014,
+        "responseBytes": 18825
+      },
+      {
+        "name": "broad-chinese-search",
+        "requests": 75,
+        "concurrency": 75,
+        "durationMs": 31.679666999999995,
+        "p50Ms": 15.911208000000016,
+        "p95Ms": 29.796625000000006,
+        "maxMs": 31.130291,
+        "responseBytes": 328125
+      },
+      {
+        "name": "contested-lock",
+        "requests": 75,
+        "concurrency": 75,
+        "durationMs": 4.900958000000003,
+        "p50Ms": 2.681041999999991,
+        "p95Ms": 4.000916999999987,
+        "maxMs": 4.090333999999984,
+        "responseBytes": 5199
+      },
+      {
+        "name": "independent-locks",
+        "requests": 75,
+        "concurrency": 75,
+        "durationMs": 10.302290999999997,
+        "p50Ms": 5.850666999999987,
+        "p95Ms": 9.445250000000016,
+        "maxMs": 9.711375000000004,
+        "responseBytes": 18075
+      },
+      {
+        "name": "publish",
+        "requests": 75,
+        "concurrency": 75,
+        "durationMs": 20.870000000000005,
+        "p50Ms": 11.76916700000001,
+        "p95Ms": 19.378541000000013,
+        "maxMs": 19.99275,
+        "responseBytes": 36515
+      }
+    ],
+    "sustained": {
+      "requests": 1500,
+      "requestsPerActor": 20,
+      "durationMs": 68.72762499999996,
+      "p95Ms": 6.380541999999991,
+      "maxMs": 11.720875000000035
+    },
+    "unexpectedFailures": 0,
+    "initialLatencyTargetMet": true
+  }
+}

@@ -54,3 +54,7 @@ When the user chooses an SOP folder, the extension saves its native directory ha
 ## Saved team-service addresses
 
 The optional service picker saves up to 20 service names and addresses in a separate extension-origin IndexedDB database on this browser. It saves no join code, session token or password. Selecting, editing or deleting a saved address makes no network request and does not change the active connection. Users explicitly click Connect and authorize the chosen origin before connection requests. A successful connection may remember its address metadata. Saved addresses persist after Disconnect and can be deleted from the picker. This feature does not discover or scan LAN devices.
+
+## Per-step feedback
+
+Feedback on a published SOP passage is saved only in this browser under a separate, bounded local format. Each entry contains the SOP identifier, exact displayed folder revision hash or team revision, step identifier, passage kind, optional exception identifier, issue type, timestamp and an optional manually entered note (up to2,000 characters). A SHA-256 source fingerprint distinguishes libraries/accounts without storing their raw endpoint in the feedback record. The interface does not copy page inputs or surrounding page text into feedback. There is no automatic upload to the developer, folder or team service. Users may explicitly export these records to JSON and share them with the responsible person; notes and identifiers in that export can be sensitive. Historical versions and local drafts do not offer these passage controls.

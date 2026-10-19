@@ -1,0 +1,82 @@
+{
+  "date": "2026-10-19",
+  "scope": "Development validation after published v1.2.0; no runtime or public asset changes.",
+  "runtimeCommit": "22ff1b589239c4b381d9ef298776fb3a63fcf7a4",
+  "publishedBaseline": {
+    "version": "1.2.0",
+    "sourceZipSha256": "772dad4e3d7e76fb9cad5f7e7972aaef1fbf0c3464b8a469c8f9f63ba79d2bcf",
+    "extensionZipSha256": "2fbeab363d6919125858bffbda21b1cca93b2d6faea97030f55557882d5e965c",
+    "checks": "Extracted verified official source; every installer extension entry compared against source."
+  },
+  "checks": {
+    "corePassed": 162,
+    "teamBrowserEach": 26,
+    "releaseInteropEach": 6,
+    "browsers": [
+      "Chromium 151.0.7922.34",
+      "Chrome 116.0.5845.96"
+    ],
+    "offlineRecoveryLongerObservationEach": 1
+  },
+  "interoperability": {
+    "combinations": [
+      "released extension / released service",
+      "released extension / development service",
+      "development extension / released service",
+      "development extension / development service"
+    ],
+    "assertions": [
+      "Annotated reading chooses actual negotiated protocol",
+      "Complete Edit retains images never displayed, including issue and other-address images",
+      "Real leased publication creates exact revision-2 guide and SHA-256",
+      "Opposite-version SDK independently reads and verifies exact publication",
+      "Simultaneous old/new SDK lease acquisition produces exactly one winner on each service"
+    ]
+  },
+  "network": {
+    "method": "Actual browser CDP Network.emulateNetworkConditions; no Playwright routing or response rewriting in these scenarios",
+    "latencyMs": 120,
+    "downloadBytesPerSecond": 65536,
+    "uploadBytesPerSecond": 65536,
+    "current": {
+      "complete": "timeout",
+      "fullMs": 8002.399999991059,
+      "selectedMs": 809.2000000029802,
+      "steps": 24,
+      "imageBytes": 27667,
+      "revision": 2
+    },
+    "chrome116": {
+      "complete": "timeout",
+      "fullMs": 8003.399999991059,
+      "selectedMs": 820.7000000029802,
+      "steps": 24,
+      "imageBytes": 27667,
+      "revision": 2
+    },
+    "offlineRecoveryAssertions": [
+      "Transport offline before real publication",
+      "No server revision change after failed request",
+      "Complete local draft and unseen images retained",
+      "Transport restoration does not publish automatically",
+      "Explicit publication recovery creates one new exact revision and releases the lease"
+    ],
+    "restoredWithoutPublicationObservationMs": 2500
+  },
+  "sourceSha256": {
+    "extension/team-client.js": "d0a8aaff97e0de8e6114b05c999db8b01e003fdb88fe5cb17e603e723f9b8107",
+    "extension/workspace.js": "5f62b9c5af38a7a9762f1949915b53d8c97031ceb298c38956c85871b115d454",
+    "extension/screenshot-editor.js": "50a5efce789e55300f3db0a3ace1d98fd085878a1bbd4daf5a048f8e9df756a3",
+    "server/app.cjs": "5dfcf15fcabb0c739119f4472258909084e40d067905a7185868b01a53f67161",
+    "server/store.cjs": "4f892e4ccdd4a899a95c6e9dc0aa20d970dac3d7ad72aed90423d55b0023992d",
+    "tests/team-release-interop-browser.cjs": "65496762428840586e4277aa779456933069ce599712cb3271af9567d63e0f73",
+    "tests/team-sidebar-images-browser.cjs": "45b146d922a08c9343fb4316f18c9b3c64fbf1d27a3c48788891d424519006f9"
+  },
+  "limits": [
+    "Loopback synthetic browser transport simulation is not physical device, WAN, NAS, hardware or trusted HTTPS acceptance.",
+    "Native permission approval is mocked.",
+    "Full-guide default read timed out at 8 seconds; selected-image success does not resolve complete Edit over this slow link.",
+    "The stronger 2.5-second online-without-auto-publication observation was rerun separately after the full suites; passed on both browsers.",
+    "No new Windows or remote CI run is claimed for these test-only additions."
+  ]
+}

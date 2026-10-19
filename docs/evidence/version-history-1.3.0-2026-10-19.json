@@ -1,0 +1,153 @@
+{
+  "version": "1.3.0",
+  "date": "2026-10-19",
+  "status": "local candidate; not published on GitHub or submitted to Chrome Web Store",
+  "baseline": "84d802594fc65f4fd491cf36d3c46188591a6984",
+  "scope": [
+    "Settings entry into authorized folder content library",
+    "Bounded category/search/list pagination, retained immutable folder version reads",
+    "Side-panel and team-library historical readers with explicit read-only notice and return-current",
+    "Exact historical text, location, work address, report/approval markers, screenshot and issue image annotations",
+    "Legacy previous body retained before catalog advances; unknown timestamps stay unknown",
+    "Source/account/tab changes and close/Escape cancel outstanding historical reads; historical content cannot become edit/publication/rating/statistics provenance"
+  ],
+  "checks": {
+    "core": {
+      "passed": 190,
+      "failed": 0,
+      "logSha256": "cdd335cd8476b17c61f488b9ebab749412f889a3ea41c4bf56dba53a8b47833d"
+    },
+    "service": {
+      "passed": 52,
+      "failed": 0,
+      "logSha256": "642bc94a4729290b560f6b188f743f5575a119b3b85bdacf220264154d02f945"
+    },
+    "teamCurrent": {
+      "passed": 29,
+      "failed": 0,
+      "logSha256": "18aeb060fbb76f68d9a546f651803fe3a0fa6e9ed74504bc66bb83b3ec93aaad"
+    },
+    "team116": {
+      "passed": 29,
+      "failed": 0,
+      "logSha256": "e59bd52d4f523e91dcee3f2f4eeef607117038137022bec55293b26a8301a651"
+    },
+    "originalCurrent": {
+      "passed": 10,
+      "failed": 0,
+      "logSha256": "a7735529a26ba997ac9058f1fc2f563fb22fb66f02e3321dbff55ba2a08fbf19"
+    },
+    "original116": {
+      "passed": 10,
+      "failed": 0,
+      "logSha256": "a7eb08c514a2aa22379c82b16d20331d4fb2d30133a1bfa8991e35cdae122178"
+    },
+    "packagedHistoryAndLibraryCurrent": {
+      "passed": 15,
+      "failed": 0,
+      "logSha256": "66c4143ab7fe1aed24ec2ea6edad47cff76ddf8bc435a18bcc06ee220628237e"
+    },
+    "packagedHistoryAndLibrary116": {
+      "passed": 15,
+      "failed": 0,
+      "logSha256": "6c4d8231d5819c48d8b66710f1084338da8461c78f71f87eec8bf3777d952b3a"
+    }
+  },
+  "browsers": [
+    "Chromium151.0.7922.34",
+    "Chrome116.0.5845.96"
+  ],
+  "sourceSha256": {
+    "extension/manifest.json": "4eb8568c090f98d349db0f9ceea3cf19468d8dd3e763905800dc0fec1cfea30e",
+    "extension/options.html": "b7712613eb178d0af9644318478f91fef2fa17dbe2da271d6c9e5feb6e6109a2",
+    "extension/options.js": "27a123ea57f49b372f0fde969f3b0e0560ea4a71485cbdacaf275727d98b44b7",
+    "extension/library.html": "190ea54e180a74c27fe561abc9944609691e048ca544ff67177dc286bc72cd81",
+    "extension/library.js": "0a5ce93b635e83f2d81a082dc5c0356f532ecb0af25add623fafc2cacc5b6cf1",
+    "extension/library.css": "4bbd24be03a0360b0def5b29c546406897caecbac8d8b011e176a55232a0768c",
+    "extension/folder-history.js": "7f6d6f0d14d1c5269ac6ee297ea2bcd0fa725e66e26d45a147d383a6739d6415",
+    "extension/nas-publisher.js": "a3dea1ba9dc69d3f2a2bf80c0a3036a58e9d74eeff4ee1f3bba3d2069f3b1b0c",
+    "extension/workspace.html": "690c44898ed9265752945766b44193e3c8a4e699e5a33b5cd4c5e36e9f98da18",
+    "extension/workspace.js": "a7b403f202bac503081cd067aa15d2f410c1ac14a08e74afcb203e4a2a5ba07f",
+    "extension/workspace.css": "9918ce63d3df65665a44f5ce5dccd2ac96b22f0fe918cec02bf9051481357ff4",
+    "extension/team-library.html": "336589db7c91a12d4101777f4f3f3ac6223216d492178dfef78500aebdc5f48d",
+    "extension/team-library.js": "1d27abb3bc78f3dd09f2b13d7080628ff6bc30ffab5c7a3f9fd6513d4c4950e6",
+    "extension/team-library.css": "f6428e449f0de19175a272c24703ffb0a1e879a5c04a7390a94aa9ed038aec45",
+    "tests/folder-history.test.cjs": "5388394ae3c7423897d8271abe7e77ad83d5f62f39ebbc0e107142ff0b4f8cda",
+    "tests/library-history-browser.cjs": "560d0def2bbfc842bb443579c20a3ad1ff76116bfb717b4ab7ed0ed52aab6df8",
+    "tests/workspace-history-browser.cjs": "347bc035fda5d19c356fae613b5483f7795aacfff8a0bf30dd8560dd01c55ce5",
+    "tests/team-library-browser.cjs": "ae19647d7592ce407e18396f11d753df56999b0140b7e574ccee06ea5aaa3ddb"
+  },
+  "packaging": {
+    "zipIntegrity": "all four archives passed",
+    "flatWebStoreRuntimeFilesByteEqual": 70,
+    "installationZipSha256": "d2d8a3955e8eefda70747d5cca4ce7b44d55f84d175573a894bfdbcc80c9ce87",
+    "webStoreZipSha256": "5cb3083123c66e4dda1b90e31414ff62d259df95e7fc967b4d5144c8374a9934",
+    "teamServiceZipSha256": "3ed479ecb210ae6cba83cd2c0e8ffbb24e84fd3f7936d1c8231274a1ac404b28"
+  },
+  "limits": [
+    "Folder history display follows at most200 linked retained entries with explicit limit notice;20 UI entries/page and50 APImaximum. Older files are not deleted.",
+    "Missing pre-retention versions cannot be reconstructed. Missing/corrupt documents or assets fail closed rather than borrowing the latest content.",
+    "No roles,approval workflow,restore action,automatic independent backup or vendor analytics was added.",
+    "Native permission dialogs,trusted HTTPS,physical two-device NAS/SMB and team statistics remain user-deferred.",
+    "Current1.3 Windows/Linux CI was not run in this local packaging task; prior development CI does not certify new history UI. Future CI includes the new history-browser script.",
+    "Published1.2.0 assets and submitted store package remain preserved."
+  ],
+  "overviewFollowup": {
+    "date": "2026-10-19",
+    "scope": "Visible View SOP overview entry; enabled-team routing, explicit folder override, unconfigured local guidance; no automatic connection",
+    "checks": {
+      "core": {
+        "passed": 190,
+        "failed": 0,
+        "logSha256": "8b0999c754ebd205c74a75a4da76d8e4acb918066a5325ac2bdc493d96088221"
+      },
+      "sourceCurrent": {
+        "passed": 2,
+        "failed": 0,
+        "logSha256": "022fb2e6a77ab44646bcab7abdd71f431e47a55217bd2c7242a2aa9518169408"
+      },
+      "source116": {
+        "passed": 2,
+        "failed": 0,
+        "logSha256": "7c19f2c203fa480e2d3c9362ea278927ba659c3a440519dbbbf6e53a23f9cbe2"
+      },
+      "packagedCurrent": {
+        "passed": 2,
+        "failed": 0,
+        "logSha256": "48f327b0df957a8311f54802aa06b8e5ec6a6a1d0eb745d6ecb3e772883920d8"
+      },
+      "packaged116": {
+        "passed": 2,
+        "failed": 0,
+        "logSha256": "749031ca7e74e8bdb469e4570029c47714a79767e983680b36eb22c3dad9380f"
+      }
+    }
+  },
+  "previousCandidateSourceSha256": {
+    "extension/manifest.json": "4eb8568c090f98d349db0f9ceea3cf19468d8dd3e763905800dc0fec1cfea30e",
+    "extension/options.html": "ea65e01bff9b2c084fc57177b2aae66edd49cc0dd222d762c2e2e743482a5f42",
+    "extension/options.js": "215147e67ae9ddbf4cd8123dfaab9c36ecfa8b7a495a195f7bbc390fe9a36bb8",
+    "extension/library.html": "0740403f3f7733a86f9059f948a056e50c6e39f5d5fe1d516d830b91d8c0fb36",
+    "extension/library.js": "d214fd29cca8feb2e09d99f2c8adc43fcc089c1dbf91389ec554e58c86025cb2",
+    "extension/library.css": "4bbd24be03a0360b0def5b29c546406897caecbac8d8b011e176a55232a0768c",
+    "extension/folder-history.js": "7f6d6f0d14d1c5269ac6ee297ea2bcd0fa725e66e26d45a147d383a6739d6415",
+    "extension/nas-publisher.js": "a3dea1ba9dc69d3f2a2bf80c0a3036a58e9d74eeff4ee1f3bba3d2069f3b1b0c",
+    "extension/workspace.html": "690c44898ed9265752945766b44193e3c8a4e699e5a33b5cd4c5e36e9f98da18",
+    "extension/workspace.js": "a7b403f202bac503081cd067aa15d2f410c1ac14a08e74afcb203e4a2a5ba07f",
+    "extension/workspace.css": "9918ce63d3df65665a44f5ce5dccd2ac96b22f0fe918cec02bf9051481357ff4",
+    "extension/team-library.html": "336589db7c91a12d4101777f4f3f3ac6223216d492178dfef78500aebdc5f48d",
+    "extension/team-library.js": "1d27abb3bc78f3dd09f2b13d7080628ff6bc30ffab5c7a3f9fd6513d4c4950e6",
+    "extension/team-library.css": "f6428e449f0de19175a272c24703ffb0a1e879a5c04a7390a94aa9ed038aec45",
+    "tests/folder-history.test.cjs": "5388394ae3c7423897d8271abe7e77ad83d5f62f39ebbc0e107142ff0b4f8cda",
+    "tests/library-history-browser.cjs": "33138c8552251818840156e5bd98ed028d31aa8af3c337a0b04669a2263cab05",
+    "tests/workspace-history-browser.cjs": "347bc035fda5d19c356fae613b5483f7795aacfff8a0bf30dd8560dd01c55ce5",
+    "tests/team-library-browser.cjs": "b5c9bdb6e82e98133252c2b6adfe2286e55536647d0160e0610134226b3fd355"
+  },
+  "previousCandidatePackaging": {
+    "zipIntegrity": "all four archives passed",
+    "flatWebStoreRuntimeFilesByteEqual": 70,
+    "installationZipSha256": "6a635a66659440b76b12d6a4d99b26e83392419ce7af0396a5687a8ead738c09",
+    "webStoreZipSha256": "368f14e43ad18fa8f66dd4e5120f9c90a5a944568013b67ebb372cc1ec518e74",
+    "teamServiceZipSha256": "3ed479ecb210ae6cba83cd2c0e8ffbb24e84fd3f7936d1c8231274a1ac404b28"
+  }
+}

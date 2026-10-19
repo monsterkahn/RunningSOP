@@ -1,0 +1,164 @@
+{
+  "kind": "actual-client-full-vs-text-plus-one-image",
+  "recordedAt": "2026-10-18T16:36:03.257Z",
+  "node": "v26.9.0",
+  "platform": "darwin",
+  "arch": "arm64",
+  "clients": 75,
+  "phases": [
+    {
+      "mode": "full",
+      "clients": 75,
+      "completed": 75,
+      "guideBytes": 3148224,
+      "selectedImagesPerReader": 12,
+      "elapsedMs": 3544.236917,
+      "p95Ms": 3438.566125,
+      "wireBytes": 236133810,
+      "requests": 168,
+      "imageRequests": 0,
+      "statuses": {
+        "200": 75,
+        "503": 93
+      },
+      "baseline": {
+        "stats": true,
+        "peakRss": 116490240,
+        "peakHeapUsed": 36256568,
+        "peakArrayBuffers": 4471867,
+        "peakConnections": 75,
+        "connections": 75,
+        "getCalls": 1,
+        "memory": {
+          "rss": 105529344,
+          "heapTotal": 11960320,
+          "heapUsed": 9738232,
+          "external": 2508086,
+          "arrayBuffers": 222820
+        }
+      },
+      "server": {
+        "stats": true,
+        "peakRss": 269959168,
+        "peakHeapUsed": 114662160,
+        "peakArrayBuffers": 133997788,
+        "peakConnections": 75,
+        "connections": 75,
+        "getCalls": 76,
+        "memory": {
+          "rss": 195166208,
+          "heapTotal": 21954560,
+          "heapUsed": 15024064,
+          "external": 2492154,
+          "arrayBuffers": 209555
+        }
+      }
+    },
+    {
+      "mode": "view",
+      "clients": 75,
+      "completed": 75,
+      "guideBytes": 3148224,
+      "selectedImagesPerReader": 1,
+      "textStage": {
+        "elapsedMs": 1031.3445420000003,
+        "wireBytes": 251475,
+        "requests": 75,
+        "imageRequests": 0,
+        "statuses": {
+          "200": 75
+        }
+      },
+      "elapsedMs": 1076.9367500000003,
+      "p95Ms": 1075.3193749999996,
+      "wireBytes": 19924437,
+      "requests": 150,
+      "imageRequests": 75,
+      "statuses": {
+        "200": 150
+      },
+      "baseline": {
+        "stats": true,
+        "peakRss": 115277824,
+        "peakHeapUsed": 35200824,
+        "peakArrayBuffers": 6831163,
+        "peakConnections": 75,
+        "connections": 75,
+        "getCalls": 1,
+        "memory": {
+          "rss": 105480192,
+          "heapTotal": 11698176,
+          "heapUsed": 9718360,
+          "external": 2508086,
+          "arrayBuffers": 222820
+        }
+      },
+      "server": {
+        "stats": true,
+        "peakRss": 190758912,
+        "peakHeapUsed": 70240368,
+        "peakArrayBuffers": 15943170,
+        "peakConnections": 75,
+        "connections": 75,
+        "getCalls": 76,
+        "memory": {
+          "rss": 153059328,
+          "heapTotal": 62849024,
+          "heapUsed": 32648944,
+          "external": 15075066,
+          "arrayBuffers": 12792467
+        }
+      }
+    }
+  ],
+  "payloadReduction": 0.9156222609544986,
+  "limitations": [
+    "75-client loopback default; warmed independent sockets and temporary synthetic SQLite databases, not physical LAN or older hardware.",
+    "The view phase retrieves text plus one image per reader, whereas complete reads include all twelve images. It is not an all-images speed comparison.",
+    "View generation still reconstructs and verifies the whole guide on the server; no reduced server reconstruction-cost claim.",
+    "Actual SDK under Node streams, no browser rendering or image decoding. The UI does not yet select these new methods.",
+    "Peak memory is sampled per separate fixture process; it is an observation, not a universal upper bound."
+  ],
+  "sourceFingerprints": [
+    {
+      "path": "extension/team-client.js",
+      "sha256": "d0a8aaff97e0de8e6114b05c999db8b01e003fdb88fe5cb17e603e723f9b8107"
+    },
+    {
+      "path": "server/app.cjs",
+      "sha256": "5dfcf15fcabb0c739119f4472258909084e40d067905a7185868b01a53f67161"
+    },
+    {
+      "path": "server/backup.cjs",
+      "sha256": "852eb88ef04bd4cc3209f0c217b3ea6b553be2f83cb7280b338b18c47e2709fe"
+    },
+    {
+      "path": "server/category-store.cjs",
+      "sha256": "0abec3ef8dc1f3e66a65460f3fb941783aa051270f0741bb07c47053981b7438"
+    },
+    {
+      "path": "server/cli.cjs",
+      "sha256": "0396199113cd860795ada0f2c6f15f779c9e4ca76fd95a327681e81493645fd5"
+    },
+    {
+      "path": "server/guide-assets.cjs",
+      "sha256": "2d273e931c46c9e3e7ef9642ce9dc4643410bfc9b627c805af33c79bbd2d1273"
+    },
+    {
+      "path": "server/store.cjs",
+      "sha256": "4f892e4ccdd4a899a95c6e9dc0aa20d970dac3d7ad72aed90423d55b0023992d"
+    },
+    {
+      "path": "server/tools/fixture-real-large-read.cjs",
+      "sha256": "bbdbaed822fd8e37ff5df3dbf4eb3a5ffb171d56d759d00f2709825a81055d90"
+    },
+    {
+      "path": "server/tools/read-view-load.cjs",
+      "sha256": "cdc19835b4a66f7a144aa56816c897c84341d847870dd48b693a5580ebe97b92"
+    },
+    {
+      "path": "tests/team-read-view-browser.cjs",
+      "sha256": "939482962942c74de04ec07da50dbd05c8449ba1e9476452d91940d79579cd8d"
+    }
+  ]
+}

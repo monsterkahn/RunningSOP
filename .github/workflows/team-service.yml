@@ -36,6 +36,8 @@ jobs:
       - if: runner.os != 'Linux'
         run: npx playwright install chromium
       - run: npm run test:team-browser
+      - run: npm run test:history-browser
+      - run: npm run test:interaction-browser
   container:
     runs-on: ubuntu-24.04
     steps:

@@ -279,3 +279,5 @@ test('refuses to point catalog at immutable content that fails readback',async()
  await assert.rejects(publisher.publish(guide('bad-write')),/回读不一致/);
  assert.equal(catalogHandle.value,before);
 });
+
+test('a queued publication refuses a different selected directory before writing',async()=>{const {root,publisher,catalogHandle}=await fixture();const before=catalogHandle.value;await assert.rejects(()=>publisher.publish(guide(),{expectedDirectoryHandle:directory('different')}),/存储位置/);assert.equal(catalogHandle.value,before);assert.equal(root.dirs.size,0);});

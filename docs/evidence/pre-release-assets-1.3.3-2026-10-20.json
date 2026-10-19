@@ -1,0 +1,152 @@
+[
+  {
+    "tag": "v1.2.0",
+    "id": 416562233,
+    "assets": [
+      {
+        "id": 653917580,
+        "name": "running-sop-extension-v1.2.0.zip",
+        "digest": "sha256:2fbeab363d6919125858bffbda21b1cca93b2d6faea97030f55557882d5e965c",
+        "size": 330160,
+        "url": "https://github.com/monsterkahn/RunningSOP/releases/download/v1.2.0/running-sop-extension-v1.2.0.zip"
+      },
+      {
+        "id": 653917579,
+        "name": "running-sop-github-v1.2.0.zip",
+        "digest": "sha256:772dad4e3d7e76fb9cad5f7e7972aaef1fbf0c3464b8a469c8f9f63ba79d2bcf",
+        "size": 1430381,
+        "url": "https://github.com/monsterkahn/RunningSOP/releases/download/v1.2.0/running-sop-github-v1.2.0.zip"
+      },
+      {
+        "id": 653917581,
+        "name": "running-sop-media-v1.2.0.zip",
+        "digest": "sha256:7f17ec65361469e95f4570c344c646ffd246b0abb5b3786b1beb3a250ea774cd",
+        "size": 1010493,
+        "url": "https://github.com/monsterkahn/RunningSOP/releases/download/v1.2.0/running-sop-media-v1.2.0.zip"
+      },
+      {
+        "id": 653917578,
+        "name": "running-sop-team-service-v1.2.0-experimental.zip",
+        "digest": "sha256:dad3f7eff258190a0463d18cec04674a44f35517f81bf4cf8d243d951c4be602",
+        "size": 44924,
+        "url": "https://github.com/monsterkahn/RunningSOP/releases/download/v1.2.0/running-sop-team-service-v1.2.0-experimental.zip"
+      },
+      {
+        "id": 653917576,
+        "name": "running-sop-webstore-v1.2.0.zip",
+        "digest": "sha256:32c55352bfd48fee390bb14ba300215e0115eb511f174fa77b2cc051ccea0a79",
+        "size": 322450,
+        "url": "https://github.com/monsterkahn/RunningSOP/releases/download/v1.2.0/running-sop-webstore-v1.2.0.zip"
+      },
+      {
+        "id": 653917595,
+        "name": "SHA256SUMS.txt",
+        "digest": "sha256:50ef6918f07a2ba83675f0c3d3260ee0cede321237e776d1b0719dc21df210a8",
+        "size": 503,
+        "url": "https://github.com/monsterkahn/RunningSOP/releases/download/v1.2.0/SHA256SUMS.txt"
+      }
+    ]
+  },
+  {
+    "tag": "v1.1.1",
+    "id": 416254523,
+    "assets": [
+      {
+        "id": 652572208,
+        "name": "running-sop-extension-v1.1.1.zip",
+        "digest": "sha256:870005135114c1649d2f802cf056508765cbf51dd9696745d50be62ed841f15e",
+        "size": 288930,
+        "url": "https://github.com/monsterkahn/RunningSOP/releases/download/v1.1.1/running-sop-extension-v1.1.1.zip"
+      },
+      {
+        "id": 652572207,
+        "name": "running-sop-github-v1.1.1.zip",
+        "digest": "sha256:d2b45fe843b4859e51d676377337b262b741c45ef43e622a00fc6c24062c26d1",
+        "size": 443404,
+        "url": "https://github.com/monsterkahn/RunningSOP/releases/download/v1.1.1/running-sop-github-v1.1.1.zip"
+      },
+      {
+        "id": 652572211,
+        "name": "running-sop-webstore-v1.1.1.zip",
+        "digest": "sha256:8dfeb8235cfdf9596187682627eacd1dcae54467327057f4a17949586853a23f",
+        "size": 282553,
+        "url": "https://github.com/monsterkahn/RunningSOP/releases/download/v1.1.1/running-sop-webstore-v1.1.1.zip"
+      },
+      {
+        "id": 652572212,
+        "name": "SHA256SUMS.txt",
+        "digest": "sha256:f76d0151f954961965b660b07b7cf74db2ed41c20c68c6317d0bda53c8d5d7a4",
+        "size": 293,
+        "url": "https://github.com/monsterkahn/RunningSOP/releases/download/v1.1.1/SHA256SUMS.txt"
+      }
+    ]
+  },
+  {
+    "tag": "v1.1.0",
+    "id": 416152642,
+    "assets": [
+      {
+        "id": 652019767,
+        "name": "running-sop-extension-v1.1.0.zip",
+        "digest": "sha256:25c31e63b9311489eac2345f1af596c7e0c8fdc901813c05c59a2fa82192db69",
+        "size": 289081,
+        "url": "https://github.com/monsterkahn/RunningSOP/releases/download/v1.1.0/running-sop-extension-v1.1.0.zip"
+      },
+      {
+        "id": 652019763,
+        "name": "running-sop-github-v1.1.0.zip",
+        "digest": "sha256:bbd9448ca3120a6888c39c2e46885d927e4c3d164e6739afd575f261477952d9",
+        "size": 438893,
+        "url": "https://github.com/monsterkahn/RunningSOP/releases/download/v1.1.0/running-sop-github-v1.1.0.zip"
+      },
+      {
+        "id": 652019765,
+        "name": "running-sop-webstore-v1.1.0.zip",
+        "digest": "sha256:6a1a86e60583cf2bcbb1d390923ae447c27e453db9c53c8b0cfa9b65620a6d0a",
+        "size": 282158,
+        "url": "https://github.com/monsterkahn/RunningSOP/releases/download/v1.1.0/running-sop-webstore-v1.1.0.zip"
+      },
+      {
+        "id": 652019769,
+        "name": "SHA256SUMS.txt",
+        "digest": "sha256:4925070c131f830f17772e79060bc7f6ec400dfa32ade349a5a841bec619fefe",
+        "size": 293,
+        "url": "https://github.com/monsterkahn/RunningSOP/releases/download/v1.1.0/SHA256SUMS.txt"
+      }
+    ]
+  },
+  {
+    "tag": "v1.0.0",
+    "id": 414907149,
+    "assets": [
+      {
+        "id": 647175393,
+        "name": "running-sop-extension-v1.0.0.zip",
+        "digest": "sha256:2e6fe25539ec05d34f4602da586f4d18683e9d5af6c6084a9a5f95f6ce91a967",
+        "size": 258379,
+        "url": "https://github.com/monsterkahn/RunningSOP/releases/download/v1.0.0/running-sop-extension-v1.0.0.zip"
+      },
+      {
+        "id": 647175395,
+        "name": "running-sop-github-v1.0.0.zip",
+        "digest": "sha256:57a5ca88aa33eda8e7b0c7f0ef8a8645ed74276a27e45543f32a4ebe8313436e",
+        "size": 393750,
+        "url": "https://github.com/monsterkahn/RunningSOP/releases/download/v1.0.0/running-sop-github-v1.0.0.zip"
+      },
+      {
+        "id": 647175386,
+        "name": "running-sop-webstore-v1.0.0.zip",
+        "digest": "sha256:ce37fd6cf9db8da178839af99a067d158386849929df2e1e6e746954c539bc8f",
+        "size": 252115,
+        "url": "https://github.com/monsterkahn/RunningSOP/releases/download/v1.0.0/running-sop-webstore-v1.0.0.zip"
+      },
+      {
+        "id": 647175392,
+        "name": "SHA256SUMS.txt",
+        "digest": "sha256:12fb05e4ca3d6065ed74e714c056e9905029bca36db54d72a5d919a5fd2db8f5",
+        "size": 293,
+        "url": "https://github.com/monsterkahn/RunningSOP/releases/download/v1.0.0/SHA256SUMS.txt"
+      }
+    ]
+  }
+]
