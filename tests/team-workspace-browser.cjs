@@ -16,7 +16,8 @@ test('team workspace matches on demand, leases edits, publishes safely and retai
   let revision=1,guide=initial;
   const hash=async value=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(value)))),x=>x.toString(16).padStart(2,'0')).join('');
   window.fetch=async(url,opts)=>{const u=new URL(url),method=opts.method||'GET';teamTestCalls.push({path:u.pathname,method});let data;
-   if(u.pathname==='/v1/matches'){data={state:'matched',items:[{id:guide.workflowId,title:guide.title,revision,sha256:await hash(guide),updatedAt:1},...(window.teamAmbiguous?[{id:'other-synthetic',title:'Other synthetic SOP',revision:1,sha256:'a'.repeat(64),updatedAt:1}]:[])]};if(window.teamAmbiguous)data.state='ambiguous';}
+   if(u.pathname==='/v1/capabilities'){data={protocolVersion:1,minClientProtocol:1,maxClientProtocol:1,features:[]};}
+   else if(u.pathname==='/v1/matches'){data={state:'matched',items:[{id:guide.workflowId,title:guide.title,revision,sha256:await hash(guide),updatedAt:1},...(window.teamAmbiguous?[{id:'other-synthetic',title:'Other synthetic SOP',revision:1,sha256:'a'.repeat(64),updatedAt:1}]:[])]};if(window.teamAmbiguous)data.state='ambiguous';}
    else if(u.pathname.endsWith('/lock')){if(window.teamLoseLease)return new Response(JSON.stringify({error:{code:'stale_lock',message:'Synthetic stale lease'}}),{status:409,headers:{'Content-Type':'application/json'}});data=method==='DELETE'?{released:true}:{token:'synthetic-lease-secret',fence:1,baseRevision:revision,serverTime:1000,expiresAt:1000+window.teamLeaseMs,leaseMs:window.teamLeaseMs,owner:{id:'actor',name:'Synthetic'}};}
    else if(method==='PUT'){guide=JSON.parse(opts.body).guide;revision++;data={id:guide.workflowId,revision,guide,sha256:await hash(guide)};}
    else data={id:guide.workflowId,revision,guide,sha256:await hash(guide),lock:null};

@@ -84,3 +84,40 @@ test('category calls validate metadata and preserve optimistic revisions and wri
  await assert.rejects(api.categories({limit:101}),{code:'invalid_limit'});await assert.rejects(api.assignCategory('sample','business',{expectedCategoryRevision:-1}),{code:'invalid_revision'});
  await assert.rejects(make(async()=>response({items:[{...category,color:'url(https://bad.test)'}],nextCursor:''})).categories(),{code:'invalid_category'});
 });
+
+const shaText = value => require('node:crypto').createHash('sha256').update(value).digest('hex');
+function readViewFixture() {
+ const image='data:image/jpeg;base64,/9j/AB==';
+ const body=JSON.parse(JSON.stringify(guide));
+ body.steps[0].issues=[{id:'issue-one',title:'Issue',actions:['Review'],next:'Continue'}];
+ const images=[{step:0,sha256:shaText(image),imageAt:'2026-01-01T00:00:00Z',imageMarks:[{type:'number',x:.2,y:.3}]},{step:0,issue:0,sha256:shaText(image)}];
+ const full=JSON.parse(JSON.stringify(body));full.steps[0].image=image;
+ const data={id:'sample',revision:3,sha256:shaText(JSON.stringify(full)),guide:body,images};
+ data.viewSha256=shaText(JSON.stringify({guide:data.guide,images:data.images}));return {data,image};
+}
+test('read-only view fetches metadata alone and images require explicit revision and exact descriptor',async()=>{
+ const {data,image}=readViewFixture(),calls=[];
+ const api=make(async(url,opts)=>{calls.push({url,opts});if(url.includes('/view'))return response(data);return response({id:'sample',revision:3,step:0,issue:0,sha256:shaText(image),image});});
+ const view=await api.readView('sample',{revision:3});assert.equal(calls.length,1);assert.equal(view.guide.steps[0].image,undefined);assert.deepEqual(view.images,data.images);assert.equal(calls[0].url,'http://localhost:8765/proxy/v1/sops/sample/view?revision=3');
+ assert.equal((await api.readImage('sample',view.images[1],{revision:view.revision})).image,image);
+ assert.equal(calls[1].url,'http://localhost:8765/proxy/v1/sops/sample/images/0/issues/0?revision=3');assert.equal(calls[1].opts.headers.Authorization,'Bearer synthetic-token');
+ await assert.rejects(api.readImage('sample',view.images[0]),{code:'invalid_revision'});
+ await assert.rejects(api.readImage('sample',{...view.images[0],url:'https://bad.test/image'},{revision:3}),{code:'invalid_image_reference'});assert.equal(calls.length,2);
+});
+test('read view rejects corrupt manifests, inline bytes, duplicate slots and invalid annotations',async()=>{
+ const {data,image}=readViewFixture();
+ const malformed=[{...data,viewSha256:'0'.repeat(64)},{...data,revision:4},{...data,images:[data.images[0],data.images[0]]},{...data,images:[{...data.images[0],step:100}]},{...data,images:[{...data.images[0],imageMarks:[{type:'number',x:2,y:0}]}]}];
+ for(const value of malformed)await assert.rejects(make(async()=>response(value)).readView('sample',{revision:3}));
+ const inline=JSON.parse(JSON.stringify(data));inline.guide.steps[0].image=image;inline.viewSha256=shaText(JSON.stringify({guide:inline.guide,images:inline.images}));await assert.rejects(make(async()=>response(inline)).readView('sample'));
+});
+test('individual image verifies bytes against manifest, blocks revision swaps and executable resources',async()=>{
+ const {data,image}=readViewFixture(),ref=data.images[0],good={id:'sample',revision:3,step:0,sha256:ref.sha256,image};
+ const other='data:image/jpeg;base64,/9j/AA==';
+ for(const value of [{...good,revision:4},{...good,step:1},{...good,image:other},{...good,image:other,sha256:shaText(other)},{...good,image:'https://bad.test/a.js'}])await assert.rejects(make(async()=>response(value)).readImage('sample',ref,{revision:3}));
+ const result=await make(async()=>response(good)).readImage('sample',ref,{revision:3});assert.equal(result.image,image);
+});
+test('partial views never populate the complete-guide offline cache and old servers fail explicitly',async()=>{
+ const {data}=readViewFixture();let offline=false;
+ const api=make(async()=>{if(offline)throw Error('offline');return response(data);});await api.readView('sample');offline=true;await assert.rejects(api.read('sample',{allowStale:true,retry:false}),{code:'network_error'});
+ let count=0;await assert.rejects(make(async()=>{count++;return response({code:'NOT_FOUND'},404);}).readView('sample'),{code:'NOT_FOUND'});assert.equal(count,1);
+});

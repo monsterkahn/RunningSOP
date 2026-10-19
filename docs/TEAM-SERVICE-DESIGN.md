@@ -1,6 +1,6 @@
 # Team service: design and acceptance ledger
 
-Status: experimental development, not a published product release. The user revised the planning workload on 2026-10-18: approximately 500 people in an organization, about 500 active SOPs, and an assumed 15% novice population (75 people). Use 75 simultaneous readers as the primary burst test, not as a measured concurrency value or an enforced product cap. Existing folder mode remains the default. The earlier 200,000-SOP/500-connection results remain historical stress evidence; they are no longer the primary acceptance workload. A working foundation alone is not completion.
+Status: the opt-in team service is published as an experimental component of v1.2.0. Publication is separate from completion of the full deployment acceptance ledger below. The user revised the planning workload on 2026-10-18: approximately 500 people in an organization, about 500 active SOPs, and an assumed 15% novice population (75 people). Use 75 simultaneous readers as the primary burst test, not as a measured concurrency value or an enforced product cap. Existing folder mode remains the default. The earlier 200,000-SOP/500-connection results remain historical stress evidence; they are no longer the primary acceptance workload. A working foundation alone is not completion.
 
 ## Decision process
 
@@ -124,3 +124,32 @@ The optional experimental service ZIP has an explicit source allowlist and its o
 The clean source-ZIP startup scenario passes locally on Node 24 and Node 26, including database/configuration creation and trusted-parent IPC shutdown. The service test suite now contains 44 passing tests; the core suite contains 148. Updated remote package-startup results must be recorded before claiming Windows extraction acceptance.
 
 Final automated checkpoint: GitHub runtime commit `fb70640f689e00c801d4d86c45fda36444119445` (tree `4b349cde2136c6e3ac6e2abd941e60d014548d01`, equal to local `ba08f5c`) passed all 10 team jobs in run `39128728309`, including the 44-test service suite and extracted-package startup on six OS/Node combinations, three OS browser scenarios and container startup. Existing extension run `39128728341` also passed, including both Windows package checks; release was skipped on this development branch. See `docs/evidence/team-final-ci-2026-10-18.json` (relative to the repository root). Duplicate push run `39128725376` was canceled. This proves only those automated environments; trusted HTTPS, real two-device/NAS/native-permission acceptance and team statistics/dashboard remain unfinished. The queued v1.2.0 release has not been made.
+
+
+## Post-publication capacity verification — 2026-10-19
+
+The authorized v1.2.0 GitHub publication completed at commit `ad9ca7ac2383e9b67febe260548674dc0759285f`, workflow [39144707756](https://github.com/monsterkahn/RunningSOP/actions/runs/39144707756). All Linux/macOS/Windows service/browser jobs, both Windows package jobs, the container job and the release asset verification passed. This does not discharge the deferred physical-deployment checks.
+
+A new inspection found that `real-large-read.cjs` reported incomplete readers but did not fail its process. Its exit status could therefore be mistaken for acceptance. The tool now writes the report and then requires zero incomplete readers in both bounded-retry phases. The initial no-retry phase intentionally measures admission rejections and is not required to have zero busy responses. A separate fault-injection run replaced the actual extension clients' reads with explicit failures: both clients were recorded as incomplete and the process exited 1 with the expected acceptance assertion. The ordinary 75-client run exited 0. No released runtime bytes were changed.
+
+Fresh source-fingerprinted evidence:
+
+- `evidence/team-scale-500-sops-75-readers-2026-10-19.json`: 500 synthetic SOPs and 75 independent authenticated clients, correct match/read/list/search results, exactly one winner for a contested lock, all independent publications reaching revision 2, and 1,500 follow-up reads. Read p95 7.1 ms, broad search p95 32.0 ms, publication p95 20.9 ms. The proposed sub-second read/search target passed on this host.
+- `evidence/team-images-75-readers-2026-10-19.json`: 3,148,224-byte guide with 12 synthetic image payloads. Ten initial readers completed and 65 received explicit busy responses. Both bounded recovery phases completed all 75 readers; actual extension clients took about 3.90 seconds, with 72 intermediate 503 responses and zero terminal failures. Peak sampled server RSS was 289,062,912 bytes across the experiment, not an upper memory bound.
+
+These are loopback tests on macOS/arm64, Node 26, with warmed connections. They do not model physical network latency, real browser image decoding, arbitrary old computers or NAS filesystems. They justify keeping admission and bounded retry; they also confirm that image-heavy burst latency and whole-guide transfer remain useful next optimization candidates. Any change to that protocol must preserve canonical integrity checks, historical revisions, old-client compatibility and opt-in storage behavior. Team statistics, trusted HTTPS/native permission and physical two-device acceptance remain deferred by the user; the full goal is not marked complete.
+
+
+## Separate-image reading foundation — 2026-10-19
+
+The next experiment adds opt-in read-only SDK methods and additive protocol-1 endpoints. It leaves the actual library/side-panel UI on the original complete-guide path. A 75-reader actual-SDK comparison transferred 19.9 MB for text plus one selected image, versus 236.1 MB for complete twelve-image guides; completion times were 1.08 s and 3.54 s. This is deliberately a different-image-coverage comparison, not a claim that all images download faster. Views still reconstruct and verify the full guide on the server. Exact-revision image hashes bind selected images to their verified views, including history and noncanonical base64 padding. Details and remaining UI acceptance work: `TEAM-READ-VIEW.md`. No released assets were changed.
+
+
+## Actual library UI checkpoint — 2026-10-19
+
+The development team-library now uses capability-gated views and exact-revision images. Actual browser network assertions establish bounded nearby/open-section fetching, old-service full-read compatibility and preview reuse; they do not extrapolate the earlier SDK transfer percentages to every user session. A review found an account-change window during image decoding. Detached staging plus a persisted identity recheck closes it; a deliberately unsafe temporary copy fails the dedicated regression. All 11 affected team-browser scenarios pass on Chrome 116 and current Chromium, with 157 passing core tests. See `evidence/team-library-images-ui-2026-10-19.json`. The side-panel reading path still loads full guides, and formal deployment acceptance remains unproven.
+
+
+## Sidebar and guarded screenshot checkpoint — 2026-10-19
+
+The development side panel now uses negotiated text views and selected images, while Edit fetches full canonical data and preserves unseen step/issue images. Atomic content/provenance refresh, an independent Edit identity guard, and exact revision/hash comparisons close a partial-copy race found during review. Per-slot issue holders prevent repeated selection from accumulating detached figures. Optional screenshot viewing guards preserve native gesture timing and cancel only the matching reading view. Core162/service46 and 24 team plus 10 original browser scenarios on each of Chrome 116/current Chromium passed; source-fingerprinted evidence is `evidence/team-sidebar-images-ui-2026-10-19.json`. Final packaged-runtime and refreshed OS-matrix checks are next, not assumed from earlier source-only checks.

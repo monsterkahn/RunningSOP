@@ -1,0 +1,92 @@
+{
+  "kind": "development-sidebar-selected-image-and-edit-boundary-acceptance",
+  "recordedDate": "2026-10-19",
+  "publishedReleaseUnchanged": "v1.2.0",
+  "core": {
+    "passed": 162,
+    "failed": 0,
+    "command": "npm test"
+  },
+  "service": {
+    "passed": 46,
+    "failed": 0,
+    "command": "npm run test:server"
+  },
+  "browsers": [
+    {
+      "version": "Chromium 151.0.7922.34",
+      "teamScenarios": {
+        "passed": 24,
+        "failed": 0
+      },
+      "existingReleaseScenarios": {
+        "passed": 10,
+        "failed": 0
+      }
+    },
+    {
+      "version": "Chrome for Testing 116.0.5845.96",
+      "teamScenarios": {
+        "passed": 24,
+        "failed": 0
+      },
+      "existingReleaseScenarios": {
+        "passed": 10,
+        "failed": 0
+      }
+    }
+  ],
+  "commands": [
+    "npm run test:team-browser",
+    "npm run test:release-browser",
+    "The same two suites with RUNTIME_SOP_CHROME set to the actual Chrome 116 executable"
+  ],
+  "verifiedBoundaries": [
+    "Feature negotiation preserves complete reads for old services; corrupt advertised views fail closed",
+    "Reading fetches visible work-address step images with two-job cap and requests no unchosen issue images",
+    "Edit obtains a full verified canonical guide and preserves all unseen step and issue images",
+    "Edit rejects changed revision before creating a malformed partial draft",
+    "A held tabs.query refresh cannot erase the displayed partial-view provenance before Edit",
+    "The screenshot-viewer early return preserves complete Edit provenance",
+    "Repeated issue selection reuses at most one holder per slot and preserves markers without repeated downloads",
+    "Changing work address, tab, SOP or account aborts held image requests and prevents stale insertion",
+    "Thumbnail decode rechecks private identity before live DOM insertion",
+    "Optional screenshot-view guards preserve native permission gesture and cancel late storage, decoding and overlay work without canceling edits"
+  ],
+  "limitations": [
+    "Isolated browser profiles, real same-host HTTP/SQLite and synthetic examples only.",
+    "Native host/folder permission acceptance, physical two-device/TLS/NAS and old hardware remain unverified/deferred.",
+    "No 500 simultaneous real browsers or production-network throughput measurement.",
+    "No new release/store submission, version renumbering or replacement of published files."
+  ],
+  "sourceFingerprints": [
+    {
+      "path": "extension/workspace.js",
+      "sha256": "5f62b9c5af38a7a9762f1949915b53d8c97031ceb298c38956c85871b115d454"
+    },
+    {
+      "path": "extension/screenshot-editor.js",
+      "sha256": "50a5efce789e55300f3db0a3ace1d98fd085878a1bbd4daf5a048f8e9df756a3"
+    },
+    {
+      "path": "extension/team-client.js",
+      "sha256": "d0a8aaff97e0de8e6114b05c999db8b01e003fdb88fe5cb17e603e723f9b8107"
+    },
+    {
+      "path": "tests/team-sidebar-images-browser.cjs",
+      "sha256": "8fdf6db30d9ef83918ebb98b05175274775e65bad5fc32541437d0cdf93f6b3a"
+    },
+    {
+      "path": "tests/screenshot-view-guard.test.cjs",
+      "sha256": "3e9267ab2a38162cde7a3bdbe89b9ab1a970ea0122aa823bc2cb436c36ed5007"
+    },
+    {
+      "path": "tests/team-workspace-browser.cjs",
+      "sha256": "9080c525e1ed073df4ef1ace354672f4b37fc9c8114cefb13fe8a03acd64d0ee"
+    },
+    {
+      "path": "package.json",
+      "sha256": "5e94bf5bd802db0c03aee9b330757c392617c98dbd5ed7a2c27ea1cf4b4594a3"
+    }
+  ]
+}

@@ -93,6 +93,44 @@
       else if (object(data.lock) && object(data.lock.owner) && text(data.lock.owner.id,128) && text(data.lock.owner.name,80) && Number.isSafeInteger(data.lock.fence) && data.lock.fence > 0 && Number.isFinite(data.lock.expiresAt)) result.lock = {owner:{id:data.lock.owner.id,name:data.lock.owner.name},fence:data.lock.fence,expiresAt:data.lock.expiresAt,baseRevision:data.lock.baseRevision,serverTime:data.lock.serverTime,leaseMs:data.lock.leaseMs};
       return result;
     }
+    async function digest(value) {
+      return Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(value))), b => b.toString(16).padStart(2, '0')).join('');
+    }
+    function imageReference(value) {
+      if (!object(value) || !Object.keys(value).every(k => ['step','issue','sha256','imageAt','imageMarks'].includes(k)) || !Number.isSafeInteger(value.step) || value.step < 0 || value.step >= 100 || value.issue !== undefined && (!Number.isSafeInteger(value.issue) || value.issue < 0 || value.issue >= 10) || !/^[a-f0-9]{64}$/.test(value.sha256 || '')) throw error('invalid_image_reference');
+      return JSON.parse(JSON.stringify(value));
+    }
+    // Read-only alternative: never use a partial view as a publication draft or
+    // place it in the full-guide/offline cache. The original read API is intact.
+    async function readView(sopId, opts = {}) {
+      id(sopId); if (opts.revision !== undefined) revision(opts.revision);
+      const data = await request('/v1/sops/' + sopId + '/view' + (opts.revision === undefined ? '' : '?revision=' + opts.revision),'GET',undefined,opts);
+      if (data.id !== sopId || opts.revision !== undefined && data.revision !== opts.revision || !/^[a-f0-9]{64}$/.test(data.sha256 || '') || !/^[a-f0-9]{64}$/.test(data.viewSha256 || '') || !Array.isArray(data.images) || data.images.length > 1100) throw error('integrity_error');
+      revision(data.revision);
+      let guide; try { guide = CatalogEngine.validateGuide(data.guide); } catch (_) { throw error('invalid_guide'); }
+      if (guide.workflowId !== sopId || JSON.stringify(guide) !== JSON.stringify(data.guide)) throw error('integrity_error');
+      const template = JSON.parse(JSON.stringify(guide)), seen = new Set();
+      for (const step of template.steps) for (const item of [step,...(step.issues || [])]) if (item.image !== undefined || item.imageAt !== undefined || item.imageMarks !== undefined) throw error('invalid_image_reference');
+      const images = data.images.map(imageReference);
+      for (const ref of images) {
+        const step = template.steps[ref.step], target = ref.issue === undefined ? step : step?.issues?.[ref.issue], position = ref.step + ':' + (ref.issue === undefined ? 'step' : ref.issue);
+        if (!target || seen.has(position)) throw error('invalid_image_reference');
+        seen.add(position); target.image = 'data:image/jpeg;base64,/9j/AA==';
+        for (const name of ['imageAt','imageMarks']) if (ref[name] !== undefined) target[name] = ref[name];
+      }
+      try { CatalogEngine.validateGuide(template); } catch (_) { throw error('invalid_image_reference'); }
+      if (await digest(JSON.stringify({guide:data.guide,images:data.images})) !== data.viewSha256) throw error('integrity_error');
+      return {id:sopId,revision:data.revision,sha256:data.sha256,viewSha256:data.viewSha256,guide,images};
+    }
+    async function readImage(sopId, reference, opts = {}) {
+      id(sopId); revision(opts.revision); const ref = imageReference(reference), requestedRevision = opts.revision;
+      const path = '/v1/sops/' + sopId + '/images/' + ref.step + (ref.issue === undefined ? '' : '/issues/' + ref.issue) + '?revision=' + requestedRevision;
+      const data = await request(path,'GET',undefined,opts);
+      if (data.id !== sopId || data.revision !== requestedRevision || data.step !== ref.step || data.issue !== ref.issue || data.sha256 !== ref.sha256 || typeof data.image !== 'string' || data.image.length > 280000) throw error('integrity_error');
+      try { CatalogEngine.validateGuide({format:'runtime-sop-guide',schemaVersion:1,workflowId:sopId,title:'Image verification',version:'1',notice:'',steps:[{id:'image',title:'',where:'Image',actions:['Image verification'],expected:'',trouble:'',acceptance:[],image:data.image,...(ref.imageAt === undefined ? {} : {imageAt:ref.imageAt}),...(ref.imageMarks === undefined ? {} : {imageMarks:ref.imageMarks})}]}); } catch (_) { throw error('invalid_image'); }
+      if (await digest(data.image) !== ref.sha256) throw error('integrity_error');
+      return {id:sopId,revision:requestedRevision,step:ref.step,...(ref.issue === undefined ? {} : {issue:ref.issue}),sha256:ref.sha256,image:data.image};
+    }
     function query(opts = {}) {
       const params = new URLSearchParams();
       for (const name of ['query','category','cursor']) if (opts[name] !== undefined) { if (!text(opts[name], name === 'cursor' ? 512 : name === 'query' ? 120 : 160)) throw error('invalid_query'); params.set(name, opts[name]); }
@@ -135,7 +173,7 @@
       endpoint, clearCache() { cache.clear(); }, newIdempotencyKey() { return key(); },
       async capabilities(opts) { const d = await request('/v1/capabilities','GET',undefined,opts,true); if (d.protocolVersion !== 1 || !Number.isInteger(d.minClientProtocol) || !Number.isInteger(d.maxClientProtocol) || d.minClientProtocol > 1 || d.maxClientProtocol < 1) throw error('unsupported_protocol'); return d; },
       async join(joinCode,displayName,opts) { if (!text(joinCode,128) || !text(displayName,80)) throw error('invalid_session'); const d = await request('/v1/sessions','POST',{joinCode,displayName},opts,true); if (!text(d.token,2048) || !object(d.actor) || !text(d.actor.id,128) || !text(d.actor.name,80)) throw error('invalid_session'); cache.clear(); return d; },
-      getSop, read:getSop,
+      getSop, read:getSop, readView, readImage,
       async matches(url,opts) { return metadata(await request('/v1/matches','POST',{url:sanitizeWorkURL(url)},opts),true); },
       async list(opts = {}) { return metadata(await request('/v1/sops' + query(opts),'GET',undefined,opts)); },
       async categories(opts={}){

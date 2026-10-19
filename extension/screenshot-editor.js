@@ -34,16 +34,23 @@ function requestAccess(context){
  return Promise.resolve(false);
 }
 function announceFallback(action){const english=window.WorkspaceI18n?.getLanguage?.()==='en',message=english?'This page cannot show the overlay. Opened the screenshot in the side panel.':(window.WorkspaceI18n?.t('当前页面不允许覆盖显示，已在侧栏打开。')||'当前页面不允许覆盖显示，已在侧栏打开。');const target=action==='edit'?$('editor-status'):$('view-status');if(target)target.textContent=message;const hint=$('marks-hint');if(action==='edit'&&hint)hint.textContent=message;}
-let activePageSession=null;
-async function openOnPage(step,title,action,context,accessPromise){
+let activePageSession=null,currentView=null;
+function cancelledView(){const error=new Error('Screenshot view cancelled');error.name='AbortError';return error;}
+async function checkView(state){if(!state)return;if(state.cancelled||currentView!==state||state.signal?.aborted)throw cancelledView();if(state.verify&&await state.verify()===false)throw cancelledView();if(state.cancelled||currentView!==state||state.signal?.aborted)throw cancelledView();}
+function releaseView(state){state.signal?.removeEventListener('abort',state.abort);state.dialog?.removeEventListener('close',state.onDialogClose);if(currentView===state)currentView=null;}
+async function cancelView(state){if(!state)return;state.cancelled=true;releaseView(state);if(state.dialog){const dialog=state.dialog;state.dialog=null;dialog.close();$('large-picture')?.replaceChildren();}if(state.close)await state.close();}
+async function closeView(){await cancelView(currentView);}
+
+async function openOnPage(step,title,action,context,accessPromise,state){
  const api=globalThis.chrome;
  if(!context||!Number.isInteger(context.tabId)||!context.url||!api?.scripting?.executeScript||!api?.storage?.session)return null;
- const access=accessPromise===undefined?requestAccess(context):accessPromise;if(!await access)return null;
- let tab;try{tab=await api.tabs.get(context.tabId);}catch(_){return null;}
+ const access=accessPromise===undefined?requestAccess(context):accessPromise;const allowed=await access;await checkView(state);if(!allowed)return null;
+ let tab;try{tab=await api.tabs.get(context.tabId);}catch(_){await checkView(state);return null;}await checkView(state);
  if(!tab?.active||!tab.url)return null;
  const requested=new URL(context.url),actual=new URL(tab.url);
  if(requested.protocol==='file:'?actual.href!==requested.href:actual.origin!==requested.origin)return null;
  if(activePageSession)await activePageSession();
+ await checkView(state);
  const token=crypto.randomUUID(),key='sop-screenshot-'+token;
  return await new Promise(resolve=>{
   let ready=false,finished=false,resolved=false,readyTimer,expiryTimer,poll;
@@ -51,28 +58,30 @@ async function openOnPage(step,title,action,context,accessPromise){
   const close=async(result=null)=>{
    if(finished)return;finished=true;clearTimeout(readyTimer);clearTimeout(expiryTimer);clearInterval(poll);api.storage.onChanged.removeListener(onChange);
    if(activePageSession===close)activePageSession=null;
+   if(state&&state.close===close){state.close=null;if(ready||state.cancelled)releaseView(state);}
    await api.storage.session.remove(key).catch(()=>{});
    await api.scripting.executeScript({target:{tabId:context.tabId},func:t=>window.SOPImageOverlay?.dispose(t),args:[token]}).catch(()=>{});
-   respond(ready?{handled:true,result}:null);
+   respond(state?.cancelled?{handled:true,result:null}:ready?{handled:true,result}:null);
   };
   const onChange=(changes,area)=>{if(area!=='session'||!changes[key]?.newValue)return;const value=changes[key].newValue;
    if(value.ready===true&&!ready){ready=true;clearTimeout(readyTimer);if(action==='view')respond({handled:true,result:{opened:true}});}
    if(Object.hasOwn(value,'result')){let result=null;try{result=value.result===null?null:M.validate(value.result);}catch(_){}close(result);}
    if(value.error)close(null);
   };
-  api.storage.onChanged.addListener(onChange);activePageSession=close;
+  api.storage.onChanged.addListener(onChange);activePageSession=close;if(state)state.close=close;
   readyTimer=setTimeout(()=>close(null),4000);expiryTimer=setTimeout(()=>close(null),20*60*1000);
   (async()=>{try{
+   await checkView(state);if(finished)return;
    await api.storage.session.set({[key]:{step:{image:step.image,imageMarks:M.validate(step.imageMarks),imageAt:step.imageAt||'',title:String(title||step.title||'截图').slice(0,160)},mode:action,tabId:context.tabId,expiresAt:Date.now()+20*60*1000}});
    if(finished){await api.storage.session.remove(key).catch(()=>{});return;}
    await api.scripting.executeScript({target:{tabId:context.tabId},files:['screenshot-overlay.js']});
-   if(finished)return;
+   await checkView(state);if(finished)return;
    const url=api.runtime.getURL('screenshot-viewer.html')+'?token='+token+'&mode='+action;
    const mounted=await api.scripting.executeScript({target:{tabId:context.tabId},func:(u,t)=>window.SOPImageOverlay.mount(u,t),args:[url,token]});
    if(finished){await api.scripting.executeScript({target:{tabId:context.tabId},func:t=>window.SOPImageOverlay?.dispose(t),args:[token]}).catch(()=>{});return;}
    if(!mounted?.[0]?.result){await close(null);return;}
    poll=setInterval(async()=>{try{const status=await api.scripting.executeScript({target:{tabId:context.tabId},func:t=>window.SOPImageOverlay?.alive(t),args:[token]});if(!status?.[0]?.result)await close(null);}catch(_){await close(null);}},750);
-  }catch(_){await close(null);}})();
+  }catch(error){if(state&&(error.name==='AbortError'||currentView!==state)){state.cancelled=true;releaseView(state);}await close(null);}})();
  });
 }
 
@@ -90,8 +99,15 @@ function install(){if(!$('marks-dialog')||install.done)return;install.done=true;
  $('marks-save').onclick=()=>finish(M.validate(marks));$('marks-cancel').onclick=()=>finish(null);$('marks-dialog').oncancel=e=>{e.preventDefault();finish(null);};
 }
 async function openFallback(step,title){install();opening=true;try{source=await loadImage(step.image);marks=M.validate(step.imageMarks);$('marks-img').src=step.image;if($('marks-title'))$('marks-title').textContent=title||'标记图片';choose('number');draw();announceFallback('edit');$('marks-dialog').showModal();return await new Promise(resolve=>{resolveOpen=resolve;});}finally{opening=false;}}
-async function openFallbackView(step,title){const dialog=$('image-dialog'),picture=$('large-picture');if(!dialog||!picture)throw Error('当前页面不支持显示截图。');$('image-title').textContent=title||'截图查看';await renderFigure(picture,step);dialog.showModal();return {opened:true,fallback:true};}
+async function openFallbackView(step,title,state){const dialog=$('image-dialog'),picture=$('large-picture');if(!dialog||!picture)throw Error('当前页面不支持显示截图。');const staging=document.createElement('div');await renderFigure(staging,step);await checkView(state);$('image-title').textContent=title||'截图查看';picture.replaceChildren(...staging.childNodes);if(state){state.dialog=dialog;state.onDialogClose=()=>{if(dialog.open)return;state.dialog=null;if(state.signal||state.verify)picture.replaceChildren();releaseView(state);};dialog.addEventListener('close',state.onDialogClose);}dialog.showModal();return {opened:true,fallback:true};}
 async function open(step,title,context,accessPromise){if(opening||resolveOpen)throw Error('请先完成当前图片的标记。');opening=true;try{if(globalThis.chrome?.scripting&&context){const access=accessPromise===undefined?requestAccess(context):accessPromise;const result=await openOnPage(step,title,'edit',context,access);if(result?.handled)return result.result;}return await openFallback(step,title);}finally{opening=false;}}
-async function view(step,title,context,accessPromise){if(globalThis.chrome?.scripting&&context){const access=accessPromise===undefined?requestAccess(context):accessPromise;const result=await openOnPage(step,title,'view',context,access);if(result?.handled)return result.result;}announceFallback('view');return await openFallbackView(step,title);}
-window.ScreenshotEditor={capturePage,open,view,requestAccess,renderFigure,figureHTML,importFile};
+async function view(step,title,context,accessPromise,guard={}){
+ // Keep native access requests inside the initiating user gesture.
+ const access=globalThis.chrome?.scripting&&context?(accessPromise===undefined?requestAccess(context):accessPromise):accessPromise;
+ const previous=currentView,state={signal:guard.signal,verify:guard.verify,cancelled:false};currentView=state;
+ state.abort=()=>{cancelView(state).catch(()=>{});};state.signal?.addEventListener('abort',state.abort,{once:true});
+ try{await cancelView(previous);await checkView(state);if(globalThis.chrome?.scripting&&context){const result=await openOnPage(step,title,'view',context,access,state);await checkView(state);if(result?.handled)return result.result;}await checkView(state);announceFallback('view');return await openFallbackView(step,title,state);}
+ catch(error){await cancelView(state);if(error.name==='AbortError')return null;throw error;}
+}
+window.ScreenshotEditor= {capturePage,open,view,closeView,requestAccess,renderFigure,figureHTML,importFile};
 })();

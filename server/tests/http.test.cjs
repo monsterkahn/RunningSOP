@@ -250,3 +250,53 @@ test('busy full-guide reads reject before hydrating images and keep bodyless GET
  let hydrated=0;const {request}=await fixture(t,{maxBufferedResponseBytes:1024,store:{estimatedReadBytes:()=>4096,get:()=>{hydrated++;throw Error('Must not hydrate');}}});
  const busy=await request('/v1/sops/sample');assert.equal(busy.status,503);assert.equal(busy.headers.get('retry-after'),'1');assert.notEqual(busy.headers.get('connection'),'close');assert.equal(hydrated,0);assert.equal((await request('/health')).status,200);
 });
+
+test('real SQLite view and selective images preserve exact revision identity and reject corruption', async t => {
+  const {TeamStore}=require('../store.cjs'),{createHash}=require('node:crypto');
+  const store=new TeamStore({dbPath:':memory:'});t.after(()=>store.close());
+  const session=store.createSession({displayName:'Synthetic reader'}),actor=session.actor;
+  const sha=s=>createHash('sha256').update(s).digest('hex');
+  // Noncanonical padding bits are deliberately accepted by the guide validator;
+  // reconstruction must retain the exact original string, not re-encode it.
+  const image='data:image/jpeg;base64,/9j/AB==',issueImage='data:image/jpeg;base64,/9j/Ag==';
+  const guide={format:'runtime-sop-guide',schemaVersion:1,workflowId:'view-test',title:'Synthetic view',version:'1',notice:'',steps:[{id:'step-1',title:'',where:'Synthetic',actions:['Review'],expected:'',trouble:'',acceptance:[],image,imageAt:'2026-01-01T00:00:00Z',imageMarks:[],issues:[{id:'issue-1',title:'Issue',actions:['Review'],next:'Continue',image:issueImage}]}]};
+  const first=store.create(guide,{actor,idempotencyKey:'view-create-01'});
+  const {request}=await fixture(t,{store});
+  const get=(route,options={})=>request(route,{...options,headers:{Authorization:`Bearer ${session.token}`,...options.headers}});
+  const route='/v1/sops/view-test';
+  assert.ok((await get('/v1/capabilities')).body.data.features.includes('read-view-images'));
+  const view=(await get(route+'/view')).body.data;
+  assert.equal(view.sha256,first.sha256);assert.equal(view.revision,1);
+  assert.equal(view.guide.steps[0].image,undefined);assert.equal(view.guide.steps[0].imageAt,undefined);assert.equal(view.guide.steps[0].imageMarks,undefined);assert.equal(view.guide.steps[0].issues[0].image,undefined);
+  assert.equal(view.images.length,2);assert.equal(view.images[0].sha256,sha(image));assert.equal(view.images[1].sha256,sha(issueImage));assert.equal(view.images[1].issue,0);
+  assert.equal(view.viewSha256,sha(JSON.stringify({guide:view.guide,images:view.images})));
+  assert.equal((await get(route+'/images/0?revision=1')).body.data.image,image);
+  assert.equal((await get(route+'/images/0?revision=1')).body.data.issue,undefined);
+  assert.equal((await get(route+'/images/0/issues/0?revision=1')).body.data.image,issueImage);
+  for(const suffix of ['/images/0','/images/-1?revision=1','/images/01?revision=1','/images/100?revision=1','/images/0/issues/10?revision=1','/images/0?revision=0'])assert.equal((await get(route+suffix)).status,400);
+  for(const suffix of ['/images/1?revision=1','/images/0/issues/1?revision=1','/images/0?revision=99'])assert.equal((await get(route+suffix)).status,404);
+  let reads=0;const old=store.getImage.bind(store);store.getImage=(...args)=>{reads++;return old(...args);};
+  assert.equal((await request(route+'/images/0?revision=1',{authenticated:false})).status,401);
+  assert.equal((await get(route+'/view',{headers:{'X-Running-SOP-Protocol':'2'}})).status,426);assert.equal(reads,0);
+  const lease=store.acquireLock('view-test',{actor});store.publish('view-test',{...guide,title:'Changed',steps:[{...guide.steps[0],image:issueImage}]},{actor,...lease,expectedRevision:1,idempotencyKey:'view-publish-01'});
+  assert.equal((await get(route+'/view')).body.data.revision,2);assert.equal((await get(route+'/view?revision=1')).body.data.sha256,first.sha256);assert.equal((await get(route+'/images/0?revision=1')).body.data.image,image);
+  const row=store.db.prepare('SELECT guide FROM revisions WHERE id=? AND revision=1').get('view-test'),compact=JSON.parse(row.guide);
+  // Corrupt an unrequested asset: selected reads still work, full views fail.
+  const issueHash=compact.guide.steps[0].issues[0].image.assetSha256;
+  store.db.prepare('UPDATE assets SET bytes=? WHERE sha256=?').run(Buffer.from([0,0,0,0]),issueHash);
+  assert.equal((await get(route+'/images/0?revision=1')).status,200);assert.equal((await get(route+'/images/0/issues/0?revision=1')).status,500);assert.equal((await get(route+'/view?revision=1')).status,500);
+  for(const mutated of [{...compact,guide:{...compact.guide,workflowId:'other'}},{...compact,guide:{...compact.guide,steps:[{...compact.guide.steps[0],image:{assetSha256:'bad'}}]}}]){
+    store.db.prepare('UPDATE revisions SET guide=? WHERE id=? AND revision=1').run(JSON.stringify(mutated),'view-test');assert.equal((await get(route+'/images/0?revision=1')).status,500);
+  }
+  // Legacy inline fallback verifies the complete original canonical record.
+  store.db.prepare('UPDATE revisions SET guide=? WHERE id=? AND revision=1').run(JSON.stringify(first.guide),'view-test');
+  assert.equal((await get(route+'/images/0?revision=1')).body.data.image,image);assert.equal((await get(route+'/view?revision=1')).body.data.sha256,first.sha256);
+  store.db.prepare("UPDATE revisions SET sha256=? WHERE id=? AND revision=1").run('0'.repeat(64),'view-test');assert.equal((await get(route+'/images/0?revision=1')).status,500);
+  assert.equal(store.db.prepare('PRAGMA user_version').get().user_version,6);
+});
+
+test('view and image response admission rejects before reconstructing a revision',async t=>{
+ let calls=0;const {request}=await fixture(t,{maxBufferedResponseBytes:1024,store:{estimatedReadBytes:()=>2048,getView:()=>{calls++;throw Error('must not reconstruct');},getImage:()=>{calls++;throw Error('must not load asset');}}});
+ for(const route of ['/v1/sops/synthetic/view','/v1/sops/synthetic/images/0?revision=1']){const response=await request(route);assert.equal(response.status,503);assert.equal(response.headers.get('retry-after'),'1');}
+ assert.equal(calls,0);
+});

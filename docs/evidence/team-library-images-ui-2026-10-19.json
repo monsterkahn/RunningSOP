@@ -1,0 +1,75 @@
+{
+  "kind": "development-library-selected-image-ui-acceptance",
+  "recordedDate": "2026-10-19",
+  "publishedReleaseUnchanged": "v1.2.0",
+  "core": {
+    "command": "npm test",
+    "passed": 157,
+    "failed": 0
+  },
+  "browsers": [
+    {
+      "version": "Chromium 151.0.7922.34",
+      "command": "npm run test:team-browser",
+      "passed": 11,
+      "failed": 0
+    },
+    {
+      "version": "Chrome for Testing 116.0.5845.96",
+      "command": "npm run test:team-browser (RUNTIME_SOP_CHROME points to actual Chrome 116 executable)",
+      "passed": 11,
+      "failed": 0
+    }
+  ],
+  "scenarios": [
+    "Old service without read-view-images retains complete-guide reads, no separate image route",
+    "New service: listing does not read SOPs or negotiate capabilities; explicit reading fetches text view, no complete guide",
+    "Nearby thumbnails and opened issue sections fetch exact revision images with at most two active thumbnail requests",
+    "No IntersectionObserver fallback uses bounded two-job queue and does not fetch closed issue images",
+    "Historical revisions retain annotations and exact-revision image requests",
+    "Opening/reopening verified thumbnail preview does not refetch its image",
+    "Switching SOP aborts held old image request and prevents stale content",
+    "Clearing account aborts held issue image and closes/clears enlarged preview",
+    "Advertised corrupt view fails closed with no complete-guide fallback",
+    "Account change during decode is detected through private settings before staged pixels enter live DOM"
+  ],
+  "mutationVerification": {
+    "description": "Temporary extension copy restored direct-to-live thumbnail rendering and removed the persisted postdecode identity check; current regression rejected this unsafe behavior. The working tree remained fixed.",
+    "command": "node --test --test-name-pattern \"thumbnail decode rechecks\" tests/team-library-images-browser.cjs (isolated mutated extension)",
+    "exitCode": 1,
+    "failedScenario": "thumbnail decode rechecks private account identity before inserting image nodes",
+    "failure": "Wait for account invalidation timed out; the old behavior did not recheck persisted identity after decode."
+  },
+  "limitations": [
+    "Native permission approval mocked; isolated profiles and synthetic JPEG fixture.",
+    "Same-host real HTTP service and browsers, not physical LAN/two-device/TLS/NAS acceptance.",
+    "No many-browser UI load or older hardware performance measurements; SDK load experiment is separate.",
+    "Side-panel and folder readers remain on complete-guide reads; no new release or store submission."
+  ],
+  "sourceFingerprints": [
+    {
+      "path": "extension/team-library.js",
+      "sha256": "b30b59bfef35ba4d87e083b06153b2c779f2ced43fb2ea74edd5e2c1a2644cce"
+    },
+    {
+      "path": "extension/team-client.js",
+      "sha256": "d0a8aaff97e0de8e6114b05c999db8b01e003fdb88fe5cb17e603e723f9b8107"
+    },
+    {
+      "path": "tests/team-library-images-browser.cjs",
+      "sha256": "b6eee44b78fe7d16a9e3b42cc7894bd52c2084c7d9f049ac7d018eede4b04e75"
+    },
+    {
+      "path": "tests/team-library-browser.cjs",
+      "sha256": "8251c5703a59ce0fdd929735ef4688f5af25d326908af52954562f7c36341b13"
+    },
+    {
+      "path": "tests/team-read-view-browser.cjs",
+      "sha256": "939482962942c74de04ec07da50dbd05c8449ba1e9476452d91940d79579cd8d"
+    },
+    {
+      "path": "package.json",
+      "sha256": "9541b98cb2dc3831fe78583c4fce47d47e6f17e7686b4c57d018dd467353fe4d"
+    }
+  ]
+}

@@ -1,0 +1,239 @@
+{
+  "kind": "isolated-local-http-load-test",
+  "node": "v26.9.0",
+  "platform": "darwin",
+  "arch": "arm64",
+  "cpuModel": "Apple M4",
+  "cpus": 10,
+  "totalMemory": 17179869184,
+  "sops": 500,
+  "clients": 75,
+  "socketPool": 75,
+  "phases": [
+    {
+      "name": "join",
+      "requests": 75,
+      "concurrency": 75,
+      "durationMs": 12.154583000000002,
+      "p50Ms": 7.180082999999996,
+      "p95Ms": 10.76679200000001,
+      "maxMs": 11.067625000000021,
+      "responseBytes": 12750
+    },
+    {
+      "name": "indexed-match",
+      "requests": 75,
+      "concurrency": 75,
+      "durationMs": 6.035667000000018,
+      "p50Ms": 3.390625,
+      "p95Ms": 4.791708,
+      "maxMs": 4.8412090000000205,
+      "responseBytes": 18975
+    },
+    {
+      "name": "read",
+      "requests": 75,
+      "concurrency": 75,
+      "durationMs": 8.004333000000003,
+      "p50Ms": 5.023167000000001,
+      "p95Ms": 7.0895419999999945,
+      "maxMs": 7.350583999999998,
+      "responseBytes": 37415
+    },
+    {
+      "name": "paged-list",
+      "requests": 75,
+      "concurrency": 75,
+      "durationMs": 11.403999999999996,
+      "p50Ms": 6.441249999999997,
+      "p95Ms": 9.650000000000006,
+      "maxMs": 10.053708,
+      "responseBytes": 811875
+    },
+    {
+      "name": "deep-paged-list",
+      "requests": 75,
+      "concurrency": 75,
+      "durationMs": 11.574083000000002,
+      "p50Ms": 6.378917000000001,
+      "p95Ms": 10.324666999999977,
+      "maxMs": 10.523541999999992,
+      "responseBytes": 811875
+    },
+    {
+      "name": "selective-search",
+      "requests": 75,
+      "concurrency": 75,
+      "durationMs": 6.820125000000019,
+      "p50Ms": 3.987499999999983,
+      "p95Ms": 6.133333999999991,
+      "maxMs": 6.206458999999995,
+      "responseBytes": 18825
+    },
+    {
+      "name": "broad-chinese-search",
+      "requests": 75,
+      "concurrency": 75,
+      "durationMs": 34.645208,
+      "p50Ms": 17.71354199999999,
+      "p95Ms": 32.01458400000001,
+      "maxMs": 33.85870800000001,
+      "responseBytes": 328125
+    },
+    {
+      "name": "contested-lock",
+      "requests": 75,
+      "concurrency": 75,
+      "durationMs": 5.16549999999998,
+      "p50Ms": 2.6932499999999777,
+      "p95Ms": 4.235208999999998,
+      "maxMs": 4.3966669999999795,
+      "responseBytes": 5199
+    },
+    {
+      "name": "independent-locks",
+      "requests": 75,
+      "concurrency": 75,
+      "durationMs": 10.823166999999984,
+      "p50Ms": 5.618290999999999,
+      "p95Ms": 9.81774999999999,
+      "maxMs": 10.115417000000036,
+      "responseBytes": 18075
+    },
+    {
+      "name": "publish",
+      "requests": 75,
+      "concurrency": 75,
+      "durationMs": 22.332875,
+      "p50Ms": 12.932834000000014,
+      "p95Ms": 20.932500000000005,
+      "maxMs": 21.55520800000005,
+      "responseBytes": 36515
+    }
+  ],
+  "limitations": [
+    "Synthetic one-step documents; not 200,000 image-heavy production SOPs.",
+    "Loopback VM/process tests do not establish physical LAN latency or old-hardware performance."
+  ],
+  "serviceSchemaVersion": 6,
+  "seedMs": 11.943583,
+  "queryPlans": {
+    "match": [
+      {
+        "id": 2,
+        "parent": 0,
+        "notused": 56,
+        "detail": "SEARCH matches USING COVERING INDEX sqlite_autoindex_matches_1 (matchKey=?)"
+      }
+    ],
+    "list": [
+      {
+        "id": 4,
+        "parent": 0,
+        "notused": 211,
+        "detail": "SCAN workflows USING COVERING INDEX workflow_listing"
+      }
+    ],
+    "search": [
+      {
+        "id": 3,
+        "parent": 0,
+        "notused": 156,
+        "detail": "SCAN title_search VIRTUAL TABLE INDEX 0:M2"
+      },
+      {
+        "id": 8,
+        "parent": 0,
+        "notused": 44,
+        "detail": "SEARCH w USING COVERING INDEX sqlite_autoindex_workflows_1 (id=?)"
+      }
+    ]
+  },
+  "databaseBytes": 753664,
+  "connectionStartup": "gradual batches of 32",
+  "sustained": {
+    "requests": 1500,
+    "requestsPerActor": 20,
+    "durationMs": 71.72112500000003,
+    "p95Ms": 6.295290999999963,
+    "maxMs": 11.000999999999976
+  },
+  "server": {
+    "stats": true,
+    "memory": {
+      "rss": 68354048,
+      "heapTotal": 14041088,
+      "heapUsed": 9247184,
+      "external": 2561496,
+      "arrayBuffers": 276270
+    },
+    "connections": 75,
+    "peakConnections": 75
+  },
+  "unexpectedFailures": 0,
+  "initialLatencyTargetMet": true,
+  "requiresOptimization": [],
+  "recordedDate": "2026-10-19",
+  "sourceFingerprints": [
+    {
+      "path": "extension/team-client.js",
+      "sha256": "c766abdee61206474f55e871f5d394750d757a922e4088b8c8192a4569a8f7d1"
+    },
+    {
+      "path": "server/app.cjs",
+      "sha256": "46bd186ab9ab11dc188533e890c78a99548670753048c94a93e2d339ec89669b"
+    },
+    {
+      "path": "server/backup.cjs",
+      "sha256": "852eb88ef04bd4cc3209f0c217b3ea6b553be2f83cb7280b338b18c47e2709fe"
+    },
+    {
+      "path": "server/category-store.cjs",
+      "sha256": "0abec3ef8dc1f3e66a65460f3fb941783aa051270f0741bb07c47053981b7438"
+    },
+    {
+      "path": "server/cli.cjs",
+      "sha256": "0396199113cd860795ada0f2c6f15f779c9e4ca76fd95a327681e81493645fd5"
+    },
+    {
+      "path": "server/guide-assets.cjs",
+      "sha256": "9da9c19ec271c5bf4a113481e4d40879bb63abfb89c322fd1690cd67dd119d37"
+    },
+    {
+      "path": "server/store.cjs",
+      "sha256": "80e0ee6b639d744f6a25e1dc1f840c4b4bf3425680690044d10e3966febb630a"
+    },
+    {
+      "path": "server/tools/backup.cjs",
+      "sha256": "7c9698c7bc3c12223550f791c7a57d2f7e289e8755832e00bde660d2d953e3e4"
+    },
+    {
+      "path": "server/tools/fixture-large-response.cjs",
+      "sha256": "43555f961bd001990fd6bec1b2931930e48f06534ca714f957463340b9b985fe"
+    },
+    {
+      "path": "server/tools/fixture-real-large-read.cjs",
+      "sha256": "bbdbaed822fd8e37ff5df3dbf4eb3a5ffb171d56d759d00f2709825a81055d90"
+    },
+    {
+      "path": "server/tools/fixture-service.cjs",
+      "sha256": "fe261f69773fb223986d4aaee862698a907e3bc4abfd56c44e299874cf163f24"
+    },
+    {
+      "path": "server/tools/large-response.cjs",
+      "sha256": "4eabd7fb44114df7eba0768a49f67c8fca358bb137fc4f2c6fd4588c0800192a"
+    },
+    {
+      "path": "server/tools/real-large-read.cjs",
+      "sha256": "659ede7b06a4c9c24ce7f7281c5b1a242e93f6a997cea4c14600a4668b1fd1b4"
+    },
+    {
+      "path": "server/tools/scale.cjs",
+      "sha256": "26832ce93604f87f0fcd6d3f62b8aa70668e2696b9ca89700740e47d6b3fc4ba"
+    },
+    {
+      "path": "server/tools/test.cjs",
+      "sha256": "7c88ecf3ff583cac1d5988cb902528e181e9f7d3b2f266ee5e0b35dbdbfab550"
+    }
+  ]
+}

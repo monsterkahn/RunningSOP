@@ -1,6 +1,6 @@
 # Chrome Web Store Listing — Running SOP
 
-> Last updated: 2026-10-18. Local review of GitHub release v1.2.0; this document is not a store submission or approval.
+> Last updated: 2026-10-19. Review baseline: GitHub release v1.2.0, with post-release development notes below; this document is not a store submission or approval.
 
 ## Store listing
 
@@ -109,3 +109,8 @@ Public documentation convention: GitHub README uses official release numbering o
 ## Unreleased compatibility hardening — 2026-10-18
 
 The Windows stability branch corrects case-insensitive folder discovery, preserves hashed example bytes across Git checkouts, and bounds shared-storage reads. No permission, privacy disclosure, product description or screenshot change is required for these fixes. This work has not been submitted as a new store package. Automated results and outstanding native/real-device checks are recorded in docs/COMPATIBILITY-REVIEW.md.
+
+
+## Post-release development review notes
+
+The development branch adds capability-gated separate-image reading to the team library and side panel. It retains complete reads for older team services and obtains a complete, hash-verified guide before editing. Screenshot reading guards cancel stale account/reading requests without changing recording capture behavior. No new permission, remote executable code, vendor analytics or collection purpose is added. Product listing descriptions above are unchanged; these implementation notes do not describe a newly submitted store package. Rebuild and inspect the next proposed package, and complete the deferred native-permission/deployment acceptance before making broader compatibility claims.

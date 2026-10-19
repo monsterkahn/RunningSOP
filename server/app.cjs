@@ -92,7 +92,7 @@ function createTeamServer({ store, joinCode, allowOrigins = [], maxBodyBytes = M
       if (!req.url.startsWith('/') || req.url.startsWith('//') || /[%\\#]/.test(req.url.split('?')[0])) throw failure(400, 'INVALID_PATH', 'Invalid request path.');
       const url = new URL(req.url, 'http://localhost'); const path = url.pathname;
       if (req.method === 'GET' && path === '/health') { send(200, { data: { status: 'ok' } }); return; }
-      if (req.method === 'GET' && path === '/v1/capabilities') { send(200, { data: { protocolVersion: 1, serverVersion: '0.1.0', experimental: true, minClientProtocol: 1, maxClientProtocol: 1, limits: { maxBodyBytes, maxPageSize: 100 }, features: ['editing-leases','history','categories'] } }); return; }
+      if (req.method === 'GET' && path === '/v1/capabilities') { send(200, { data: { protocolVersion: 1, serverVersion: '0.1.0', experimental: true, minClientProtocol: 1, maxClientProtocol: 1, limits: { maxBodyBytes, maxPageSize: 100 }, features: ['editing-leases','history','categories',...(store.getView&&store.getImage?['read-view-images']:[])] } }); return; }
       if (!path.startsWith('/v1/')) throw failure(404, 'NOT_FOUND', 'Route not found.');
       if (req.headers['x-running-sop-protocol'] !== '1') throw failure(426, 'PROTOCOL_MISMATCH', 'Protocol version 1 is required.');
       const body = (guide = false) => readBody(req, guide ? maxBodyBytes : Math.min(8192, maxBodyBytes), requestTimeoutMs, budget);
@@ -118,6 +118,16 @@ function createTeamServer({ store, joinCode, allowOrigins = [], maxBodyBytes = M
       }
       else if (path === '/v1/sops' && req.method === 'GET') {if(url.searchParams.has('uncategorized')&&url.searchParams.get('uncategorized')!=='1')throw failure(400,'INVALID_REQUEST','Invalid category filter.');result = store.list({ ...page(), query: url.searchParams.get('query') || '', category: url.searchParams.get('category') || '',uncategorized:url.searchParams.get('uncategorized')==='1' });}
       else if (path === '/v1/sops' && req.method === 'POST') { const data = await body(true); result = store.create(data.guide, { actor, idempotencyKey }); status = 201; }
+      else if (req.method==='GET' && /^\/v1\/sops\/[a-z0-9][a-z0-9-]{0,79}\/(?:view|images\/[^/]+(?:\/issues\/[^/]+)?)$/.test(path)) {
+        const parts=path.split('/'),id=parts[3],options={revision:url.searchParams.has('revision')?integer(url.searchParams.get('revision'),'revision'):undefined};
+        if(parts[4]==='images'){
+          if(options.revision===undefined)throw failure(400,'INVALID_REQUEST','Exact revision is required.');
+          const index=(value,max=100)=>{if(!/^(?:0|[1-9]\d*)$/.test(value)||!Number.isSafeInteger(Number(value))||Number(value)>=max)throw failure(400,'INVALID_REQUEST','Invalid image index.');return Number(value);};
+          options.step=index(parts[5]);if(parts[6])options.issue=index(parts[7],10);
+        }
+        if(store.estimatedReadBytes&&bufferedResponses+store.estimatedReadBytes(id,options)>maxBufferedResponseBytes)throw failure(503,'BUSY','Service response buffer is full.');
+        result=parts[4]==='view'?store.getView(id,options):store.getImage(id,options);
+      }
       else if (path === '/v1/matches' && req.method === 'POST') { const data = await body(); result = store.match(data.url); }
       else {
         const match = /^\/v1\/sops\/([^/]+)(?:\/(lock|history))?$/.exec(path);

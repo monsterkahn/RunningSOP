@@ -18,10 +18,24 @@ function reconstructGuide(db,serialized,expectedHash,expectedId){
  if(typeof serialized!=='string'||Buffer.byteLength(serialized)>MAX_GUIDE+65536)throw Error('Stored guide exceeds storage bound');
  let guide=JSON.parse(serialized);let total=0;
  if(guide&&guide.internalFormat===FORMAT){guide=guide.guide;if(!guide||!Array.isArray(guide.steps)||guide.steps.length>100)throw Error('Invalid compact guide');
- const read=statement(db,'SELECT bytes,byteLength FROM assets WHERE sha256=? AND byteLength<=? AND length(bytes)<=?');
- images(guide,ref=>{if(!ref||typeof ref!=='object'||Array.isArray(ref)||!Object.keys(ref).every(k=>['assetSha256','suffix'].includes(k))||!/^[a-f0-9]{64}$/.test(ref.assetSha256)||ref.suffix!==undefined&&(typeof ref.suffix!=='string'||!/^[A-Za-z0-9+/]{2,4}={0,2}$/.test(ref.suffix)||ref.suffix.length!==4))throw Error('Invalid image asset reference');const asset=read.get(ref.assetSha256,MAX_IMAGE,MAX_IMAGE);if(!asset||asset.byteLength<1||asset.byteLength!==asset.bytes.length||digest(asset.bytes)!==ref.assetSha256)throw Error('Missing or corrupt image asset');let encoded=Buffer.from(asset.bytes).toString('base64');if(ref.suffix){encoded=encoded.slice(0,-4)+ref.suffix;if(!Buffer.from(encoded,'base64').equals(Buffer.from(asset.bytes)))throw Error('Invalid image asset encoding');}const image='data:image/jpeg;base64,'+encoded;total+=Buffer.byteLength(image);if(total>MAX_GUIDE)throw Error('Reconstructed guide exceeds storage bound');return image;});}
+ images(guide,ref=>{const image=readAsset(db,ref);total+=Buffer.byteLength(image);if(total>MAX_GUIDE)throw Error('Reconstructed guide exceeds storage bound');return image;});}
  const json=JSON.stringify(guide);if(Buffer.byteLength(json)>MAX_GUIDE||digest(json)!==expectedHash||guide.workflowId!==expectedId)throw Error('Revision verification failed');
  const validated=validateGuide(guide);if(JSON.stringify(validated)!==json)throw Error('Stored guide is not canonical');return validated;
 }
 function verifyAssets(db){let assets=0,assetBytes=0;for(const row of statement(db,'SELECT sha256,byteLength,length(bytes) AS actualLength FROM assets').iterate()){if(row.byteLength<1||row.byteLength>MAX_IMAGE||row.byteLength!==row.actualLength)throw Error('Asset size verification failed');const data=statement(db,'SELECT bytes FROM assets WHERE sha256=?').get(row.sha256).bytes;if(digest(data)!==row.sha256)throw Error('Asset hash verification failed');assets++;assetBytes+=row.byteLength;}return {assets,assetBytes};}
-module.exports={compactGuide,reconstructGuide,verifyAssets};
+function readAsset(db,ref){
+ const read=statement(db,'SELECT bytes,byteLength FROM assets WHERE sha256=? AND byteLength<=? AND length(bytes)<=?');
+ if(!ref||typeof ref!=='object'||Array.isArray(ref)||!Object.keys(ref).every(k=>['assetSha256','suffix'].includes(k))||!/^[a-f0-9]{64}$/.test(ref.assetSha256)||ref.suffix!==undefined&&(typeof ref.suffix!=='string'||!/^[A-Za-z0-9+/]{2,4}={0,2}$/.test(ref.suffix)||ref.suffix.length!==4))throw Error('Invalid image asset reference');const asset=read.get(ref.assetSha256,MAX_IMAGE,MAX_IMAGE);if(!asset||asset.byteLength<1||asset.byteLength!==asset.bytes.length||digest(asset.bytes)!==ref.assetSha256)throw Error('Missing or corrupt image asset');let encoded=Buffer.from(asset.bytes).toString('base64');if(ref.suffix){encoded=encoded.slice(0,-4)+ref.suffix;if(!Buffer.from(encoded,'base64').equals(Buffer.from(asset.bytes)))throw Error('Invalid image asset encoding');}return 'data:image/jpeg;base64,'+encoded;
+}
+// This path verifies the selected asset, not the entire revision. The view is
+// separately constructed from a fully verified revision and binds its image hash.
+function readGuideImage(db,serialized,expectedHash,expectedId,step,issue){
+ if(typeof serialized!=='string'||Buffer.byteLength(serialized)>MAX_GUIDE+65536)throw Error('Stored guide exceeds storage bound');
+ const stored=JSON.parse(serialized);
+ const guide=stored&&stored.internalFormat===FORMAT?stored.guide:reconstructGuide(db,serialized,expectedHash,expectedId);
+ if(!guide||guide.workflowId!==expectedId||!Array.isArray(guide.steps)||guide.steps.length>100)throw Error('Invalid compact guide');
+ const target=issue===undefined?guide.steps[step]:guide.steps[step]?.issues?.[issue];
+ if(!target||target.image===undefined)return null;
+ return stored.internalFormat===FORMAT?readAsset(db,target.image):target.image;
+}
+module.exports={compactGuide,reconstructGuide,verifyAssets,readGuideImage};
