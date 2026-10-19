@@ -239,6 +239,16 @@ test('guided recording edits STEP 1, advances explicitly and preserves approval 
  try{
   context=await chromium.launchPersistentContext(path.join(temp,'profile'),{channel:'chromium',headless:!process.env.RUNTIME_SOP_CHROME,...(process.env.RUNTIME_SOP_CHROME?{executablePath:process.env.RUNTIME_SOP_CHROME}:{}),args:[...(process.env.RUNTIME_SOP_CHROME?['--headless=new']:[]),`--disable-extensions-except=${staged}`,`--load-extension=${staged}`]});
   const worker=context.serviceWorkers()[0]||await context.waitForEvent('serviceworker');const id=new URL(worker.url()).host;
+  // Finish the genuine install-triggered settings navigation before creating
+  // work tabs: Chrome116 may otherwise reuse the new panel tab for onboarding.
+  let onboarding;
+  for(let attempt=0;attempt<100;attempt++){
+    onboarding=context.pages().find(page=>page.url()===`chrome-extension://${id}/options.html`);
+    if(onboarding)break;
+    await new Promise(resolve=>setTimeout(resolve,50));
+  }
+  assert.ok(onboarding,'guided fixture must finish initial settings opening');
+  await onboarding.waitForLoadState('domcontentloaded');
   await context.route('https://example.test/**',route=>route.fulfill({contentType:'text/html',body:'<title>Synthetic work</title><button id="work">Prepare report</button>'}));
   const work=await context.newPage();await work.goto('https://example.test/work');
   const panel=await context.newPage();await panel.goto(`chrome-extension://${id}/workspace.html`);

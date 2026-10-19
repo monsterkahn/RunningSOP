@@ -108,6 +108,9 @@
     get('team-disconnect').addEventListener('click',async () => { if (state === 'busy') return; const generation = ++readGeneration; state = 'busy'; render(); try { await instance().clear(); if (generation === readGeneration) record = {enabled:false}; state = 'idle'; } catch (_) { state = 'error'; } render(); await refreshRecord(); });
     get('team-endpoint').addEventListener('input',render);
     root.chrome?.storage?.onChanged?.addListener((changes,area) => { if (area === 'local' && changes[KEY]) refreshRecord(); });
+    // Language and private connection settings load independently. Repaint
+    // after the language is applied, whichever read finishes first.
+    doc.addEventListener('workspace-language-change',render);
     await refreshRecord(true);
   }
   if (root.document) { if (root.document.readyState === 'loading') root.document.addEventListener('DOMContentLoaded',initialize,{once:true}); else initialize(); }

@@ -25,7 +25,7 @@ if(typeof document!=='undefined')root.SOPIcons?.apply(document);
     root.WorkspaceI18n?.setLanguage(next.language);root.WorkspaceI18n?.apply(document);root.SOPReleaseNotes?.render($('release-notes'),root.WorkspaceI18n?.getLanguage());
     renderLanguage(next.language);
   }
-  function renderLanguage(language){$('language-auto').title=tr('跟随浏览器语言');for(const code of ['auto','zh','zh-TW','en','es','ru','ko','ja'])$('language-'+code).setAttribute('aria-pressed',String(language===code));const resolved=root.WorkspaceI18n.resolveLanguage(language);document.documentElement.lang=resolved==='zh'?'zh-CN':resolved;}
+  function renderLanguage(language){$('language-auto').title=tr('跟随浏览器语言');for(const code of ['auto','zh','zh-TW','en','es','ru','ko','ja'])$('language-'+code).setAttribute('aria-pressed',String(language===code));const resolved=root.WorkspaceI18n.resolveLanguage(language);document.documentElement.lang=resolved==='zh'?'zh-CN':resolved;document.dispatchEvent(new Event('workspace-language-change'));}
   function send(type,settings){return new Promise((resolve,reject)=>chrome.runtime.sendMessage({type,...(settings?{settings}:{})},response=>{const error=chrome.runtime.lastError;if(error)return reject(Error(error.message));if(response?.error)return reject(Error(response.error));resolve(response); }));}
   async function refreshCatalog(){
     try{

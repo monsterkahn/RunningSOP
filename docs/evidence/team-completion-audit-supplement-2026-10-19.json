@@ -1,0 +1,706 @@
+{
+  "date": "2026-10-19",
+  "scope": "Development-only completion audit supplement; official v1.2.0 binaries preserved. Final platform recheck remains required after the language correction.",
+  "baselineRuntimeCommit": "c32f1835fe5cb983056c3fb609daa1a63f7b9139",
+  "sourceSha256": {
+    "extension/options.js": "d149b3a4620cd5786c14c08c198ee3b31de0222c6c4a6d8fa4a4db71b43a2f49",
+    "extension/team-settings.js": "1272f6b0779cc932c0222df0855b024248265a4ca47eeba022a43939f03e09fe",
+    "extension/team-service-picker.js": "ab0eb20f995f8df666709731803323a8875d2d1975d72ceec9451d73524fd300",
+    "tests/team-service-picker-browser.cjs": "80e878d9789e558b982bf6a802fe144403681db70682c4f092c711a25b3c632a",
+    "tests/team-slow-publish-browser.cjs": "8c417e41e7ee36c9ac494703998f91202a448a7e2aa3a56673be05ab59982c37",
+    "server/tools/primary-rich.cjs": "f6c4bad9549d9a1aadc3611ba9ee7a26301fe7750ea7807bfcc3baeaac5fd6f1",
+    "server/tools/fixture-service.cjs": "2b4e4d73d3249e672239e85ee9eda2c7c09e6d9838ac9c76205c65435cb08112",
+    "tests/public-browser.cjs": "ec295f2b24005d1fd33720ddd55264471178bd26d310223639b308235c761af5"
+  },
+  "richPrimaryWorkload": {
+    "kind": "combined-rich-primary-actual-sdk-http",
+    "recordedAt": "2026-10-19T05:01:29.721Z",
+    "node": "v26.9.0",
+    "platform": "darwin",
+    "arch": "arm64",
+    "clients": 75,
+    "latencyDefinition": "Per-participant completion time within a phase, including paging, sequential guide reads, and SDK retries where applicable; not individual HTTP response latency.",
+    "cache": {
+      "cacheLimit": 0,
+      "maxCacheBytes": 0,
+      "fetch": "no-store"
+    },
+    "phases": [
+      {
+        "name": "independent-authenticated-sessions",
+        "participants": 75,
+        "completed": 75,
+        "uncompleted": 0,
+        "httpRequests": 75,
+        "retryAttempts": 0,
+        "imageRequests": 0,
+        "responseBytes": 12965,
+        "transportErrors": 0,
+        "statuses": {
+          "201": 75
+        },
+        "durationMs": 12.50958300000002,
+        "p50Ms": 6.73720800000001,
+        "p95Ms": 9.119584000000032,
+        "maxMs": 9.314584000000195,
+        "failures": []
+      },
+      {
+        "name": "exact-indexed-address-match",
+        "participants": 75,
+        "completed": 75,
+        "uncompleted": 0,
+        "httpRequests": 150,
+        "retryAttempts": 0,
+        "imageRequests": 0,
+        "responseBytes": 24195,
+        "transportErrors": 0,
+        "statuses": {
+          "200": 150
+        },
+        "durationMs": 18.89016599999991,
+        "p50Ms": 14.711750000000166,
+        "p95Ms": 17.6752919999999,
+        "maxMs": 17.71633299999985,
+        "failures": []
+      },
+      {
+        "name": "selective-search",
+        "participants": 75,
+        "completed": 75,
+        "uncompleted": 0,
+        "httpRequests": 75,
+        "retryAttempts": 0,
+        "imageRequests": 0,
+        "responseBytes": 21345,
+        "transportErrors": 0,
+        "statuses": {
+          "200": 75
+        },
+        "durationMs": 13.039832999999817,
+        "p50Ms": 6.8541660000000775,
+        "p95Ms": 11.233999999999924,
+        "maxMs": 11.592707999999902,
+        "failures": []
+      },
+      {
+        "name": "department-search-paging",
+        "participants": 75,
+        "completed": 75,
+        "uncompleted": 0,
+        "httpRequests": 375,
+        "retryAttempts": 0,
+        "imageRequests": 0,
+        "responseBytes": 1581755,
+        "transportErrors": 0,
+        "statuses": {
+          "200": 375
+        },
+        "durationMs": 113.16191600000002,
+        "p50Ms": 99.73079200000006,
+        "p95Ms": 109.21591699999999,
+        "maxMs": 113.15658299999996,
+        "failures": []
+      },
+      {
+        "name": "business-category-search-paging",
+        "participants": 75,
+        "completed": 75,
+        "uncompleted": 0,
+        "httpRequests": 300,
+        "retryAttempts": 0,
+        "imageRequests": 0,
+        "responseBytes": 540118,
+        "transportErrors": 0,
+        "statuses": {
+          "200": 300
+        },
+        "durationMs": 78.272917,
+        "p50Ms": 60.88995799999998,
+        "p95Ms": 72.89145800000006,
+        "maxMs": 77.96745899999996,
+        "failures": []
+      },
+      {
+        "name": "category-tree-paging",
+        "participants": 75,
+        "completed": 75,
+        "uncompleted": 0,
+        "httpRequests": 300,
+        "retryAttempts": 0,
+        "imageRequests": 0,
+        "responseBytes": 260025,
+        "transportErrors": 0,
+        "statuses": {
+          "200": 300
+        },
+        "durationMs": 18.871249999999918,
+        "p50Ms": 13.839166999999861,
+        "p95Ms": 17.862124999999878,
+        "maxMs": 18.126666999999998,
+        "failures": []
+      },
+      {
+        "name": "verified-text-and-selected-step-and-issue-images",
+        "participants": 75,
+        "completed": 75,
+        "uncompleted": 0,
+        "httpRequests": 225,
+        "retryAttempts": 0,
+        "imageRequests": 150,
+        "responseBytes": 4684597,
+        "transportErrors": 0,
+        "statuses": {
+          "200": 225
+        },
+        "durationMs": 177.13900000000012,
+        "p50Ms": 154.42883299999994,
+        "p95Ms": 166.2283749999997,
+        "maxMs": 176.969834,
+        "failures": []
+      },
+      {
+        "name": "all-500-full-guide-integrity-75-reader-burst",
+        "participants": 75,
+        "completed": 75,
+        "uncompleted": 0,
+        "httpRequests": 500,
+        "retryAttempts": 0,
+        "imageRequests": 0,
+        "responseBytes": 134430693,
+        "transportErrors": 0,
+        "statuses": {
+          "200": 500
+        },
+        "durationMs": 818.1237500000002,
+        "p50Ms": 730.0531669999996,
+        "p95Ms": 811.2997909999999,
+        "maxMs": 817.5029589999999,
+        "failures": []
+      },
+      {
+        "name": "rename-six-departments",
+        "participants": 6,
+        "completed": 6,
+        "uncompleted": 0,
+        "httpRequests": 6,
+        "retryAttempts": 0,
+        "imageRequests": 0,
+        "responseBytes": 886,
+        "transportErrors": 0,
+        "statuses": {
+          "200": 6
+        },
+        "durationMs": 2.4351670000000922,
+        "p50Ms": 1.6943750000000364,
+        "p95Ms": 2.0448749999995925,
+        "maxMs": 2.0448749999995925,
+        "failures": []
+      },
+      {
+        "name": "reassign-75-guide-business-categories",
+        "participants": 75,
+        "completed": 75,
+        "uncompleted": 0,
+        "httpRequests": 150,
+        "retryAttempts": 0,
+        "imageRequests": 0,
+        "responseBytes": 27892,
+        "transportErrors": 0,
+        "statuses": {
+          "200": 150
+        },
+        "durationMs": 21.442665999999917,
+        "p50Ms": 15.8134170000003,
+        "p95Ms": 19.98720800000001,
+        "maxMs": 21.116999999999734,
+        "failures": []
+      },
+      {
+        "name": "post-category-update-unchanged-canonical-guides",
+        "participants": 75,
+        "completed": 75,
+        "uncompleted": 0,
+        "httpRequests": 75,
+        "retryAttempts": 0,
+        "imageRequests": 0,
+        "responseBytes": 20094036,
+        "transportErrors": 0,
+        "statuses": {
+          "200": 75
+        },
+        "durationMs": 111.85433300000022,
+        "p50Ms": 58.20945900000015,
+        "p95Ms": 107.58629100000007,
+        "maxMs": 111.1505830000001,
+        "failures": []
+      }
+    ],
+    "limitations": [
+      "500 synthetic SOPs and a simultaneous 75-reader planning burst; 75 is not measured organization concurrency.",
+      "All 4,750 image references reuse ONE actual synthetic illustrated JPEG and deduplicate to one binary asset. These are not distinct physical screenshots.",
+      "Independent authenticated SDK readers and HTTP socket agents on one loopback host; not 75 devices, browser rendering, physical LAN, NAS, HTTPS, or old-hardware evidence.",
+      "Sockets warm in batches of 25; measured read phases burst all 75 readers. Cold socket acceptance is covered by the separate scale fixture.",
+      "Response bytes count received HTTP bodies, including rejected admission attempts; request headers and TCP overhead are excluded.",
+      "Production admission, rate, body, and timeout limits are unchanged. Only the real SDK bounded authenticated-read retries are allowed.",
+      "Category rename and assignment writes are explicitly performed once, with no mutation retry."
+    ],
+    "seedMs": 1662.207208,
+    "dataset": {
+      "guides": 500,
+      "steps": 3750,
+      "issues": 1000,
+      "minStepsPerGuide": 3,
+      "maxStepsPerGuide": 12,
+      "reportPoints": 500,
+      "approvalPoints": 500,
+      "departments": 6,
+      "categories": 24,
+      "businessSubcategories": 18,
+      "stepImageReferences": 3750,
+      "issueImageReferences": 1000,
+      "uniqueImageHashes": 1,
+      "uniqueAssetBytes": 20732,
+      "jpegFileSha256": "64354cfd313df5fe538e3dfd380739ef16790e75657d15c9e441d31d16df18e7",
+      "imageDataUrlSha256": "384c5dfb7226fd242fccda5c4e8ea234ba80444e5cec95e9954e5e71c4a97f51",
+      "minGuideBytes": 141143,
+      "maxGuideBytes": 396461,
+      "totalGuideBytes": 134357193,
+      "serviceSchemaVersion": 6,
+      "departmentCounts": [
+        {
+          "id": "finance",
+          "name": "Finance",
+          "guides": 84
+        },
+        {
+          "id": "people",
+          "name": "Human Resources",
+          "guides": 84
+        },
+        {
+          "id": "procurement",
+          "name": "Procurement",
+          "guides": 83
+        },
+        {
+          "id": "sales",
+          "name": "Sales",
+          "guides": 83
+        },
+        {
+          "id": "support",
+          "name": "Customer Support",
+          "guides": 83
+        },
+        {
+          "id": "it",
+          "name": "Information Technology",
+          "guides": 83
+        }
+      ]
+    },
+    "queryPlans": {
+      "match": [
+        {
+          "id": 2,
+          "parent": 0,
+          "notused": 56,
+          "detail": "SEARCH matches USING COVERING INDEX sqlite_autoindex_matches_1 (matchKey=?)"
+        }
+      ],
+      "category": [
+        {
+          "id": 4,
+          "parent": 0,
+          "notused": 55,
+          "detail": "SEARCH workflows USING COVERING INDEX workflow_category (category=?)"
+        }
+      ],
+      "search": [
+        {
+          "id": 3,
+          "parent": 0,
+          "notused": 156,
+          "detail": "SCAN title_search VIRTUAL TABLE INDEX 0:M2"
+        },
+        {
+          "id": 8,
+          "parent": 0,
+          "notused": 44,
+          "detail": "SEARCH w USING COVERING INDEX sqlite_autoindex_workflows_1 (id=?)"
+        }
+      ]
+    },
+    "manifestSha256": "d55aaedc001b1edaadd14be53369cfa803921df9cdace98dd149c0344b2f12ca",
+    "independentAuthenticatedActors": 75,
+    "fullGuideCoverage": 500,
+    "server": {
+      "stats": true,
+      "connections": 75,
+      "peakConnections": 75,
+      "getCalls": 650,
+      "revisionsUnchanged": true,
+      "categoryUpdates": 6,
+      "assignments": 575,
+      "memory": {
+        "rss": 238616576,
+        "heapTotal": 63225856,
+        "heapUsed": 14858168,
+        "external": 23375404,
+        "arrayBuffers": 340755
+      }
+    },
+    "totalFullGuideVerifications": 575,
+    "uncompleted": 0,
+    "unexpectedFailures": 0,
+    "success": true,
+    "cleanup": {
+      "socketsDestroyed": true,
+      "childStopped": true,
+      "temporaryDatabaseRemoved": true
+    }
+  },
+  "constrainedBrowsers": {
+    "chrome116": {
+      "cases": 2,
+      "slowPublication": [
+        {
+          "maximal": false,
+          "guideBytes": 726243,
+          "requestBytes": 726338,
+          "elapsedMs": 22573.916667,
+          "outcome": "verified publication",
+          "revision": 3,
+          "attempts": 1,
+          "pendingCleared": true
+        }
+      ],
+      "heapAndCpu": [
+        {
+          "simulation": "V8 old-space ceiling and CDP CPU throttle; not physical hardware or total machine RAM",
+          "initial": {
+            "browser": "Chrome/116.0.5845.96",
+            "cpuThrottleRate": 4,
+            "requestedOldSpaceMiB": 128,
+            "heapLimitBytes": 159383552,
+            "usedSize": 3690392,
+            "totalSize": 6356992
+          },
+          "final": {
+            "browser": "Chrome/116.0.5845.96",
+            "cpuThrottleRate": 4,
+            "requestedOldSpaceMiB": 128,
+            "heapLimitBytes": 159383552,
+            "usedSize": 8351432,
+            "totalSize": 11288576
+          }
+        },
+        {
+          "simulation": "V8 old-space ceiling and CDP CPU throttle; not physical hardware or total machine RAM",
+          "initial": {
+            "browser": "Chrome/116.0.5845.96",
+            "cpuThrottleRate": 4,
+            "requestedOldSpaceMiB": 128,
+            "heapLimitBytes": 159383552,
+            "usedSize": 3588020,
+            "totalSize": 6094848
+          },
+          "final": {
+            "browser": "Chrome/116.0.5845.96",
+            "cpuThrottleRate": 4,
+            "requestedOldSpaceMiB": 128,
+            "heapLimitBytes": 159383552,
+            "usedSize": 14388980,
+            "totalSize": 22675456
+          }
+        }
+      ]
+    },
+    "current": {
+      "cases": 2,
+      "slowPublication": [
+        {
+          "maximal": false,
+          "guideBytes": 726243,
+          "requestBytes": 726338,
+          "elapsedMs": 22473.3775,
+          "outcome": "verified publication",
+          "revision": 3,
+          "attempts": 1,
+          "pendingCleared": true
+        }
+      ],
+      "heapAndCpu": [
+        {
+          "simulation": "V8 old-space ceiling and CDP CPU throttle; not physical hardware or total machine RAM",
+          "initial": {
+            "browser": "Chrome/151.0.7922.34",
+            "cpuThrottleRate": 4,
+            "requestedOldSpaceMiB": 128,
+            "heapLimitBytes": 234881024,
+            "usedSize": 3069088,
+            "totalSize": 7143424,
+            "embedderHeapUsedSize": 4231744,
+            "backingStorageSize": 752683
+          },
+          "final": {
+            "browser": "Chrome/151.0.7922.34",
+            "cpuThrottleRate": 4,
+            "requestedOldSpaceMiB": 128,
+            "heapLimitBytes": 234881024,
+            "usedSize": 15121028,
+            "totalSize": 29245440,
+            "embedderHeapUsedSize": 3335360,
+            "backingStorageSize": 4092384
+          }
+        },
+        {
+          "simulation": "V8 old-space ceiling and CDP CPU throttle; not physical hardware or total machine RAM",
+          "initial": {
+            "browser": "Chrome/151.0.7922.34",
+            "cpuThrottleRate": 4,
+            "requestedOldSpaceMiB": 128,
+            "heapLimitBytes": 234881024,
+            "usedSize": 3335080,
+            "totalSize": 7143424,
+            "embedderHeapUsedSize": 4228104,
+            "backingStorageSize": 1021939
+          },
+          "final": {
+            "browser": "Chrome/151.0.7922.34",
+            "cpuThrottleRate": 4,
+            "requestedOldSpaceMiB": 128,
+            "heapLimitBytes": 234881024,
+            "usedSize": 24102112,
+            "totalSize": 32882688,
+            "embedderHeapUsedSize": 2362592,
+            "backingStorageSize": 6271823
+          }
+        }
+      ]
+    }
+  },
+  "constrainedServer": {
+    "kind": "isolated-local-http-load-test",
+    "node": "v26.9.0",
+    "platform": "darwin",
+    "arch": "arm64",
+    "cpuModel": "Apple M4",
+    "cpus": 10,
+    "totalMemory": 17179869184,
+    "sops": 500,
+    "clients": 75,
+    "socketPool": 75,
+    "phases": [
+      {
+        "name": "join",
+        "requests": 75,
+        "concurrency": 75,
+        "durationMs": 13.724582999999996,
+        "p50Ms": 8.473749999999995,
+        "p95Ms": 12.347915999999998,
+        "maxMs": 12.678416999999996,
+        "responseBytes": 12750
+      },
+      {
+        "name": "indexed-match",
+        "requests": 75,
+        "concurrency": 75,
+        "durationMs": 4.738917000000015,
+        "p50Ms": 2.6835000000000093,
+        "p95Ms": 3.6978750000000105,
+        "maxMs": 3.8249160000000018,
+        "responseBytes": 18975
+      },
+      {
+        "name": "read",
+        "requests": 75,
+        "concurrency": 75,
+        "durationMs": 5.905957999999998,
+        "p50Ms": 3.4274999999999807,
+        "p95Ms": 5.190832999999998,
+        "maxMs": 5.317958000000004,
+        "responseBytes": 37415
+      },
+      {
+        "name": "paged-list",
+        "requests": 75,
+        "concurrency": 75,
+        "durationMs": 10.21270800000002,
+        "p50Ms": 5.514791000000002,
+        "p95Ms": 8.732416,
+        "maxMs": 9.093874999999997,
+        "responseBytes": 811875
+      },
+      {
+        "name": "deep-paged-list",
+        "requests": 75,
+        "concurrency": 75,
+        "durationMs": 10.222249999999974,
+        "p50Ms": 5.26233400000001,
+        "p95Ms": 9.22316699999999,
+        "maxMs": 9.62504199999998,
+        "responseBytes": 811875
+      },
+      {
+        "name": "selective-search",
+        "requests": 75,
+        "concurrency": 75,
+        "durationMs": 7.828833000000003,
+        "p50Ms": 4.822665999999998,
+        "p95Ms": 6.8117909999999995,
+        "maxMs": 6.92987500000001,
+        "responseBytes": 18825
+      },
+      {
+        "name": "broad-chinese-search",
+        "requests": 75,
+        "concurrency": 75,
+        "durationMs": 32.88816700000001,
+        "p50Ms": 16.70233300000001,
+        "p95Ms": 30.897875,
+        "maxMs": 32.18341699999999,
+        "responseBytes": 328125
+      },
+      {
+        "name": "contested-lock",
+        "requests": 75,
+        "concurrency": 75,
+        "durationMs": 4.905332999999985,
+        "p50Ms": 2.8812910000000045,
+        "p95Ms": 4.126249999999999,
+        "maxMs": 4.226832999999999,
+        "responseBytes": 5199
+      },
+      {
+        "name": "independent-locks",
+        "requests": 75,
+        "concurrency": 75,
+        "durationMs": 9.248291999999992,
+        "p50Ms": 4.6871249999999804,
+        "p95Ms": 8.291249999999991,
+        "maxMs": 8.595957999999996,
+        "responseBytes": 18075
+      },
+      {
+        "name": "publish",
+        "requests": 75,
+        "concurrency": 75,
+        "durationMs": 28.29554200000001,
+        "p50Ms": 19.02362499999998,
+        "p95Ms": 26.867208000000005,
+        "maxMs": 27.480707999999993,
+        "responseBytes": 36515
+      }
+    ],
+    "limitations": [
+      "Synthetic one-step documents; not 200,000 image-heavy production SOPs.",
+      "Loopback VM/process tests do not establish physical LAN latency or old-hardware performance."
+    ],
+    "serviceSchemaVersion": 6,
+    "seedMs": 21.116374999999998,
+    "queryPlans": {
+      "match": [
+        {
+          "id": 2,
+          "parent": 0,
+          "notused": 56,
+          "detail": "SEARCH matches USING COVERING INDEX sqlite_autoindex_matches_1 (matchKey=?)"
+        }
+      ],
+      "list": [
+        {
+          "id": 4,
+          "parent": 0,
+          "notused": 211,
+          "detail": "SCAN workflows USING COVERING INDEX workflow_listing"
+        }
+      ],
+      "search": [
+        {
+          "id": 3,
+          "parent": 0,
+          "notused": 156,
+          "detail": "SCAN title_search VIRTUAL TABLE INDEX 0:M2"
+        },
+        {
+          "id": 8,
+          "parent": 0,
+          "notused": 44,
+          "detail": "SEARCH w USING COVERING INDEX sqlite_autoindex_workflows_1 (id=?)"
+        }
+      ]
+    },
+    "databaseBytes": 753664,
+    "connectionStartup": "gradual batches of 32",
+    "sustained": {
+      "requests": 1500,
+      "requestsPerActor": 20,
+      "durationMs": 70.33683399999995,
+      "p95Ms": 6.2935829999999555,
+      "maxMs": 11.521166999999991
+    },
+    "server": {
+      "stats": true,
+      "memory": {
+        "rss": 68534272,
+        "heapTotal": 14565376,
+        "heapUsed": 9437776,
+        "external": 2587270,
+        "arrayBuffers": 277174
+      },
+      "heapLimitBytes": 234881024,
+      "connections": 75,
+      "peakConnections": 75
+    },
+    "unexpectedFailures": 0,
+    "initialLatencyTargetMet": true,
+    "requiresOptimization": []
+  },
+  "limitations": [
+    "75 concurrent readers is a planning assumption, not measured organization concurrency.",
+    "Rich fixture reuses one real synthetic JPEG across 4750 image references; distinct-image volume is exercised separately.",
+    "V8 old-space and CDP CPU throttling simulate constraints, not physical old computers or total machine RAM.",
+    "Trusted HTTPS, real two-device NAS/SMB and native permission acceptance, and team statistics remain explicitly deferred by the user.",
+    "No Google certification, universal hardware guarantee or replacement of the submitted public package is implied."
+  ],
+  "crossPlatformFinding": {
+    "run": "https://github.com/monsterkahn/RunningSOP/actions/runs/39184422081",
+    "commit": "c39b084cf0c05c44a54119a71be50494228bd763",
+    "result": "12 verification jobs succeeded; macOS team-browser job had 28 passes and one language initialization timeout; release skipped. This run is NOT all-green evidence.",
+    "fix": "The applied language emits a document event; team settings and saved-address captions repaint without network access or connection changes. A held preference read forces the original failure; old runtime fails and corrected runtime passes on Chrome116 and current Chromium. Seven manual language choices are checked too."
+  },
+  "packaging": {
+    "archives": [
+      {
+        "name": "running-sop-extension-v1.2.0.zip",
+        "sha256": "8bb53941dc51c0d299d2b4842dbbede6a9c480ceb2a02262c52d06ce08dc949d"
+      },
+      {
+        "name": "running-sop-github-v1.2.0.zip",
+        "sha256": "a70cd11c81b38f294100d7b94e72bbce9ed450fcb28138ea51536b9e27cee8cc"
+      },
+      {
+        "name": "running-sop-team-service-v1.2.0-experimental.zip",
+        "sha256": "47f16fb04245138369e3fe6caad9bbf400bdde33ddd702390e57ded5b9cb2b5f"
+      },
+      {
+        "name": "running-sop-webstore-v1.2.0.zip",
+        "sha256": "1aa4ad52dfca20192d6d63412ca730be86b7cac45b99ef464fac0377b1937281"
+      }
+    ],
+    "runtimeEntriesByteEqual": 66
+  },
+  "currentLocalChecks": {
+    "core": 180,
+    "teamCurrent": 29,
+    "teamChrome116": 29,
+    "extractedPackageOriginalPlusPickerCurrent": 7,
+    "extractedPackageOriginalPlusPickerChrome116": 7,
+    "negativeRegression": "Old three-file settings runtime reproduces the held-preference-read timeout; corrected runtime passes without increasing deadlines.",
+    "extractedPackageOriginalReleaseCurrent": 10,
+    "extractedPackageOriginalReleaseChrome116": 10
+  },
+  "browserHarnessFinding": "A Chrome116 guided-recording fixture navigated while real install onboarding was still opening, interrupting the workspace navigation. The fixture now requires the genuine settings page to appear and finish DOMContentLoaded before opening work tabs; it does not disable or mock onboarding."
+}

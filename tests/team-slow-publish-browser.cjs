@@ -3,12 +3,13 @@ const {test}=require('node:test'),assert=require('node:assert/strict'),fs=requir
 const {chromium}=require(process.env.RUNTIME_SOP_PLAYWRIGHT||'playwright');
 const {TeamStore}=require('../server/store.cjs'),{createTeamServer}=require('../server/app.cjs');
 const extension=process.env.RUNTIME_SOP_EXTENSION||path.resolve(__dirname,'../extension');
+const constrained=process.env.RUNTIME_SOP_CONSTRAINED==='1';
 const pause=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 async function fixture(run){
  const maximal=process.env.RUNTIME_SOP_MAX_TRANSFER==='1';
  const directory=fs.mkdtempSync(path.join(os.tmpdir(),'sop-slow-publish-'));let context,store,server;
  try{
-  context=await chromium.launchPersistentContext(path.join(directory,'profile'),{channel:'chromium',headless:!process.env.RUNTIME_SOP_CHROME,...(process.env.RUNTIME_SOP_CHROME?{executablePath:process.env.RUNTIME_SOP_CHROME}:{}),args:[...(process.env.RUNTIME_SOP_CHROME?['--headless=new']:[]),`--disable-extensions-except=${extension}`,`--load-extension=${extension}`,'--no-first-run','--no-default-browser-check']});
+  context=await chromium.launchPersistentContext(path.join(directory,'profile'),{channel:'chromium',headless:!process.env.RUNTIME_SOP_CHROME,...(process.env.RUNTIME_SOP_CHROME?{executablePath:process.env.RUNTIME_SOP_CHROME}:{}),args:[...(constrained?['--js-flags=--max-old-space-size=128']:[]),...(process.env.RUNTIME_SOP_CHROME?['--headless=new']:[]),`--disable-extensions-except=${extension}`,`--load-extension=${extension}`,'--no-first-run','--no-default-browser-check']});
   const worker=context.serviceWorkers()[0]||await context.waitForEvent('serviceworker'),origin='chrome-extension://'+new URL(worker.url()).host;
   store=new TeamStore({dbPath:path.join(directory,'library.sqlite')});const actor=store.createSession({displayName:'Synthetic seed'}).actor;
   const image='data:image/jpeg;base64,'+fs.readFileSync(path.resolve(__dirname,'../examples/illustrations/demo-step.jpg')).toString('base64');
@@ -33,8 +34,14 @@ async function fixture(run){
   const page=await context.newPage();await page.setViewportSize({width:1100,height:700});
   await page.addInitScript(()=>{window.syntheticTab={id:12345,url:'https://work.example.test/work',title:'Synthetic work'};chrome.tabs.query=async()=>[window.syntheticTab];});
   const writes=[];page.on('request',request=>{if(request.url()===endpoint+'/v1/sops/images-a'&&request.method()==='PUT')writes.push({key:request.headers()['idempotency-key'],bytes:Buffer.byteLength(request.postData()||'')});});
+  let resourceSession;
+  if(constrained){resourceSession=await context.newCDPSession(page);await resourceSession.send('Emulation.setCPUThrottlingRate',{rate:4});}
   await page.goto(origin+'/workspace.html');await page.waitForFunction(()=>document.documentElement.dataset.workspaceReady==='true');
+  const resourceSnapshot=async()=>({browser:(await resourceSession.send('Browser.getVersion')).product,cpuThrottleRate:4,requestedOldSpaceMiB:128,heapLimitBytes:await page.evaluate(()=>performance.memory?.jsHeapSizeLimit??null),...await resourceSession.send('Runtime.getHeapUsage')});
+  const initialResources=constrained?await resourceSnapshot():undefined;
+  if(constrained){assert.ok(initialResources.heapLimitBytes>0&&initialResources.heapLimitBytes<256*1024*1024,'The browser must expose a reduced V8 heap limit');}
   await run({context,page,writes,store,image,endpoint});
+  if(constrained){console.log('CONSTRAINED_BROWSER_EVIDENCE '+JSON.stringify({simulation:'V8 old-space ceiling and CDP CPU throttle; not physical hardware or total machine RAM',initial:initialResources,final:await resourceSnapshot()}));await resourceSession.detach();}
  }finally{if(context)await context.close();if(server){server.closeAllConnections();await new Promise(resolve=>server.close(resolve));}if(store)store.close();fs.rmSync(directory,{recursive:true,force:true});}
 }
 const drafts=page=>page.evaluate(async()=>(await chrome.runtime.sendMessage({type:'recorder-get'})).data.drafts);
