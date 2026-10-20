@@ -6,11 +6,11 @@
 
 ![Running SOP: Clear steps. Right where you work.](docs/assets/running-sop-social-preview.png)
 
-**Release: v1.3.3** · [Download](https://github.com/monsterkahn/RunningSOP/releases/latest)
+**Release: v1.3.4** · [Download](https://github.com/monsterkahn/RunningSOP/releases/latest)
 
 Create step-by-step guides with screenshots, follow them beside your work, and share SOPs through a folder you choose.
 
-Version **1.3.3** adds retained-version reading and an SOP overview, clearer screenshot editing, and a safer publication flow. Cleared steps are skipped and the remaining steps are numbered consecutively; an entirely empty SOP cannot be published. Verified publication removes the corresponding unchanged local draft and opens the published steps directly. Other drafts, failed or uncertain writes, and newer concurrent edits are preserved. The previous v1.2.0 release assets remain available. This GitHub release does not submit or replace a Chrome Web Store package. See [Version history](docs/VERSION-HISTORY.md) and [Release review](docs/RELEASE-REVIEW-1.3.3.md).
+Version **1.3.4** adds folder category management in Settings and the SOP overview: create or rename categories, change their icons and colors, and assign SOPs without rewriting their content. Folder write permission governs category changes; this does not add administrator roles. The overview can show verified cached content during a folder outage, with a visible stale-copy notice and an explicit reconnect action. Damaged older connection settings can be replaced by selecting a valid folder. Previous published assets remain available. This GitHub distribution does not submit or replace a Chrome Web Store package. See [Storage](docs/STORAGE.md) and [Release review](docs/RELEASE-REVIEW-1.3.4.md).
 
 ## What it does
 
@@ -78,11 +78,11 @@ GitHub explanatory documentation and public release notes are maintained in Engl
 
 - [Privacy](PRIVACY.md): processed data, storage and sharing boundaries.
 - [Security](SECURITY.md): trust boundaries and private vulnerability reporting.
-- [Release review](docs/RELEASE-REVIEW-1.3.3.md): actual test results and limitations.
+- [Release review](docs/RELEASE-REVIEW-1.3.4.md): actual test results and limitations.
 - [Chrome Web Store metadata](CHROMEWEBSTORE.md): permissions and disclosure preparation.
 - [Release checklist](docs/RELEASE-CHECKLIST.md): build, package and manual acceptance checks.
 
-The v1.3.3 release review records current core, service, browser and package verification. Native operating-system authorization, physical two-device NAS/HTTPS acceptance and team statistics remain user-deferred; automated results do not establish that these checks passed or that Google approved the extension.
+The v1.3.4 release review records current core, service, browser and package verification. Native operating-system authorization, physical two-device NAS/HTTPS acceptance and team statistics remain user-deferred; automated results do not establish that these checks passed or that Google approved the extension.
 
 ## Development
 

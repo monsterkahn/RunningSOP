@@ -1,12 +1,12 @@
 # Chrome Web Store Listing — Running SOP
 
-> Last updated: 2026-10-20. Current GitHub distribution: v1.3.3. This document is preparation material, not a Chrome Web Store submission or approval.
+> Last updated: 2026-10-20. Current GitHub distribution: v1.3.4. This document is preparation material, not a Chrome Web Store submission or approval.
 
-Version 1.3.3 includes read-only retained-version viewing and the Settings SOP overview. Publication skips cleared empty steps, renumbers retained steps, rejects empty SOPs, deletes only the corresponding unchanged draft after verified publication and opens the exact published reader. Failed or uncertain writes preserve the draft.
+Version 1.3.4 adds folder category management in Settings and the SOP overview, including icons, colors and per-SOP assignment. It also adds verified-cache overview recovery, an explicit reconnect action and recovery from malformed old connection settings. Existing publication, retained-history and privacy behavior is preserved.
 
 The screenshot editor uses bundled SVG icons with localized accessible names and hover hints. Zoom, annotation and undo/clear groups have vertical separators and extra spacing. Save notes and Exit replace the previous cancel/save/close layout; Exit discards unsaved marks. Rounded boxes and numbered marks support drag/keyboard adjustment, and version-bound step feedback stays local. PayPal account details expand on demand beside two inactive coffee placeholders. Fresh installations do not connect or synchronize automatically, and permissions remain unchanged.
 
-The current verification record is docs/RELEASE-REVIEW-1.3.3.md. Use the newly generated v1.3.3 images for store preparation; no existing store listing or package is submitted or replaced by this GitHub release. Native permissions, physical two-device storage and HTTPS acceptance remain deferred.
+The current verification record is docs/RELEASE-REVIEW-1.3.4.md. Use the newly generated v1.3.4 images for store preparation; no existing store listing or package is submitted or replaced by this GitHub release. Native permissions, physical two-device storage and HTTPS acceptance remain deferred.
 
 ## Store listing
 

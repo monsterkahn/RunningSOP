@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.3.4 · 2026-10-20 — GitHub distribution
+
+- Manage folder categories from Settings or the SOP overview: create, rename, nest and delete empty categories, choose icons and colors, and assign or clear SOP categories.
+- Keep category metadata separate from SOP bodies, with explicit write permission, revisioned backups, conflict detection, verified writes and source guards. No administrator role or distributed lock is added.
+- Read verified cached current SOPs during folder outages, with a stale-copy notice. Reconnect explicitly from the overview and inspect read-error details.
+- Recover malformed older connection settings after explicit folder selection; choosing a folder does not enable background polling.
+- Retain Chrome 116, Manifest V3, existing permissions and privacy boundaries. Native permissions, physical two-device/HTTPS acceptance and team statistics remain deferred.
+
 ## 1.3.3 · 2026-10-20 — GitHub distribution
 
 - Omit cleared or untouched empty steps when publishing, and number the remaining steps consecutively. Refuse publication if every step is empty; partially completed steps still require valid instructions.

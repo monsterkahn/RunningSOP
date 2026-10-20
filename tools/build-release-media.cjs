@@ -104,6 +104,12 @@ async function main() {
   await annotation.goto(origin+'/screenshot-viewer.html?token='+annotationToken+'&mode=edit');
   await annotation.waitForFunction(()=>document.querySelector('#picture').naturalWidth>0&&document.querySelector('#save').textContent==='Save notes'&&document.querySelector('#close-viewer').textContent==='Exit'&&document.querySelectorAll('.tool-group').length===3&&!document.querySelector('#edit-tools').hidden);
   await annotation.screenshot({path:path.join(out,'06-screenshot-editor.png')});
+  await setup.evaluate(()=>{window.showDirectoryPicker=async()=>await(await navigator.storage.getDirectory()).getDirectoryHandle('Synthetic release categories',{create:true});});
+  await setup.locator('#choose-sop-folder').click();await setup.waitForFunction(()=>!document.querySelector('#category-settings').disabled);
+  await setup.locator('#category-settings').click();await setup.locator('#category-name').fill('Operations');await setup.locator('#category-color').selectOption('purple');await setup.locator('#category-icon').selectOption('briefcase');
+  await setup.locator('#category-form button[type=submit]').click();await setup.waitForFunction(()=>document.querySelector('#category-status').textContent==='Saved.');
+  await setup.screenshot({path:path.join(out,'07-category-settings.png')});await setup.locator('#category-close').click();
+
   const composePage=await context.newPage();
   await compose(composePage,'01-read-guide.png',1280,800,'Keep the instructions in view.','Read published steps, check the details and enlarge screenshots when you need them.',readView,'');
   await compose(composePage,'02-record-and-edit.png',1280,800,'Build one clear step at a time.','Add instructions and screenshots. Next step saves your changes; publish after reviewing the result.',editorShot,'');
@@ -112,7 +118,7 @@ async function main() {
   await compose(composePage,'social-1280x640.png',1280,640,'Record it once. Follow it step by step.','Screenshots and clear instructions keep routine work easier to repeat.',libraryShot,'social');
   await compose(composePage,'promo-440x280.png',440,280,'Clear steps. Better handoffs.','Record once. Follow alongside your work.',readView,'mini');
   fs.copyFileSync(icon,path.join(out,'icon-128.png'));
-  write('README.txt',`Running SOP v${version} introduction media\n\nScreens show actual extension pages populated with synthetic examples. Team library content and settings are opt-in experimental features. No production SOPs, browser profiles, or real services are included.\n\nFiles: 01-read-guide.png, 02-record-and-edit.png, 03-team-library-history.png, 04-optional-folder-settings.png, 05-select-team-service.png, 06-screenshot-editor.png, introduction-1280x800.png, promo-1400x560.png, promo-440x280.png, social-1280x640.png, icon-128.png.\n`);
+  write('README.txt',`Running SOP v${version} introduction media\n\nScreens show actual extension pages populated with synthetic examples. Team library content and settings are opt-in experimental features. No production SOPs, browser profiles, or real services are included.\n\nFiles: 01-read-guide.png, 02-record-and-edit.png, 03-team-library-history.png, 04-optional-folder-settings.png, 05-select-team-service.png, 06-screenshot-editor.png, 07-category-settings.png, introduction-1280x800.png, promo-1400x560.png, promo-440x280.png, social-1280x640.png, icon-128.png.\n`);
   const files=fs.readdirSync(out).filter(name=>name!=='SHA256SUMS.txt').sort();
   const sums=files.map(name=>`${crypto.createHash('sha256').update(fs.readFileSync(path.join(out,name))).digest('hex')}  ${name}`).join('\n')+'\n';
   write('SHA256SUMS.txt',sums);
@@ -120,7 +126,7 @@ async function main() {
   const zip=path.join(root,'dist',mediaArchive);
   fs.rmSync(zip,{force:true});archiver.execFileSync('zip',['-q','-r',zip,mediaDirectory],{cwd:path.join(root,'dist')});
   fs.writeFileSync(zip+'.sha256',crypto.createHash('sha256').update(fs.readFileSync(zip)).digest('hex')+`  ${mediaArchive}\n`);
-  console.log(JSON.stringify({out,zip,files:[...files,'SHA256SUMS.txt'],dimensions:{'01-read-guide.png':'1280x800','02-record-and-edit.png':'1280x800','03-team-library-history.png':'1280x800','04-optional-folder-settings.png':'1280x800','05-select-team-service.png':'1280x800','06-screenshot-editor.png':'1280x800','introduction-1280x800.png':'1280x800','promo-1400x560.png':'1400x560','promo-440x280.png':'440x280','social-1280x640.png':'1280x640'}},null,2));
+  console.log(JSON.stringify({out,zip,files:[...files,'SHA256SUMS.txt'],dimensions:{'01-read-guide.png':'1280x800','02-record-and-edit.png':'1280x800','03-team-library-history.png':'1280x800','04-optional-folder-settings.png':'1280x800','05-select-team-service.png':'1280x800','06-screenshot-editor.png':'1280x800','07-category-settings.png':'1280x800','introduction-1280x800.png':'1280x800','promo-1400x560.png':'1400x560','promo-440x280.png':'440x280','social-1280x640.png':'1280x640'}},null,2));
 }
 
 main().catch(error=>{console.error(error);process.exitCode=1;}).finally(async()=>{if(context)await context.close();if(server){server.closeAllConnections();await new Promise(resolve=>server.close(resolve));}if(store)store.close();fs.rmSync(scratch,{recursive:true,force:true});});

@@ -62,7 +62,10 @@ if(typeof document!=='undefined')root.SOPIcons?.apply(document);
       const selected=await picking;
       // Preserve a previously enabled schedule; choosing a new library alone
       // performs one check and does not opt the user into background polling.
-      const previous=(await root.CatalogSync.info()).settings;
+      let previous=null;
+      // Explicit folder selection must also recover malformed older settings.
+      // An unreadable setting is not evidence that polling was enabled.
+      try{previous=(await root.CatalogSync.info()).settings;}catch(_){}
       await send('catalog-configure',{endpoint:selected.endpoint,enabled:previous?.enabled===true});
       const checked=await send('catalog-check');
       if(['offline','error','blocked'].includes(checked.status?.state))throw Error(checked.status.message||tr('暂时无法读取'));

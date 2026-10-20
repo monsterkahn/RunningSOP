@@ -218,7 +218,9 @@
     if(inFlight)await inFlight;
     await withCacheLock(async()=>{
       if(!(await sourceMatches(endpoint)))throw Error('存储器目录与已选择的文件夹不匹配，请重新选择。');
-      const previous=await getSettings();
+      let previous={endpoint:''};
+      // A validated, explicitly selected source can replace malformed old settings.
+      try{previous=await getSettings();}catch(_){}
       await chrome.storage.local.set({[SETTINGS]:{enabled:value.enabled!==false,endpoint}});
       if(previous.endpoint!==endpoint){await chrome.storage.local.remove([CACHE,STATUS]);validatedMemo=null;}
     });

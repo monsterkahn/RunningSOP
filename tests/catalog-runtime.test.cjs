@@ -58,6 +58,30 @@ function routesFor(endpoint,packed){
   return routes;
 }
 
+test('explicit configuration replaces malformed old settings and clears their cache without enabling polling',async()=>{
+ const packed=await pack(),app=boot(routesFor(ENDPOINT_A,packed),{endpoint:'broken-old-endpoint',enabled:true},{
+  'runtime-sop-catalog-cache-v1':{endpoint:'broken-old-endpoint',rawCatalog:'stale'},
+  'runtime-sop-catalog-status-v1':{state:'ready'}
+ });
+ const result=await app.message('catalog-configure',{endpoint:ENDPOINT_A,enabled:false});
+ assert.equal(result.status.state,'disabled');
+ assert.deepEqual({...await app.context.CatalogSync.getSettings()},{endpoint:ENDPOINT_A,enabled:false});
+ assert.equal(app.data[app.context.CatalogSync.CACHE],undefined);
+ assert.equal(app.alarmsCreated.length,0);
+ assert.equal(app.fetches[ENDPOINT_A],undefined);
+ assert.equal((await app.message('catalog-check')).status.state,'ready');
+ assert.equal((await app.context.CatalogSync.loadCatalog()).workflows[0].id,packed.workflow.id);
+});
+
+test('malformed old settings do not bypass the selected directory identity check',async()=>{
+ const settings={endpoint:'broken-old-endpoint',enabled:true},app=boot({},settings),endpoint='sop-directory://00000000-0000-4000-8000-000000000001/catalog.json';
+ app.context.SOPStorageSource={validateEndpoint:value=>value,info:async()=>({selected:true,endpoint:endpoint.replace('000001','000002')})};
+ const result=await app.message('catalog-configure',{endpoint,enabled:false});
+ assert.match(result.error,/不匹配/);
+ assert.deepEqual(app.data[app.context.CatalogSync.SETTINGS],settings);
+ assert.equal(app.alarmsCreated.length,0);
+});
+
 test('catalog check reads only directory and requested workflow is loaded on demand',async()=>{
  const good=await pack(),routes=routesFor(ENDPOINT_A,good),app=boot(routes);
  await app.message('catalog-check');

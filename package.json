@@ -1,6 +1,6 @@
 {
   "name": "runtime-sop",
-  "version": "1.3.3",
+  "version": "1.3.4",
   "private": true,
   "description": "Local-first Chrome workflow recorder and shared SOP reader",
   "author": {
@@ -31,7 +31,7 @@
     "build:team-service": "node tools/build-team-service.cjs",
     "build:release-media": "node tools/build-release-media.cjs",
     "build:release": "npm run build && npm run build:team-service && npm run build:release-media && node tools/release-checksums.cjs",
-    "test:history-browser": "node --test --test-concurrency=1 tests/library-history-browser.cjs tests/workspace-history-browser.cjs",
+    "test:history-browser": "node --test --test-concurrency=1 tests/library-history-browser.cjs tests/options-categories-browser.cjs tests/library-categories-browser.cjs tests/library-recovery-browser.cjs tests/workspace-history-browser.cjs",
     "test:interaction-browser": "node --test --test-concurrency=1 tests/annotation-editing-browser.cjs tests/step-feedback-browser.cjs tests/publish-reading-browser.cjs"
   },
   "devDependencies": {

@@ -23,6 +23,8 @@ Shared content may include:
 
 Publishing is explicitly triggered by the user. If automatic catalog checks were enabled, the extension reads the catalog every minute while the browser is running. After a statistics folder is connected and sync is enabled, view counts and ratings are written automatically. Disabling automatic catalog checks or statistics sync stops subsequent background activity but does not delete previously shared data. The current settings no longer expose these switches; upgrades retain configurations explicitly enabled in earlier versions. Selecting a folder performs one check without enabling background activity by default.
 
+Settings and the folder SOP overview provide **Category settings** to create or rename categories, choose their parent, icon and color, and delete empty categories. Each published SOP row has **Assign category**, including an Uncategorized choice. These controls require a live, explicitly selected directory and valid category data. Saving requests write permission only from the user action, and edits are shared by users of that folder. Folder filesystem permissions govern access; these controls do not add owner roles. Other overview tabs read the updated categories on refresh.
+
 Saving categories validates the data, backs up existing category metadata, checks for revision conflicts, and reads the written file back for verification. It does not rewrite workflow content. Revision-based optimistic conflict detection across devices is not a cross-device transaction lock.
 
 ## Dashboard generation tool
