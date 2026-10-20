@@ -2,8 +2,8 @@
  'use strict';
  const labels={
   en:['Category settings','Assign category','New category','Category name','Parent category','Top level','Save','Delete empty category','Close','Saved.','Saving…','Choose a category','Uncategorized','Categories are shared with everyone using this folder. Saving requires folder write access.','Allow write access to save categories.','Refresh the overview before editing categories.','SOP','Category','Cancel','Save failed. Refresh before retrying.'],
-  zh:['归类设置','指定分类','新建分类','分类名称','上级分类','顶级分类','保存','删除空分类','关闭','已保存。','正在保存…','选择分类','未分类','分类由使用同一文件夹的人共享，保存时需要文件夹写入许可。','请允许写入文件夹后保存分类。','请刷新总表后再修改分类。','SOP','分类','取消','保存失败，请刷新后重试。'],
-  'zh-TW':['歸類設定','指定分類','新增分類','分類名稱','上層分類','頂層分類','儲存','刪除空分類','關閉','已儲存。','儲存中…','選擇分類','未分類','分類由使用同一資料夾的人共用，儲存時需要資料夾寫入許可。','請允許寫入資料夾後儲存分類。','請重新整理總表後再修改分類。','SOP','分類','取消','儲存失敗，請重新整理後重試。'],
+  zh:['分类设置','指定分类','新建分类','分类名称','上级分类','顶级分类','保存','删除空分类','关闭','已保存。','正在保存…','选择分类','未分类','分类由使用同一文件夹的人共享，保存时需要文件夹写入许可。','请允许写入文件夹后保存分类。','请刷新总表后再修改分类。','SOP','分类','取消','保存失败，请刷新后重试。'],
+  'zh-TW':['分類設定','指定分類','新增分類','分類名稱','上層分類','頂層分類','儲存','刪除空分類','關閉','已儲存。','儲存中…','選擇分類','未分類','分類由使用同一資料夾的人共用，儲存時需要資料夾寫入許可。','請允許寫入資料夾後儲存分類。','請重新整理總表後再修改分類。','SOP','分類','取消','儲存失敗，請重新整理後重試。'],
   es:['Configurar categorías','Asignar categoría','Nueva categoría','Nombre','Categoría superior','Nivel superior','Guardar','Eliminar categoría vacía','Cerrar','Guardado.','Guardando…','Elegir categoría','Sin categoría','Las categorías se comparten con quienes usan esta carpeta. Guardar requiere acceso de escritura.','Permite escribir en la carpeta.','Actualiza el resumen antes de editar categorías.','SOP','Categoría','Cancelar','No se guardó. Actualiza antes de reintentar.'],
   ru:['Настройки категорий','Назначить категорию','Новая категория','Название','Родительская категория','Верхний уровень','Сохранить','Удалить пустую категорию','Закрыть','Сохранено.','Сохранение…','Выбрать категорию','Без категории','Категории общие для пользователей папки. Для сохранения нужен доступ на запись.','Разрешите запись в папку.','Обновите обзор перед изменением категорий.','SOP','Категория','Отмена','Не сохранено. Обновите перед повтором.'],
   ko:['분류 설정','분류 지정','새 분류','분류 이름','상위 분류','최상위','저장','빈 분류 삭제','닫기','저장됨.','저장 중…','분류 선택','미분류','분류는 같은 폴더를 사용하는 사용자와 공유됩니다. 저장하려면 쓰기 권한이 필요합니다.','폴더 쓰기 권한을 허용하세요.','분류를 수정하기 전에 목록을 새로고침하세요.','SOP','분류','취소','저장하지 못했습니다. 새로고침한 후 재시도하세요.'],
@@ -34,10 +34,20 @@
   function close(){dialog.close();assignment.close();handle=null;source='';target=null;data=null;update();}
   function option(select,value,text){const item=document.createElement('option');item.value=value;item.textContent=text;select.append(item);}
   function choices(select,empty,exclude){select.replaceChildren();option(select,'',empty);for(const c of data.categories)if(c.id!==exclude)option(select,c.id,c.name);}
-  function preview(){const color=palette[$('category-color').value]||palette.blue,icon=icons.includes($('category-icon').value)?$('category-icon').value:'folder';$('category-preview').style.color=color;$('category-preview').style.backgroundColor=color+'14';$('category-preview').innerHTML=SOPIcons.svg(icon);}
-  function styleChoices(){const color=$('category-color').value||'blue',icon=$('category-icon').value||'folder';$('category-color').replaceChildren();$('category-icon').replaceChildren();colors.forEach((c,i)=>option($('category-color'),c,styles[2+i]));icons.forEach((c,i)=>option($('category-icon'),c,styles[8+i]));$('category-color').value=color;$('category-icon').value=icon;preview();}
+  const selected=kind=>$(kind).querySelector('input:checked')?.value;
+  function selectStyle(kind,value){for(const input of $(kind).querySelectorAll('input'))input.checked=input.value===value;}
+  function preview(){const color=palette[selected('category-color')]||palette.blue,icon=icons.includes(selected('category-icon'))?selected('category-icon'):'folder';$('category-preview').style.color=color;$('category-preview').style.backgroundColor=color+'14';$('category-preview').innerHTML=SOPIcons.svg(icon);}
+  function styleChoices(){
+   for(const [kind,values,offset] of [['category-color',colors,2],['category-icon',icons,8]]){
+    const chosen=selected(kind)||values[0],container=$(kind);container.replaceChildren();
+    values.forEach((value,index)=>{const label=document.createElement('label'),input=document.createElement('input'),graphic=document.createElement('span');label.className='category-choice';label.htmlFor=kind+'-'+value;label.title=styles[offset+index];input.type='radio';input.name=kind;input.id=label.htmlFor;input.value=value;input.checked=value===chosen;input.disabled=busy;input.setAttribute('aria-label',styles[offset+index]);graphic.setAttribute('aria-hidden','true');
+     if(kind==='category-color'){graphic.className='category-swatch';graphic.style.setProperty('--swatch-color',palette[value]);}else graphic.innerHTML=SOPIcons.svg(value);
+     input.onchange=preview;label.append(input,graphic);container.append(label);
+    });
+   }preview();
+  }
   function translate(next){words=labels[next]||labels.en;styles=styleLabels[next]||styleLabels.en;document.querySelectorAll('[data-category-word]').forEach(n=>n.textContent=t(n.dataset.categoryWord));styleChoices();if(data){const chosen=$('category-edit').value,parent=$('category-parent').value,assigned=$('assignment-category').value;choices($('category-edit'),t('new'));$('category-edit').value=chosen;choices($('category-parent'),t('top'),chosen);$('category-parent').value=parent;choices($('assignment-category'),t('none'));$('assignment-category').value=assigned;}}
-  function editor(){const id=$('category-edit').value,c=data.categories.find(c=>c.id===id);$('category-name').value=c?.name||'';choices($('category-parent'),t('top'),id);$('category-parent').value=c?.parentId||'';$('category-color').value=c?.color||'blue';$('category-icon').value=c?.icon||'folder';preview();$('category-delete').disabled=!c||busy;}
+  function editor(){const id=$('category-edit').value,c=data.categories.find(c=>c.id===id);$('category-name').value=c?.name||'';choices($('category-parent'),t('top'),id);$('category-parent').value=c?.parentId||'';selectStyle('category-color',c?.color||'blue');selectStyle('category-icon',c?.icon||'folder');preview();$('category-delete').disabled=!c||busy;}
   function renderEditor(id=''){choices($('category-edit'),t('new'));$('category-edit').value=id;editor();}
   async function guard(){await assertActive();if(!available()||getContext().endpoint!==source)throw Error(t('changed'));const current=await SOPStorageSource.getHandle();if(!current||!handle||!await current.isSameEntry(handle))throw Error(t('changed'));await assertActive();}
   async function prepare(){
@@ -64,14 +74,14 @@
   }
   $('category-settings').onclick=openManager;
   $('category-edit').onchange=()=>{editor();message('category-status','');};
-  $('category-form').onsubmit=async event=>{event.preventDefault();if(busy||!$('category-form').reportValidity())return;const old=data.categories.find(c=>c.id===$('category-edit').value),id=old?.id||'category-'+crypto.randomUUID(),name=$('category-name').value.trim(),parentId=$('category-parent').value||null,color=$('category-color').value,icon=$('category-icon').value;if(!name)return;
+  $('category-form').onsubmit=async event=>{event.preventDefault();if(busy||!$('category-form').reportValidity())return;const old=data.categories.find(c=>c.id===$('category-edit').value),id=old?.id||'category-'+crypto.randomUUID(),name=$('category-name').value.trim(),parentId=$('category-parent').value||null,color=selected('category-color'),icon=selected('category-icon');if(!name)return;
    const saved=await save(current=>SOPCategories.upsert(current,{id,name,parentId,color,icon}),'category-status');if(saved)renderEditor(id);
   };
   $('category-delete').onclick=async()=>{const id=$('category-edit').value;if(!id||busy)return;const saved=await save(current=>SOPCategories.remove(current,id),'category-status');if(saved)renderEditor();};
   $('assignment-form').onsubmit=async event=>{event.preventDefault();const id=target,destination=$('assignment-category').value||null;if(!id||busy)return;const saved=await save(current=>{if(!getContext().catalog.workflows.some(w=>w.id===id&&w.status==='published'))throw Error(t('changed'));return SOPCategories.assign(current,id,destination);},'assignment-status');if(saved)assignment.close();};
   for(const id of ['category-close','assignment-close'])$(id).onclick=()=>{if(!busy)close();};
   for(const d of [dialog,assignment])d.addEventListener('cancel',event=>{if(busy)event.preventDefault();});
-  $('category-color').onchange=preview;$('category-icon').onchange=preview;styleChoices();
+  styleChoices();
   return {update,close,translate,button(workflow){const b=document.createElement('button');b.type='button';b.className='assign-category';b.textContent=t('assign');b.setAttribute('aria-label',t('assign')+' · '+workflow.title);b.disabled=!available()||opening||busy;b.onclick=()=>openAssignment(workflow);return b;}};
  }};
 })(globalThis);

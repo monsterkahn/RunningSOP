@@ -106,7 +106,7 @@ async function main() {
   await annotation.screenshot({path:path.join(out,'06-screenshot-editor.png')});
   await setup.evaluate(()=>{window.showDirectoryPicker=async()=>await(await navigator.storage.getDirectory()).getDirectoryHandle('Synthetic release categories',{create:true});});
   await setup.locator('#choose-sop-folder').click();await setup.waitForFunction(()=>!document.querySelector('#category-settings').disabled);
-  await setup.locator('#category-settings').click();await setup.locator('#category-name').fill('Operations');await setup.locator('#category-color').selectOption('purple');await setup.locator('#category-icon').selectOption('briefcase');
+  await setup.locator('#category-settings').click();await setup.locator('#category-name').fill('Operations');await setup.locator('#category-color input[value="purple"]').check();await setup.locator('#category-icon input[value="briefcase"]').check();
   await setup.locator('#category-form button[type=submit]').click();await setup.waitForFunction(()=>document.querySelector('#category-status').textContent==='Saved.');
   await setup.screenshot({path:path.join(out,'07-category-settings.png')});await setup.locator('#category-close').click();
 

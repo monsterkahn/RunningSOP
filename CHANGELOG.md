@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.3.5 · 2026-10-20 — GitHub distribution
+
+- Place Category settings beside the Categories heading in the SOP overview.
+- Replace text-only icon and color dropdowns with graphical icon choices and color swatches in category editors.
+- Preserve category storage, write permissions, conflict checks and existing published v1.3.4 assets.
+- Core 202 and affected category browser scenarios passed on current Chromium and actual Chrome 116, including extracted-package checks. Native permission, physical two-device and HTTPS acceptance remain deferred; no Chrome Web Store submission.
+
 ## 1.3.4 · 2026-10-20 — GitHub distribution
 
 - Manage folder categories from Settings or the SOP overview: create, rename, nest and delete empty categories, choose icons and colors, and assign or clear SOP categories.

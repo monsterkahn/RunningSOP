@@ -6,11 +6,11 @@
 
 ![Running SOP: Clear steps. Right where you work.](docs/assets/running-sop-social-preview.png)
 
-**Release: v1.3.4** · [Download](https://github.com/monsterkahn/RunningSOP/releases/latest)
+**Release: v1.3.5** · [Download](https://github.com/monsterkahn/RunningSOP/releases/latest)
 
 Create step-by-step guides with screenshots, follow them beside your work, and share SOPs through a folder you choose.
 
-Version **1.3.4** adds folder category management in Settings and the SOP overview: create or rename categories, change their icons and colors, and assign SOPs without rewriting their content. Folder write permission governs category changes; this does not add administrator roles. The overview can show verified cached content during a folder outage, with a visible stale-copy notice and an explicit reconnect action. Damaged older connection settings can be replaced by selecting a valid folder. Previous published assets remain available. This GitHub distribution does not submit or replace a Chrome Web Store package. See [Storage](docs/STORAGE.md) and [Release review](docs/RELEASE-REVIEW-1.3.4.md).
+Version **1.3.5** places Category settings beside the Categories heading and replaces text-only category icon and color dropdowns with graphical choices and color swatches. The editors preserve native keyboard selection, seven interface languages and the existing shared category format. See [Storage](docs/STORAGE.md) and the [v1.3.5 release review](docs/RELEASE-REVIEW-1.3.5.md).
 
 ## What it does
 
