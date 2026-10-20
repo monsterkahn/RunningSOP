@@ -9,3 +9,5 @@
 
 select{font:inherit;color:inherit;border:1px solid #ccd5e4;border-radius:7px;min-height:40px;background:white;padding:8px 12px;max-width:100%;min-width:0}select:focus-visible{outline:3px solid #8aafff;outline-offset:2px}.category-form{display:grid;gap:9px}.category-form label{margin-top:6px}.category-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}.assign-category{margin-inline-start:8px}#assignment-name{font-weight:600;overflow-wrap:anywhere}td:last-child{white-space:normal}@media(max-width:650px){.header-actions{flex-wrap:wrap}.assign-category{margin:6px 0 0 8px}}
 .category-style-fields{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) 44px;align-items:end;gap:10px}.category-style-fields label{display:block;margin-bottom:6px}.category-style-fields select{width:100%}.category-preview{display:grid;place-items:center;width:42px;height:42px;border-radius:8px}.category-preview svg{width:24px;height:24px}
+
+aside>#category-settings{margin:0 10px 14px;max-width:calc(100% - 20px)}

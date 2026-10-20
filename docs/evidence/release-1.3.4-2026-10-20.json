@@ -13,16 +13,6 @@
       "failed": 0,
       "skipped": 0
     },
-    "sourceCurrentBrowser": {
-      "passed": 55,
-      "failed": 0,
-      "skipped": 0
-    },
-    "sourceChrome116": {
-      "passed": 55,
-      "failed": 0,
-      "skipped": 0
-    },
     "extractedCurrentBrowser": {
       "passed": 5,
       "failed": 0,
@@ -30,6 +20,26 @@
     },
     "extractedChrome116": {
       "passed": 5,
+      "failed": 0,
+      "skipped": 0
+    },
+    "prePlacementSourceCurrentBrowser": {
+      "passed": 55,
+      "failed": 0,
+      "skipped": 0
+    },
+    "prePlacementSourceChrome116": {
+      "passed": 55,
+      "failed": 0,
+      "skipped": 0
+    },
+    "placementSourceCurrentBrowser": {
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0
+    },
+    "placementSourceChrome116": {
+      "passed": 3,
       "failed": 0,
       "skipped": 0
     }
@@ -61,8 +71,8 @@
     "extension/folder-history.js": "7f6d6f0d14d1c5269ac6ee297ea2bcd0fa725e66e26d45a147d383a6739d6415",
     "extension/image-marks.js": "c0419ac3a41439ec762dd1fcad23e058e1533ebd1758cd2a2e78de65bbf507af",
     "extension/library-categories.js": "5348a828b0bad4e5ffc2a88cd8447b2c676d5b03395cfa596c44ff026546c334",
-    "extension/library.css": "908605b34eb6fd16e86d322c7879651fb7a4f3af4b6b5bce5ed2f30452b9bb93",
-    "extension/library.html": "f183a766574c05c18b3a84f463411a13a1c74b12b5a6f511ac15d04ec20a8d5f",
+    "extension/library.css": "bd56a7a01c408882aef30f1df59756e037fa58ff47885130e71114ad658fa83f",
+    "extension/library.html": "811a3b1f33896737021982d1e46949c87ae29e7a448490413b3926a2cf1c2314",
     "extension/library.js": "acc42a66e61bc7850f07084288403ebc4b0c59a999f9541fc6c73e1b21602a0b",
     "extension/local-sop-engine.js": "3f25e990048933e6b1a069b8965cd5269b89231f9b31d3eaa491a3cc02d303f1",
     "extension/locale-data.js": "a5938859df015f23b0e380e418bd2f4a0c548dd62fec4180d34c36e69fdb06bd",
@@ -115,5 +125,27 @@
   "physicalTwoDeviceAccepted": false,
   "httpsDeploymentAccepted": false,
   "teamStatisticsAccepted": false,
-  "remainingLimits": "Synthetic OPFS and injected read/write errors do not establish native or two-device acceptance."
+  "remainingLimits": "Synthetic OPFS and injected read/write errors do not establish native or two-device acceptance.",
+  "layoutMatrix": {
+    "languages": 7,
+    "widths": [
+      320,
+      390,
+      1280
+    ],
+    "combinations": 21,
+    "nativeWindowResizes": 3,
+    "perActionTimeoutMs": 15000,
+    "wholeScenarioTimeoutMs": 90000
+  },
+  "initialRemoteAttempts": [
+    {
+      "run": 39347058966,
+      "result": "Category regression exceeded total timeout on Linux and Windows; publication blocked."
+    },
+    {
+      "run": 39347851227,
+      "result": "Phase diagnostics showed continuous progress; repeated native viewport emulation consumed the total timeout. Matrix reordered without removing checks or increasing timeouts."
+    }
+  ]
 }

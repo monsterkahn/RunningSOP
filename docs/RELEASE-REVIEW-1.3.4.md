@@ -15,8 +15,9 @@ The package retains previous publication, annotation, history and local-feedback
 ## Executed verification
 
 - Core: 202 tests passed. Service: 52 tests passed locally.
-- Complete browser suites: 55 passed on current bundled Chromium and 55 on actual Chrome 116, without skips or failures. These cover recording/privacy, shared/team editing and source fencing, publication/cleanup, annotations, local feedback, retained history, folder recovery and category management.
-- Extracted installation: 5 affected folder/category/history/recovery scenarios passed per browser on current Chromium and Chrome 116. All 74 runtime files matched source byte-for-byte. See docs/evidence/release-1.3.4-2026-10-20.json.
+- Complete browser suites before the final Categories-section button placement follow-up: 55 passed on current bundled Chromium and 55 on actual Chrome 116, without skips or failures. These cover recording/privacy, shared/team editing and source fencing, publication/cleanup, annotations, local feedback, retained history, folder recovery and category management.
+- Final button-placement follow-up: 202 core tests and 3 affected source browser scenarios passed per browser on current Chromium and Chrome 116. Category settings is inside the Categories section, rather than the page header.
+- Final extracted installation: 5 affected folder/category/history/recovery scenarios passed per browser on current Chromium and Chrome 116. All 74 runtime files matched source byte-for-byte. See docs/evidence/release-1.3.4-2026-10-20.json.
 - The category tests cover creation, rename, icons/colors, assignment/clear, empty-only deletion, shared refresh visibility, denied write permission, concurrent-change rejection, preserved SOP bytes, backups, seven languages, narrow layouts, offline disabling and changed-source cancellation.
 - Category-store regressions exercise source changes during backup verification, final reads, staged writes and post-commit verification. They do not simulate a distributed transaction lock.
 - Packaging must pass ZIP integrity, manifest/root layout, exact runtime-file comparison and checksums. The release job independently downloads and verifies uploaded bytes.
@@ -26,3 +27,7 @@ Native operating-system permission dialogs, physical two-device NAS/SMB behavior
 ## Publication
 
 GitHub publication is gated by Linux verification, two Windows package jobs, six OS/Node service jobs, three OS team/history/category/interaction browser jobs and a non-root container startup check. Remote workflow completion and release download readback must be verified before reporting publication complete. Existing published tags and binary assets remain untouched. No Chrome Web Store submission is performed.
+
+## Cross-platform test timing
+
+The first remote attempts (39347058966 and 39347851227) blocked publication after the category regression exceeded its 90-second total timeout on Linux and Windows. Added phase diagnostics showed continuous progress through the language/layout matrix; each native viewport emulation cost several seconds. The matrix now iterates widths before languages, preserving all 21 combinations with three native resizes rather than 21. The 90-second scenario and 15-second action limits remain enforced, with explicit dialog state checks and synthetic failure diagnostics. Final remote publication still requires every gate to pass.

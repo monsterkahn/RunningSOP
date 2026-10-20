@@ -4,7 +4,7 @@ Create step-by-step guides with screenshots, follow them beside your work, and s
 
 ## What's new since v1.3.3
 
-- Manage folder categories from Settings or the SOP overview. Create, rename or nest categories, choose their icons and colors with a live preview, and delete empty categories.
+- Manage folder categories from Settings or the SOP overview’s Categories section. Create, rename or nest categories, choose their icons and colors with a live preview, and delete empty categories.
 - Use Assign category beside an SOP to set or clear its category. Category metadata is shared through the selected folder; SOP bodies and publication versions are not rewritten. Other overview pages read the updated categories on refresh.
 - Save only after an explicit write-permission action, with revisioned category backups, optimistic conflict checks, read-back verification and source checks through asynchronous writes. Changing folders closes the editor and blocks stale operations. Folder filesystem permissions govern access; this release adds no administrator role or cross-device transaction lock.
 - During a folder outage, the overview can show a previously verified catalog and cached current SOPs, with a visible potentially-outdated-copy notice. Uncached content and historical reads require a connection. Editing is disabled while offline.
