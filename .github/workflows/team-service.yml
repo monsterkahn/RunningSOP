@@ -35,6 +35,8 @@ jobs:
         run: npx playwright install --with-deps chromium
       - if: runner.os != 'Linux'
         run: npx playwright install chromium
+      - name: Verify category management before longer browser scenarios
+        run: node --test tests/library-categories-browser.cjs
       - run: npm run test:team-browser
       - run: npm run test:history-browser
       - run: npm run test:interaction-browser
