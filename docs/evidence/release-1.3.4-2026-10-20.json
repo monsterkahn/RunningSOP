@@ -42,6 +42,26 @@
       "passed": 3,
       "failed": 0,
       "skipped": 0
+    },
+    "sourceCurrentBrowser": {
+      "passed": 55,
+      "failed": 0,
+      "skipped": 0
+    },
+    "sourceChrome116": {
+      "passed": 55,
+      "failed": 0,
+      "skipped": 0
+    },
+    "foregroundCategoryCurrentBrowser": {
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0
+    },
+    "foregroundCategoryChrome116": {
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0
     }
   },
   "runtimeFiles": {
@@ -136,7 +156,8 @@
     "combinations": 21,
     "nativeWindowResizes": 3,
     "perActionTimeoutMs": 15000,
-    "wholeScenarioTimeoutMs": 90000
+    "wholeScenarioTimeoutMs": 180000,
+    "foregroundTabExplicit": true
   },
   "initialRemoteAttempts": [
     {
@@ -146,6 +167,10 @@
     {
       "run": 39347851227,
       "result": "Phase diagnostics showed continuous progress; repeated native viewport emulation consumed the total timeout. Matrix reordered without removing checks or increasing timeouts."
+    },
+    {
+      "run": 39348416783,
+      "result": "Reordered matrix passed Linux. Windows continued through the full layout matrix and final source-switch phase but exceeded the aggregate 90-second budget. The test now explicitly focuses the operating tab and allows 180 seconds including startup/cleanup, while every individual action stays bounded at 15 seconds."
     }
   ]
 }
