@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Running SOP",
-  "version": "1.3.5",
+  "version": "2.0.0",
   "description": "Create step-by-step guides with screenshots, follow them beside your work, and share SOPs through a folder you choose.",
   "minimum_chrome_version": "116",
   "permissions": [

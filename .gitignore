@@ -24,3 +24,7 @@ examples/storage/publication-history/
 examples/storage/category-history/
 tests/*-report.json
 tests/*.png
+
+# Local design work and capture output are not release sources.
+.archify/
+output/

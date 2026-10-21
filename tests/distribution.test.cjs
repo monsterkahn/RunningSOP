@@ -8,12 +8,13 @@ test('release archives use the explicit source allowlist and current checksums',
  const temp=fs.mkdtempSync(path.join(os.tmpdir(),'runtime-sop-dist-'));
  try{
   const copy=path.join(temp,'repo');copyTree(root,copy);const dist=path.join(copy,'dist');fs.mkdirSync(dist,{recursive:true});fs.writeFileSync(path.join(dist,'old-release.zip'),'old');fs.writeFileSync(path.join(copy,'.DS_Store'),'machine-specific');
+  for(const builder of ['tools/build-dashboard.cjs','tools/build-relationships.cjs','tools/build-mobile-reader.cjs','tools/build-storage-pages.cjs']){const result=spawnSync(process.execPath,[builder],{cwd:copy,encoding:'utf8'});assert.equal(result.status,0,result.stderr);}
   const built=spawnSync(process.execPath,['tools/package.cjs'],{cwd:copy,encoding:'utf8'});assert.equal(built.status,0,built.stderr);
   const manifest=JSON.parse(fs.readFileSync(path.join(copy,'extension/manifest.json'))),files=fs.readdirSync(dist);
   const sums=fs.readFileSync(path.join(dist,'SHA256SUMS.txt'),'utf8').trim().split('\n');assert.equal(sums.length,3);
   const names=sums.map(line=>line.split(/\s+/)[1]);assert.deepEqual(names.sort(),[`running-sop-extension-v${manifest.version}.zip`,`running-sop-github-v${manifest.version}.zip`,`running-sop-webstore-v${manifest.version}.zip`].sort());
   for(const line of sums){const [expected,name]=line.split(/\s+/),bytes=fs.readFileSync(path.join(dist,name));assert.equal(crypto.createHash('sha256').update(bytes).digest('hex'),expected);}
-  const extension=zipNames(path.join(dist,names.find(name=>name.includes('-extension-'))));assert(extension.includes('extension/locale-data.js'));
+  const extension=zipNames(path.join(dist,names.find(name=>name.includes('-extension-'))));assert(extension.includes('extension/locale-data.js'));for(const page of ['index.html','relationships.html','sop.html'])assert(extension.includes(page),'Installation package includes standalone '+page);assert(extension.includes('docs/STORAGE-RELATIONSHIPS.md'));
   const webstore=zipNames(path.join(dist,names.find(name=>name.includes('-webstore-'))));assert(webstore.includes('manifest.json'),'Chrome Web Store manifest must be at ZIP root');assert.deepEqual(webstore.slice().sort(),relativeFiles(path.join(copy,'extension')).sort());assert(!webstore.some(name=>name.startsWith('extension/')||/^(?:PRIVACY\.md|docs\/|tests\/|tools\/|workflows\/)/.test(name)));assert(!webstore.some(name=>/^(?:demo|sample|default-data|workflows)(?:\/|\.|$)/i.test(name)));
   const source=zipNames(path.join(dist,names.find(name=>name.includes('-github-'))));assert(!source.some(name=>name.includes('.DS_Store')||name.startsWith('dist/')));assert(source.includes('docs/RELEASE-CHECKLIST.md'));
   assert(fs.existsSync(path.join(dist,'old-release.zip')),'packaging should preserve local historical archives without checksumming them');

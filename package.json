@@ -1,6 +1,6 @@
 {
   "name": "runtime-sop",
-  "version": "1.3.5",
+  "version": "2.0.0",
   "private": true,
   "description": "Local-first Chrome workflow recorder and shared SOP reader",
   "author": {
@@ -18,21 +18,24 @@
     "build:example": "node tools/build-example.cjs",
     "build:demo": "node tools/build-example.cjs && node tools/build-dashboard.cjs",
     "demo:server": "node tools/demo-server.cjs",
-    "build": "node tools/build-example.cjs && node tools/build-dashboard.cjs && node tools/build-mobile-reader.cjs && node tools/scan-public.cjs && node tools/package.cjs",
+    "build": "node tools/build-example.cjs && node tools/build-dashboard.cjs && node tools/build-relationships.cjs && node tools/build-mobile-reader.cjs && node tools/build-storage-pages.cjs && node tools/scan-public.cjs && node tools/package.cjs",
     "build:mobile": "node tools/build-mobile-reader.cjs",
     "qr": "node tools/generate-qr.cjs",
     "test:qr-browser": "node --test tests/qr-browser.cjs",
     "test:folder-browser": "node --test tests/folder-browser.cjs",
     "test:dashboard-languages": "node --test tests/dashboard-language-browser.cjs",
-    "test:release-browser": "node --test --test-concurrency=1 tests/public-browser.cjs tests/folder-browser.cjs tests/qr-browser.cjs tests/dashboard-language-browser.cjs",
+    "test:release-browser": "node --test --test-concurrency=1 tests/public-browser.cjs tests/folder-browser.cjs tests/qr-browser.cjs tests/dashboard-language-browser.cjs tests/relationships-browser.cjs tests/workspace-relations-browser.cjs tests/storage-pages-browser.cjs tests/appearance-browser.cjs tests/relationships-connected-browser.cjs tests/unified-overview-browser.cjs",
     "test:server": "node server/tools/test.cjs",
     "test:team-scale": "node server/tools/scale.cjs",
     "test:team-browser": "node --test --test-concurrency=1 tests/team-workspace-browser.cjs tests/team-library-browser.cjs tests/team-service-picker-browser.cjs tests/team-read-view-browser.cjs tests/team-library-images-browser.cjs tests/team-sidebar-images-browser.cjs tests/team-slow-publish-browser.cjs",
     "build:team-service": "node tools/build-team-service.cjs",
-    "build:release-media": "node tools/build-release-media.cjs",
+    "build:release-media": "node tools/build-release-media-200.cjs",
     "build:release": "npm run build && npm run build:team-service && npm run build:release-media && node tools/release-checksums.cjs",
     "test:history-browser": "node --test --test-concurrency=1 tests/library-history-browser.cjs tests/options-categories-browser.cjs tests/library-categories-browser.cjs tests/library-recovery-browser.cjs tests/workspace-history-browser.cjs",
-    "test:interaction-browser": "node --test --test-concurrency=1 tests/annotation-editing-browser.cjs tests/step-feedback-browser.cjs tests/publish-reading-browser.cjs"
+    "test:interaction-browser": "node --test --test-concurrency=1 tests/annotation-editing-browser.cjs tests/step-feedback-browser.cjs tests/publish-reading-browser.cjs tests/mosaic-editing-browser.cjs tests/mosaic-publication-browser.cjs",
+    "test:relations-browser": "node --test --test-concurrency=1 tests/relationships-browser.cjs tests/workspace-relations-browser.cjs",
+    "test:storage-pages-browser": "node --test tests/storage-pages-browser.cjs",
+    "test:overview-browser": "node --test --test-concurrency=1 tests/appearance-browser.cjs tests/relationships-connected-browser.cjs tests/unified-overview-browser.cjs"
   },
   "devDependencies": {
     "playwright": "1.62.1"

@@ -69,7 +69,8 @@ function loadSnapshot(sourceDir){
 }
 function scriptData(value){return JSON.stringify(JSON.stringify(value)).replace(/</g,'\\u003c').replace(/\u2028/g,'\\u2028').replace(/\u2029/g,'\\u2029');}
 function buildHtml(payload){
-  const template=fs.readFileSync(path.join(__dirname,'..','extension','dashboard.html'),'utf8');
+  // Source pages load local scripts for Manifest V3; the standalone artifact inlines them once.
+  const template=fs.readFileSync(path.join(__dirname,'..','extension','dashboard.html'),'utf8').replace('<script src="appearance.js"></script>',()=>'<script>\n'+fs.readFileSync(path.join(__dirname,'..','extension','appearance.js'),'utf8')+'\n</script>').replace(/\s*<script src="(?!dashboard\.js)[^"]+"><\/script>/g,'');
   const logo='data:image/png;base64,'+fs.readFileSync(path.join(__dirname,'..','extension','assets/icons/icon-48.png')).toString('base64');
   const css=fs.readFileSync(path.join(__dirname,'..','extension','dashboard.css'),'utf8');
   const app=fs.readFileSync(path.join(__dirname,'..','extension','dashboard.js'),'utf8');
@@ -88,7 +89,7 @@ function buildHtml(payload){
     fs.readFileSync(path.join(__dirname,'..','extension','sync-runtime.js'),'utf8'),
     fs.readFileSync(path.join(__dirname,'..','extension','stats-engine.js'),'utf8')
   ].join('\n;\n');
-  let html=template.replaceAll('__PLUGIN_VERSION__',JSON.parse(fs.readFileSync(path.join(__dirname,'..','extension','manifest.json'),'utf8')).version).replaceAll('__SOP_LOGO__',logo).replace('<link rel="stylesheet" href="dashboard.css">','<style>\n'+css+'\n</style>');
+  let html=template.replaceAll('__PLUGIN_VERSION__',JSON.parse(fs.readFileSync(path.join(__dirname,'..','extension','manifest.json'),'utf8')).version).replaceAll('__SOP_LOGO__',logo).replaceAll('assets/icons/icon-48.png',logo).replace('<link rel="stylesheet" href="dashboard.css">','<style>\n'+css+'\n</style>');
   html=html.replace('<script src="dashboard.js"></script>',()=>'<script>\n'+engines+'\n</script>\n<script id="dashboard-data" type="application/json">'+JSON.stringify(payload).replace(/</g,'\\u003c').replace(/\u2028/g,'\\u2028').replace(/\u2029/g,'\\u2029')+'</script>\n<script>\n'+app+'\n</script>');
   return html;
 }
@@ -101,6 +102,7 @@ function main(argv=process.argv.slice(2)){
   const temp=output+'.tmp-'+process.pid;
   fs.writeFileSync(temp,html,{flag:'wx'});
   try{fs.renameSync(temp,output);}catch(e){try{fs.unlinkSync(temp);}catch(_){}throw e;}
+  if(output===DEFAULT_OUTPUT)fs.writeFileSync(path.join(path.dirname(output),'index.html'),html);
   process.stdout.write(`已生成离线总表：${output}\n目录：${payload.catalog.version} · SOP ${payload.workflows.length} 份 · ${payload.provenance.totalBytes} bytes\n统计：${payload.statisticsAvailable?'已读取匿名设备样本':'未采集'} · 更新历史：${payload.historyEvents.length?payload.historyEvents.length+' 条':'未追踪'}\n`);
   return {output,payload};
 }

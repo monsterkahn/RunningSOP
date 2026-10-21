@@ -67,15 +67,35 @@
   };
   const libraryLabels={en:'Open team library',zh:'打开团队内容库','zh-TW':'開啟團隊內容庫',es:'Abrir biblioteca de equipo',ru:'Открыть командную библиотеку',ko:'팀 라이브러리 열기',ja:'チームライブラリを開く'};
   for(const [code,values] of Object.entries(strings))values.push(libraryLabels[code]);
+  const joinHelp={
+    en:['Where do I get a join code?','Ask the administrator running the team service. A generated code is shown once in the first-start terminal or container logs and saved in config.json in the service data directory. A configured JOIN_CODE overrides that saved value. Shared-folder storage does not need a join code.'],
+    zh:['加入码在哪看？','请向运行团队服务的管理员索取。自动生成的加入码会在首次启动的终端或容器日志中显示一次，并保存在服务数据目录的 config.json 中。若配置了 JOIN_CODE，则以该配置为准。仅使用共享文件夹时不需要加入码。'],
+    'zh-TW':['加入碼在哪裡查看？','請向執行團隊服務的管理員索取。自動產生的加入碼會在首次啟動的終端或容器日誌顯示一次，並儲存在服務資料目錄的 config.json 中。若設定了 JOIN_CODE，則以該設定為準。僅使用共用資料夾時不需要加入碼。'],
+    es:['¿Dónde consigo el código?','Pídelo al administrador del servicio. El código generado aparece una vez en los registros del primer inicio y se guarda en config.json del directorio de datos. JOIN_CODE tiene prioridad si está configurado. Una carpeta compartida no necesita código.'],
+    ru:['Где взять код подключения?','Обратитесь к администратору сервиса. Сгенерированный код выводится один раз при первом запуске в терминале или журнале контейнера и сохраняется в config.json каталога данных. Настройка JOIN_CODE имеет приоритет. Для общей папки код не нужен.'],
+    ko:['참여 코드는 어디서 확인하나요?','팀 서비스 관리자에게 요청하세요. 생성된 코드는 첫 실행 터미널 또는 컨테이너 로그에 한 번 표시되고 데이터 폴더의 config.json에 저장됩니다. JOIN_CODE 설정이 있으면 그 값을 사용합니다. 공유 폴더에는 코드가 필요 없습니다.'],
+    ja:['参加コードはどこで確認できますか？','チームサービスの管理者に確認してください。生成されたコードは初回起動時の端末やコンテナログに一度表示され、データフォルダーの config.json に保存されます。JOIN_CODE の設定が優先されます。共有フォルダーだけならコードは不要です。']
+  };
+  const nameWords={
+    en:['Use device name','A short name saved in this browser. You can edit the display name.','Device name unavailable. Enter a display name.'],
+    zh:['使用设备名称','本机浏览器保存的简短名称，显示名称仍可手动修改。','无法读取设备名称，请手动填写显示名称。'],
+    'zh-TW':['使用裝置名稱','本機瀏覽器儲存的簡短名稱，顯示名稱仍可手動修改。','無法讀取裝置名稱，請手動填寫顯示名稱。'],
+    es:['Usar nombre del equipo','Nombre corto guardado en este navegador. Puedes editarlo.','Nombre no disponible. Escribe un nombre.'],
+    ru:['Имя устройства','Короткое имя сохранено в браузере. Его можно изменить.','Имя недоступно. Введите имя.'],
+    ko:['기기 이름 사용','이 브라우저에 저장된 짧은 이름입니다. 표시 이름을 수정할 수 있습니다.','기기 이름을 읽지 못했습니다. 이름을 입력하세요.'],
+    ja:['デバイス名を使用','このブラウザーに保存する短い名前です。表示名は編集できます。','デバイス名を取得できません。表示名を入力してください。']
+  };
   let singleton;
   function instance() { return singleton || (singleton = create()); }
   async function initialize() {
     const doc = root.document, form = doc?.getElementById('team-connect-form'); if (!form) return;
-    const get = id => doc.getElementById(id); let record = {enabled:false}, state = 'idle', readGeneration = 0;
+    const get = id => doc.getElementById(id); let record = {enabled:false}, state = 'idle', readGeneration = 0, naming = false, deviceName = '';
+    const nameReady=Promise.resolve().then(()=>root.RunningSOPDeviceName.get()).then(name=>{deviceName=name;if(!get('team-display-name').value&&!record.enabled)get('team-display-name').value=name;render();}).catch(()=>{});
     function render() {
-      const words = strings[root.WorkspaceI18n?.getLanguage()] || strings.en;
+      const words = strings[root.WorkspaceI18n?.getLanguage()] || strings.en;const names=nameWords[root.WorkspaceI18n?.getLanguage()]||nameWords.en;if(get('team-use-device-name')){get('team-use-device-name').textContent=names[0];get('team-use-device-name').disabled=state==='busy'||naming;}if(get('team-name-help'))get('team-name-help').textContent=names[1];
       doc.querySelectorAll('[data-team-text]').forEach(node => { node.textContent = words[Number(node.dataset.teamText)]; });
-      get('team-status').textContent = words[state === 'busy' ? 8 : state === 'error' ? 9 : record.enabled ? 7 : 6] + (record.enabled && state === 'idle' ? ' · ' + record.endpoint : '');
+      const help=joinHelp[root.WorkspaceI18n?.getLanguage()]||joinHelp.en;if(get('team-join-help-title'))get('team-join-help-title').textContent=help[0];if(get('team-join-help'))get('team-join-help').textContent=help[1];
+      get('team-status').textContent = words[state === 'busy' ? 8 : state === 'error' ? 9 : record.enabled ? 7 : 6] + (record.enabled && state === 'idle' ? (deviceName?' · '+deviceName:'')+' · ' + record.endpoint : '');
       if(get('team-library'))get('team-library').hidden=!record.enabled;if(get('team-choose-service'))get('team-choose-service').disabled=state==='busy';root.RunningSOPTeamPicker?.refreshCurrent(record);
       get('team-connect').disabled = state === 'busy'; get('team-disconnect').disabled = state === 'busy' || !record.enabled;
       let url; try { url = new URL(get('team-endpoint').value); } catch (_) {}
@@ -97,6 +117,12 @@
         state = 'error'; render();
       }
     }
+    if(get('team-use-device-name'))get('team-use-device-name').onclick=async()=>{
+      if(state==='busy'||naming)return;const field=get('team-display-name'),previous=field.value;naming=true;render();
+      try{const name=await root.RunningSOPDeviceName.get();deviceName=name;if(state!=='busy'&&field.value===previous){field.value=name;field.dispatchEvent(new Event('input',{bubbles:true}));field.focus();}}
+      catch(_){if(get('team-name-help'))get('team-name-help').textContent=(nameWords[root.WorkspaceI18n?.getLanguage()]||nameWords.en)[2];}
+      finally{naming=false;get('team-use-device-name').disabled=state==='busy';}
+    };
     form.addEventListener('submit', async event => {
       event.preventDefault();if(state==='busy')return;if(!get('team-endpoint').value&&root.RunningSOPTeamPicker){root.RunningSOPTeamPicker.open();return;}if(!form.reportValidity())return;
       const pending = instance().connect({endpoint:get('team-endpoint').value,joinCode:get('team-join-code').value,displayName:get('team-display-name').value});
@@ -112,6 +138,7 @@
     // after the language is applied, whichever read finishes first.
     doc.addEventListener('workspace-language-change',render);
     await refreshRecord(true);
+    await nameReady;
   }
   if (root.document) { if (root.document.readyState === 'loading') root.document.addEventListener('DOMContentLoaded',initialize,{once:true}); else initialize(); }
   return Object.freeze({KEY,create,read:() => instance().read(),clear:() => instance().clear(),connect:input => instance().connect(input)});

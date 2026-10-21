@@ -10,7 +10,7 @@ async function checkTools(page){for(const id of ['move','number','arrow','rect']
 test('fallback editor selects and moves annotations with pointer capture, keyboard, undo, cancel and exact saved geometry',{timeout:30000},()=>fixture(async page=>{
  const html=fs.readFileSync(path.join(root,'workspace.html'),'utf8'),dialog=html.match(/<dialog id="marks-dialog"[\s\S]*?<\/dialog>/)[0];
  await page.setContent('<style>#marks-dialog{width:1000px}#marks-surface{position:relative;width:900px;line-height:0;touch-action:none}#marks-img{width:100%}#marks-overlay{position:absolute;inset:0;pointer-events:none}svg{width:100%;height:100%}.marks-tool svg{width:24px;height:24px}</style>'+dialog);
- await page.addScriptTag({path:path.join(root,'image-marks.js')});await page.addScriptTag({path:path.join(root,'screenshot-editor.js')});
+ await page.addScriptTag({path:path.join(root,'image-marks.js')});await page.addScriptTag({path:path.join(root,'screenshot-redaction.js')});await page.addScriptTag({path:path.join(root,'screenshot-editor.js')});
  await page.evaluate(initial=>{const c=document.createElement('canvas');c.width=1000;c.height=500;c.getContext('2d').fillRect(0,0,1000,500);window.testImage=c.toDataURL('image/png');window.start=()=>{window.result='pending';ScreenshotEditor.open({image:testImage,imageMarks:initial}).then(value=>window.result=value);};window.start();},initial);
  await page.locator('#marks-dialog').waitFor();await checkTools(page);await page.locator('#marks-move').click();
  await drag(page,'#marks-surface',[.3,.3],[.4,.4]);await page.keyboard.press('ArrowRight');await page.keyboard.press('Shift+ArrowDown');

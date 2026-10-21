@@ -10,10 +10,10 @@ const { chromium } = require(process.env.RUNTIME_SOP_PLAYWRIGHT || 'playwright')
 
 const root = path.resolve(__dirname, '..');
 const dashboardURL = pathToFileURL(path.join(root, 'dist/dashboard.html')).href;
-const languages = ['zh', 'en', 'es', 'ru', 'ko', 'ja'];
+const languages = ['zh', 'zh-TW', 'en', 'es', 'ru', 'ko', 'ja'];
 const ratingKeys = ['非常不满意', '不满意', '一般', '满意', '非常满意'];
 
-test('standalone dashboard translates six languages and preserves authored SOP content', { timeout: 90000 }, async () => {
+test('standalone dashboard translates seven languages and preserves authored SOP content', { timeout: 90000 }, async () => {
   const browser = await chromium.launch({
     headless: !process.env.RUNTIME_SOP_CHROME,
     args: process.env.RUNTIME_SOP_CHROME ? ['--headless=new'] : [],
@@ -44,7 +44,7 @@ test('standalone dashboard translates six languages and preserves authored SOP c
   async function translated(page, selector, key, attribute) {
     const expected = await page.evaluate(key => DashboardI18n.t(key), key);
     const language = await page.locator('#dashboard-language').inputValue();
-    if (language !== 'zh') assert.notEqual(expected, key, `${language}: missing translation for ${key}`);
+    if (!['zh', 'zh-TW'].includes(language)) assert.notEqual(expected, key, `${language}: missing translation for ${key}`);
     const actual = attribute
       ? await page.locator(selector).getAttribute(attribute)
       : await page.locator(selector).textContent();
@@ -56,14 +56,20 @@ test('standalone dashboard translates six languages and preserves authored SOP c
     const chinese = await open('zh-CN');
     assert.equal(await chinese.page.locator('html').getAttribute('lang'), 'zh-CN');
     assert.equal(await chinese.page.locator('#dashboard-language').inputValue(), 'zh');
-    assert.equal(await chinese.page.locator('#page-title').textContent(), '存储器 SOP 总览');
+    assert.equal(await chinese.page.locator('#page-title').textContent(), 'SOP 总表');
     assert.equal(await chinese.page.evaluate(() => window.testDirectoryPickerCalls), 0);
     await chinese.context.close();
+    const traditional = await open('zh-HK');
+    assert.equal(await traditional.page.locator('html').getAttribute('lang'), 'zh-TW');
+    assert.equal(await traditional.page.locator('#dashboard-language').inputValue(), 'zh-TW');
+    assert.equal(await traditional.page.locator('#page-title').textContent(), 'SOP 總表');
+    await traditional.context.close();
 
     const { page } = await open('fr-FR');
     assert.equal(await page.locator('html').getAttribute('lang'), 'en');
     assert.equal(await page.locator('#dashboard-language').inputValue(), 'en');
     assert.deepEqual(await page.locator('#dashboard-language option').evaluateAll(options => options.map(option => option.value)), languages);
+    assert.equal(await page.locator('#dashboard-language').evaluate(node => /[\u{1F1E6}-\u{1F1FF}]/u.test(node.textContent)), false, 'language choices must not contain country flags');
 
     const authored = await page.evaluate(() => {
       const payload = JSON.parse(document.getElementById('dashboard-data').textContent);
@@ -79,7 +85,10 @@ test('standalone dashboard translates six languages and preserves authored SOP c
       await page.locator('#dashboard-language').selectOption(language);
       const htmlLanguage = language === 'zh' ? 'zh-CN' : language;
       await page.waitForFunction(lang => document.documentElement.lang === lang, htmlLanguage);
-      await translated(page, '#page-title', '存储器 SOP 总览');
+      await translated(page, '#page-title', 'SOP 总表');
+      assert.equal(await page.locator('#sops').isVisible(), true, 'unified home must show the SOP table with dashboard metrics');
+      await translated(page, '#sops th:nth-child(2)', '步骤数量');
+      await translated(page, '.privacy-notice', '截图和备注可能包含敏感信息，分享前请核对。');
       await page.locator('main').evaluate(n=>n.scrollTop=0);
       assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
       await translated(page, '#search', '名称、说明或 ID', 'placeholder');
@@ -92,11 +101,11 @@ test('standalone dashboard translates six languages and preserves authored SOP c
       if (screenshotDir) await page.screenshot({ path: path.join(screenshotDir, `${language}-overview-390.png`), fullPage: true });
 
       await page.locator('nav a[href="#sops"]').click();
-      await page.waitForFunction(() => location.hash === '#sops' && !document.getElementById('sops').hidden);
+      await page.waitForFunction(() => location.hash === '#sops' && !document.getElementById('sops').hidden && document.getElementById('overview').hidden);
       await translated(page, '#page-title', 'SOP 内容库');
       await translated(page, '#sops h2', 'SOP 内容库');
       assert.equal(await page.locator('#overview').isVisible(), false);
-      await translated(page, '#new-category', '新建分类', 'aria-label');
+      await translated(page, '#new-category', '分类设置', 'aria-label');
       await page.locator('#new-category').click();
       await page.locator('#category-dialog').waitFor({ state: 'visible' });
       for (const [selector, key] of [

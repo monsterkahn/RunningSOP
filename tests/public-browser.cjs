@@ -70,7 +70,7 @@ test('fresh extension install is private by default and About shows release iden
     assert.equal(await page.locator('#login-url,#source-kind').count(),0);
     await page.locator('#language-en').click();
     await page.waitForFunction(()=>document.documentElement.lang==='en'&&document.querySelector('#language-en').getAttribute('aria-pressed')==='true');
-    assert.equal(await page.locator('#language-en').textContent(),'🇬🇧English');
+    assert.equal(await page.locator('#language-en').textContent(),'ENEnglish');
     assert.equal(await page.locator('[data-i18n="SOP存储地址"]').textContent(),'SOP storage address');
     assert.equal(await page.locator('#login-url,#source-kind').count(),0);
     await page.reload();await page.waitForFunction(()=>document.documentElement.lang==='en');
@@ -222,6 +222,14 @@ test('screenshot iframe isolates image bytes from work pages and saves annotatio
   await frame.locator('#close-viewer').click();await work.waitForFunction(()=>!document.getElementById('sop-image-overlay-host'));
   assert.equal(work.isClosed(),false);
   const residue=await worker.evaluate(async()=>Object.keys(await chrome.storage.session.get(null)).filter(k=>k.startsWith('sop-screenshot-')));assert.deepEqual(residue,[]);
+  // A real isolated iframe returns destructive mosaic pixels through the
+  // authenticated session, while leaving normal annotation data editable.
+  await work.bringToFront();await panel.evaluate(async shot=>{const tab=(await chrome.tabs.query({active:true,currentWindow:true}))[0];window.mosaicResult=ScreenshotEditor.open(shot,'Synthetic privacy mask',{tabId:tab.id,url:tab.url},Promise.resolve(true));},{...shot,imageMarks:saved});
+  frame=undefined;for(let n=0;n<80;n++){frame=work.frames().find(f=>f.url().includes('/screenshot-viewer.html'));if(frame)break;await new Promise(r=>setTimeout(r,100));}assert(frame);await frame.locator('#marks-mosaic').click();await work.bringToFront();const maskBox=await frame.locator('#picture').boundingBox();await work.mouse.move(maskBox.x+maskBox.width*.1,maskBox.y+maskBox.height*.1);await work.mouse.down();await work.mouse.move(maskBox.x+maskBox.width*.7,maskBox.y+maskBox.height*.7,{steps:5});await work.mouse.up();await frame.waitForFunction(()=>document.querySelector('#marks-count').textContent.startsWith('4 / 40'));
+  if(process.env.RUNTIME_SOP_AUDIT_DIR)await work.screenshot({path:path.join(process.env.RUNTIME_SOP_AUDIT_DIR,'secure-screenshot-mosaic.png')});
+  await frame.locator('#save').click();const masked=await panel.evaluate(()=>window.mosaicResult);assert.deepEqual(Object.keys(masked).sort(),['image','imageMarks']);assert.notEqual(masked.image,shot.image);assert.deepEqual(masked.imageMarks,saved);await work.waitForFunction(()=>!document.getElementById('sop-image-overlay-host'));
+  const maskPixel=await panel.evaluate(async src=>{const image=new Image();await new Promise(ok=>{image.onload=ok;image.src=src;});const c=document.createElement('canvas');c.width=image.naturalWidth;c.height=image.naturalHeight;const ctx=c.getContext('2d');ctx.drawImage(image,0,0);return [...ctx.getImageData(Math.round(c.width*.3),Math.round(c.height*.3),1,1).data];},masked.image);assert.ok(Math.max(...maskPixel.slice(0,3))-Math.min(...maskPixel.slice(0,3))<25);assert.equal(maskPixel[3],255);
+  const cleanAfterMask=await worker.evaluate(async()=>Object.keys(await chrome.storage.session.get(null)).filter(k=>k.startsWith('sop-screenshot-')));assert.deepEqual(cleanAfterMask,[]);
   // A public viewer URL in another tab may not read or cancel a legitimate session.
   const isolated=await worker.evaluate(async shot=>{const tab=(await chrome.tabs.query({active:true,currentWindow:true}))[0],token=crypto.randomUUID(),key='sop-screenshot-'+token;await chrome.storage.session.set({[key]:{step:shot,mode:'view',tabId:tab.id,expiresAt:Date.now()+60000}});return {token,key};},shot);
   const unauthorized=await context.newPage();await unauthorized.goto(`chrome-extension://${id}/screenshot-viewer.html?token=${isolated.token}&mode=view`);
@@ -313,7 +321,10 @@ test('guided recording edits STEP 1, advances explicitly and preserves approval 
   await panel.locator('.step-point.report').waitFor({state:'visible'});
   assert.equal(await panel.locator('.step-point.report .point-heading svg').count(),1);
   const style=await panel.evaluate(()=>({body:getComputedStyle(document.querySelector('.step-actions')).fontSize,note:getComputedStyle(document.querySelector('.step-point.report p')).fontSize,radius:getComputedStyle(document.querySelector('.step-point.report')).borderRadius,border:getComputedStyle(document.querySelector('.step-point.report')).borderTopWidth}));
-  assert.deepEqual(style,{body:'16px',note:'14px',radius:'10px',border:'1px'});
+  assert.deepEqual(style,{body:'16px',note:'12px',radius:'8px',border:'1px'});
+  assert.equal(await panel.locator('.step-point.report').evaluate(point=>point.parentElement.classList.contains('step-auxiliary')),true);
+  assert.equal(await panel.locator('.step-actions').first().evaluate(actions=>actions.parentElement.classList.contains('step-content')),true);
+  assert.equal(await panel.locator('.step-body').first().evaluate(body=>getComputedStyle(body).marginLeft),'0px');
   assert.equal(await panel.locator('.step-label').first().innerText(),'STEP 1');
   const titled=await panel.evaluate(async()=>{const key='runtime-sop-recorder-v1',state=(await chrome.storage.local.get(key))[key];state.drafts[0].steps[0].title='Prepare the report';await chrome.storage.local.set({[key]:state});return true;});
   assert(titled);await panel.evaluate(()=>WorkspaceApp.refresh());

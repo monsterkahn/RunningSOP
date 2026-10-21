@@ -1,5 +1,51 @@
 # Changelog
 
+## 2.0.0 - 2026-10-22 - Web Store package candidate
+
+- Combine statistics, category management, searchable SOP listings and step counts in a unified overview, with retained-version reading and a standalone index.
+- Add a separate SOP relationship editor and explicit next-SOP navigation for verified folder libraries. Reuse the connected folder for reading; request write access only on Save and retain conflict, source-change, backup and read-back checks.
+- Install only missing standalone index and relationship pages after explicit folder selection and write authorization; preserve existing pages.
+- Add browser-local Light, Dark and System appearance choices to the overview and relationship pages.
+- Add deliberate screenshot mosaic masking; saved masking replaces image bytes but does not purge older copies.
+- Use neutral reading cards and 16:6 previews while preserving original screenshot and annotation proportions in full viewing.
+- Include empty-step filtering, unchanged-draft cleanup after verified publication, exact published-SOP reading, seven flag-free interface languages and stable local device display names.
+- Preserve Manifest V3, Chrome 116 minimum, permission declarations, local settings and existing SOP data. No breaking data migration or settings reset.
+- Web Store package preparation does not establish submission or approval. Native permission prompts, physical two-device storage, HTTPS deployment and team statistics remain deferred.
+
+## 1.4.1 - 2026-10-21 - Local installation candidate
+
+- After explicit SOP folder selection and write authorization, install missing index and relationship pages from a hashed package-local bundle.
+- Preserve all existing pages, including custom or older files. This is missing-page installation, not an automatic shared-page upgrade.
+- Add Settings controls to open the dashboard and retry installing missing pages. The internal dashboard can read the selected authorized folder without enabling polling.
+- Keep an existing library readable when optional deployment write access is denied.
+- Recreate plugin-only listing images in the earlier pale-blue brand style. No dashboard, index or relationship editor screenshots are included.
+- Apply the approved neutral 15px reading cards, 12px gaps and unindented content; remove connectors and the repeated reading address. Keep editing URLs and internal matching/feedback context.
+- Crop reading previews through a 16:6 viewport while retaining the original image and annotation proportions for full viewing. Put next step inside an equal-width card.
+- Local packaging only; no GitHub or Web Store publication. Native permission and physical two-device deployment acceptance remain deferred.
+
+## 1.4.0 - 2026-10-21 - Local installation candidate
+
+- Include the standalone index dashboard and separate relationship editor in the installation ZIP, preserving existing dashboard functions.
+- Edit SOP title/count nodes and connections directly, with 100% default zoom, connection deletion and undo.
+- Save validated relationships separately in relations.json with explicit folder authorization, revision checks, history backups and read-back verification.
+- Show a next step card for verified folder relationships and open the next SOP's configured work page on request.
+- Group reading instructions and screenshots, connect STEP labels, and show one feedback control per step. Report and issue cards appear only with content.
+- Include screenshot mosaic masking, short device display names, overview category management and revised language choices.
+- Local packaging only; native prompts, physical two-device storage and HTTPS acceptance remain deferred. No GitHub or Web Store publication is claimed.
+
+## 1.3.7 · 2026-10-20 — Local distribution
+
+- Replace flag-based language choices with SC, TC, EN, ES, RU, KO and JA above the full language names. Use 16px abbreviations without individual borders.
+- Place Follow browser language below all manual choices, retaining the Chrome icon. Keep equal-width responsive choices and visible selected states.
+- Retain existing settings when updating the same extension identity; browser-managed folder permissions may require reauthorization.
+- Local packaging only; no GitHub release or Chrome Web Store submission.
+
+## 1.3.6 · 2026-10-20 — Local distribution
+
+- Produce a new maintenance package from the verified v1.3.5 functionality with v1.3.6 metadata and multilingual release notes.
+- Preserve settings and the SOP storage address when updating the same extension identity. Uninstalling or installing with a different ID does not transfer its local data; native folder access can require reauthorization.
+- No GitHub release or Chrome Web Store submission is part of this local packaging request.
+
 ## 1.3.5 · 2026-10-20 — GitHub distribution
 
 - Place Category settings beside the Categories heading in the SOP overview.

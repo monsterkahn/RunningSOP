@@ -19,6 +19,9 @@ jobs:
       - run: npm run test:qr-browser
       - run: npm run test:folder-browser
       - run: npm run test:dashboard-languages
+      - run: npm run test:relations-browser
+      - run: npm run test:storage-pages-browser
+      - run: npm run test:overview-browser
       - run: npm run build:team-service
       - run: npm run build:release-media
       - run: node tools/release-checksums.cjs
@@ -51,18 +54,6 @@ jobs:
         with:
           name: running-sop-packages
           path: dist
-      - name: Synchronize historical release description
-        env:
-          GH_TOKEN: ${{ github.token }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          historical_notes=docs/releases/v1.0.0.md
-          historical_state=$(gh release view v1.0.0 --repo "$GITHUB_REPOSITORY" --json body,isDraft)
-          if [[ $(jq -r '.isDraft' <<< "$historical_state") == false ]] && \
-             [[ $(jq -r '.body' <<< "$historical_state") != "$(cat "$historical_notes")" ]]; then
-            gh release edit v1.0.0 --repo "$GITHUB_REPOSITORY" --notes-file "$historical_notes"
-          fi
       - name: Publish the version once
         env:
           GH_TOKEN: ${{ github.token }}

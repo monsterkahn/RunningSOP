@@ -18,7 +18,7 @@ test('saved team-service addresses persist as metadata and never change the acti
   assert.match(await page.locator('#team-status').textContent(),/已连接/);
   await page.evaluate(()=>{sessionStorage.removeItem('hold-picker-language');window.releasePickerLanguage();});
   await page.waitForFunction(()=>/Connected/.test(document.querySelector('#team-status').textContent));
-  assert.equal(await page.locator('#team-choose-service [data-service-word="choose"]').textContent(),'Select team service');await page.locator('#team-settings summary').click();
+  assert.equal(await page.locator('#team-choose-service [data-service-word="choose"]').textContent(),'Select team service');await page.locator('#team-settings-heading').click();
   const initialCalls=await page.evaluate(()=>pickerNetworkCalls.length);
   await page.locator('#team-choose-service').click();await page.locator('[data-service-edit="current"]').click();assert.equal(await page.locator('#team-service-url').inputValue(),'https://active.example.test');await page.locator('#team-service-name').fill('Synthetic active endpoint');await page.locator('#team-service-save').click();await page.locator('#team-service-dialog').waitFor({state:'hidden'});
   const currentEdit=await page.evaluate(async()=>{const api=RunningSOPTeamPicker.create(),items=await api.list(),item=items[0];if(item)await api.remove(item.id);return {item,remaining:await api.list()};});assert.equal(currentEdit.item.name,'Synthetic active endpoint');assert.notEqual(currentEdit.item.id,'current');assert.equal(currentEdit.item.endpoint,'https://active.example.test');assert.equal(currentEdit.remaining.length,0);
@@ -29,7 +29,7 @@ test('saved team-service addresses persist as metadata and never change the acti
   await page.locator('#team-service-name').fill(injectedName);await page.locator('#team-service-url').fill('https://east.example.test');await page.locator('#team-service-save').click();await page.locator('#team-service-dialog').waitFor({state:'hidden'});
   let saved=await page.evaluate(name=>RunningSOPTeamPicker.list().then(items=>({items,hasInjectedName:items.some(item=>item.name===name)})),injectedName);assert.equal(saved.items.length,2);assert.equal(saved.items.some(item=>Object.hasOwn(item,'token')||Object.hasOwn(item,'joinCode')),false);assert.equal(saved.hasInjectedName,true);saved=saved.items;
   const first=saved.find(item=>item.name==='Synthetic west'),second=saved.find(item=>item.name===injectedName);
-  await page.reload();await page.waitForFunction(()=>!!window.RunningSOPTeamPicker);await page.locator('#team-settings summary').click();
+  await page.reload();await page.waitForFunction(()=>!!window.RunningSOPTeamPicker);await page.locator('#team-settings-heading').click();
   saved=await page.evaluate(()=>RunningSOPTeamPicker.list());assert.equal(saved.length,2);assert.ok(saved.some(item=>item.id===first.id));assert.ok(saved.some(item=>item.id===second.id));
   await page.locator('#team-choose-service').click();await page.locator(`[data-service-select="${second.id}"]`).waitFor();assert.equal(await page.locator('#team-service-list img').count(),0);assert.equal(await page.locator(`[data-service-select="${second.id}"]`).textContent(),injectedName+'https://east.example.test');
   await page.locator(`[data-service-edit="${first.id}"]`).click();assert.equal(await page.locator('#team-service-name').inputValue(),'Synthetic west');assert.equal(await page.locator('#team-service-url').inputValue(),'https://west.example.test');

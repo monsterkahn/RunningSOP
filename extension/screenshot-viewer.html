@@ -6,11 +6,11 @@
   <div class="heading"><strong id="page-title">截图查看</strong><span id="image-meta"></span></div>
   <div class="zoom-tools tool-group" role="group" aria-label="缩放"><button id="fit" type="button">适应窗口</button><button id="actual" type="button">原始尺寸</button><button id="zoom-out" type="button" aria-label="缩小">−</button><button id="zoom-in" type="button" aria-label="放大">＋</button><output id="zoom-value">100%</output></div>
   <div class="edit-tools" id="edit-tools" hidden>
-   <div class="tool-group" role="group" aria-label="标记"><button id="marks-move" type="button" aria-pressed="false">移动</button><button id="marks-number" type="button" aria-pressed="true">编号</button><button id="marks-arrow" type="button" aria-pressed="false">箭头</button><button id="marks-rect" type="button" aria-pressed="false">方框</button></div><div class="tool-group" role="group" aria-label="编辑记录"><button id="undo" type="button">撤销</button><button id="clear" type="button">清除</button></div><span id="marks-count"></span><button id="save" type="button" class="primary">保存标记</button>
+   <div class="tool-group" role="group" aria-label="标记"><button id="marks-move" type="button" aria-pressed="false">移动</button><button id="marks-number" type="button" aria-pressed="true">编号</button><button id="marks-arrow" type="button" aria-pressed="false">箭头</button><button id="marks-rect" type="button" aria-pressed="false">方框</button><button id="marks-mosaic" type="button" class="marks-tool" aria-pressed="false" aria-label="马赛克"></button></div><div class="tool-group" role="group" aria-label="编辑记录"><button id="undo" type="button">撤销</button><button id="clear" type="button">清除</button></div><span id="marks-count"></span><button id="save" type="button" class="primary">保存标记</button>
   </div>
   <button id="close-viewer" type="button">退出</button>
  </header>
  <main id="viewport" aria-label="截图画布"><div id="stage"><img id="picture" alt="截图"><div id="overlay" aria-hidden="true"></div></div></main>
  <p id="status" role="status"></p>
- <script src="image-marks.js"></script><script src="locale-data.js"></script><script src="traditional-zh.js"></script><script src="workspace-i18n.js"></script><script src="screenshot-viewer.js"></script>
+ <script src="image-marks.js"></script><script src="screenshot-redaction.js"></script><script src="locale-data.js"></script><script src="traditional-zh.js"></script><script src="workspace-i18n.js"></script><script src="screenshot-viewer.js"></script>
 </body></html>

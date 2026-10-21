@@ -15,6 +15,14 @@ test('directory identifiers and resource paths stay bounded and never accept fil
 test('folder selection immediately opens a read-only picker and binds reading and publishing to one folder',async()=>{
  const e=env(),lib=library();e.choose(lib.root);const pending=e.source.chooseDirectory();assert.deepEqual(e.calls,[{mode:'read'}]);const chosen=await pending;assert.equal(chosen.workflowCount,1);assert.equal(e.pair.handle,lib.root);assert.equal(e.pair.record.handle,lib.root);assert.equal((await e.source.info()).endpoint,chosen.endpoint);assert.equal(await e.source.read(chosen.endpoint),catalog);assert.equal(await e.source.read(Source.resolve(chosen.endpoint,'hello.txt')),'hello');assert.deepEqual(await e.source.read(Source.resolve(chosen.endpoint,'hello.txt'),{binary:true}),Uint8Array.from(Buffer.from('hello')));
 });
+test('explicit deployment selection requests write access before library reads and retains a read-only library',async()=>{
+ for(const writable of [true,false]){
+  const e=env(),lib=library(),events=[];lib.root.requestPermission=async({mode})=>{events.push(mode);return mode==='readwrite'&&!writable?'denied':'granted';};
+  const original=lib.root.getFileHandle;lib.root.getFileHandle=async function(...args){assert.equal(events[0],'readwrite');return original.apply(this,args);};
+  e.choose(lib.root);const pending=e.source.chooseDirectory({mode:'readwrite'});assert.deepEqual(e.calls,[{mode:'readwrite'}]);const chosen=await pending;assert.equal(chosen.workflowCount,1);assert.equal(await e.source.read(chosen.endpoint),catalog);
+ }
+ const e=env();await assert.rejects(e.source.chooseDirectory({mode:'unsafe'}));assert.equal(e.calls.length,0);
+});
 test('a catalog file alone never activates a library and only its matching folder can finish selection',async()=>{
  const e=env(),a=library('A'),b=library('B');e.file(a.catalog);const chosen=await e.source.chooseFile();assert.equal(chosen.handle,a.catalog);assert.equal((await e.source.info()).selected,false);e.choose(b.root);await assert.rejects(e.source.chooseDirectory({expectedFile:chosen.handle}),/不包含/);assert.equal((await e.source.info()).selected,false);e.choose(a.root);await e.source.chooseDirectory({expectedFile:chosen.handle});assert.equal((await e.source.info()).name,'A');
 });

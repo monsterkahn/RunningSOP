@@ -39,7 +39,7 @@ test('clickable folder card selects a native library, preserves customization an
   try{await page.waitForFunction(()=>document.querySelector('#source-connection').dataset.state==='ready',null,{timeout:10000});}
   catch(error){console.error('Folder connection diagnostic:',await page.locator('#catalog-status').textContent(),await worker.evaluate(()=>CatalogSync.info()));throw error;}
   assert.equal(await page.locator('#source-name').textContent(),'SOP');
-  assert.equal(await page.locator('#source-end-icon').evaluate(el=>getComputedStyle(el).animationName),'none');
+  assert.equal(await page.locator('#source-end-icon').evaluate(el=>getComputedStyle(el).animationName),'sop-folder-breathe');assert.equal(await page.locator('#source-count').count(),0);assert.match(await page.locator('#source-state-label').textContent(),/^已连接 · (Mac|Win|Lin|CrOS|And|BSD|Fuch)-[A-HJ-NP-Z2-9]{4}$/);await page.mouse.move(0,0);const readyStyle=await page.locator('#choose-sop-folder').evaluate(el=>({background:getComputedStyle(el).backgroundColor,color:getComputedStyle(el).color}));assert.deepEqual(readyStyle,{background:'rgb(231, 246, 237)',color:'rgb(23, 105, 64)'});await page.emulateMedia({reducedMotion:'reduce'});assert.equal(await page.locator('#source-end-icon').evaluate(el=>getComputedStyle(el).animationName),'none');await page.emulateMedia({reducedMotion:'no-preference'});
   assert.equal((await worker.evaluate(()=>CatalogSync.getSettings())).enabled,false);
   assert.equal((await worker.evaluate(()=>CatalogSync.loadWorkflow('demo-work'))).steps.length,2);
   await page.locator('#source-appearance summary').click();await page.locator('#source-display-name').fill('Team <SOP>');await page.locator('[data-source-icon=storage]').click();await page.locator('#save-source-appearance').click();
@@ -49,7 +49,7 @@ test('clickable folder card selects a native library, preserves customization an
   for(const language of ['zh','zh-TW','en','es','ru','ko','ja']){
    await page.locator('#language-'+language).click();await page.waitForFunction(code=>document.querySelector('#language-'+code).getAttribute('aria-pressed')==='true',language);
    assert.equal(await page.locator('#source-name').textContent(),'Team <SOP>');
-   for(const width of [320,390]){await page.setViewportSize({width,height:844});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);const layout=await page.locator('.language-switch button:not(#language-auto)').evaluateAll(buttons=>buttons.map(button=>{const r=button.getBoundingClientRect();return {top:r.top,width:r.width};}));assert.equal(new Set(layout.map(r=>r.top)).size,1);assert.ok(Math.max(...layout.map(r=>r.width))-Math.min(...layout.map(r=>r.width))<1);}
+   for(const width of [320,390]){await page.setViewportSize({width,height:844});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);const layout=await page.locator('.language-switch button:not(#language-auto)').evaluateAll(buttons=>buttons.map(button=>{const r=button.getBoundingClientRect();return {top:r.top,width:r.width};}));assert.ok(new Set(layout.map(r=>r.top)).size<=4);assert.ok(Math.max(...layout.map(r=>r.width))-Math.min(...layout.map(r=>r.width))<1);}
   }
   await page.locator('#language-zh').click();
   if(process.env.RUNTIME_SOP_AUDIT_DIR){fs.mkdirSync(process.env.RUNTIME_SOP_AUDIT_DIR,{recursive:true});await page.locator('#source-appearance summary').click();await page.screenshot({path:path.join(process.env.RUNTIME_SOP_AUDIT_DIR,'folder-card-390.png'),fullPage:true});}

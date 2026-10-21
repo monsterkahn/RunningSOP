@@ -20,6 +20,16 @@ Keep the extension directory in place after installation; moving or deleting it 
 
 ## Permissions
 
+The local v1.4.1 installation archive also includes `index.html`,
+`relationships.html` and `sop.html` at its root. Keep these standalone pages
+together. Open `index.html` for the storage dashboard and its relationship-map
+entry, then explicitly choose your SOP library folder. These pages are separate
+from the `extension/` directory selected when loading the browser extension.
+In v1.4.1, selecting a writable SOP folder also adds missing index and relationship pages while preserving existing files. Settings provides Open dashboard and Install missing dashboard pages. The internal dashboard can reuse the selected folder; standalone files require their own explicit folder selection.
+
+See [Storage relationships](STORAGE-RELATIONSHIPS.md) for shared saving and
+next-SOP navigation.
+
 Local drafts and recording work without a shared folder. HTTP(S) site permissions are requested as needed for functions such as recording or screenshots on the current page. If permission is denied, page injection may be unavailable on that site; other local functions remain usable.
 
 To use functions on `file://` pages or read catalog files through a `file://` address, enable **Allow access to file URLs** in Running SOP's details on Chrome's extensions page. This switch is separate from the shared folder's File System Access read/write authorization. Enable it when needed.

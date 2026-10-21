@@ -1,12 +1,18 @@
 # Chrome Web Store Listing — Running SOP
 
-> Last updated: 2026-10-20. Current GitHub distribution: v1.3.4. This document is preparation material, not a Chrome Web Store submission or approval.
+> Last updated: 2026-10-22. Web Store package candidate: v2.0.0. Submission and approval are not confirmed. Last independently verified GitHub distribution: v1.3.5; this task does not publish a GitHub release.
 
-Version 1.3.4 adds folder category management in Settings and the SOP overview, including icons, colors and per-SOP assignment. It also adds verified-cache overview recovery, an explicit reconnect action and recovery from malformed old connection settings. Existing publication, retained-history and privacy behavior is preserved.
+Version 2.0.0 packages the accumulated recording, reading and library improvements. The exact approved English short description below is unchanged. Use [the 2.0.0 release introduction](docs/RELEASE-NOTES-2.0.0.md) for the update summary, and [the release review](docs/RELEASE-REVIEW-2.0.0.md) for current verification and remaining acceptance limits.
 
-The screenshot editor uses bundled SVG icons with localized accessible names and hover hints. Zoom, annotation and undo/clear groups have vertical separators and extra spacing. Save notes and Exit replace the previous cancel/save/close layout; Exit discards unsaved marks. Rounded boxes and numbered marks support drag/keyboard adjustment, and version-bound step feedback stays local. PayPal account details expand on demand beside two inactive coffee placeholders. Fresh installations do not connect or synchronize automatically, and permissions remain unchanged.
+The overview combines library statistics, categories and searchable SOP listings with step counts. A separate relationship editor connects SOPs, and verified folder relationships provide explicit next-SOP navigation. The connected editor reuses the selected authorized folder for reading; saving requests write access only after a user click and retains revision, source-change, backup and read-back guards.
 
-The current verification record is docs/RELEASE-REVIEW-1.3.4.md. Use the newly generated v1.3.4 images for store preparation; no existing store listing or package is submitted or replaced by this GitHub release. Native permissions, physical two-device storage and HTTPS acceptance remain deferred.
+Reading uses neutral rounded cards and 16:6 screenshot previews; full viewing preserves original image and annotation proportions. Both overview and relationship pages provide Light, Dark and System choices, remembered locally. Theme changes do not alter SOP or relationship data.
+
+Screenshot mosaic masking requires deliberate user action and replaces the edited image bytes. It does not purge earlier publications, history or backups. Screenshots and manually entered notes may contain sensitive information and must be reviewed before publication. Publishing skips empty steps, refuses an entirely empty procedure and removes only the unchanged draft after verified success; failed or uncertain writes preserve it.
+
+After explicit folder selection and write authorization, missing-only deployment can install the standalone index and relationship pages. Existing files are preserved, including older or customized pages; this is not a shared-page upgrade. The package also includes seven flag-free interface languages and stable browser-local device display names.
+
+No new extension permissions, breaking SOP data migration or settings reset is introduced. Fresh installations still require explicit storage configuration. Existing same-identity local data is retained, while browser-managed folder permissions may require reauthorization. Native permission dialogs, physical two-device storage, HTTPS deployment and team statistics remain deferred. Automated package checks do not establish Google certification or Chrome Web Store approval.
 
 ## Store listing
 
@@ -33,16 +39,16 @@ Requires desktop Chrome 116 or later. Some browser pages restrict extension acce
 Source: https://github.com/monsterkahn/RunningSOP
 Support: https://github.com/monsterkahn/RunningSOP/issues
 
-This is proposed 1.1.0 text only. Previously submitted 1.0.0 listing materials have not been edited or resubmitted. Removed backup/export controls must not be advertised for 1.1.0.
+The approved English short description is retained exactly. The listing and 2.0.0 introduction are prepared materials; they do not establish that a store draft has been uploaded, submitted or approved. Removed backup/export controls must not be advertised.
 
 ## Graphics and assets
 
 | Asset | Dimensions | Local state |
 | --- | --- | --- |
 | Store icon | 128 × 128 PNG | extension/assets/icons/icon-128.png; inspect packaged dimensions |
-| Screenshots | 1280 × 800 or 640 × 400 | 1.0.0 assets frozen; refresh for 1.1.0 before submission |
-| Small tile | 440 × 280 | Existing 1.0.0 material; review before reuse |
-| Marquee | 1400 × 560 | Existing 1.0.0 material; review before reuse |
+| Screenshots | 1280 × 800 or 640 × 400 | Verified: five actual 2.0.0 plugin screenshots, RGB |
+| Small tile | 440 × 280 | Verified: 2.0.0 RGB media archive |
+| Marquee | 1400 × 560 | Verified: 2.0.0 RGB media archive |
 
 Only real rendered extension UI and synthetic workflows should appear in store screenshots. Do not add fictional controls or mobile mockups. Folder animation is a progressive enhancement, not required to select the folder.
 
@@ -97,6 +103,7 @@ Privacy policy source: PRIVACY.md. Public repository link: https://github.com/mo
 
 | Version | Date | Changes | Status |
 | --- | --- | --- | --- |
+| 2.0.0 | 2026-10-22 | Unified overview, relationships and next-SOP navigation, missing-only pages, local appearance, mosaic masking and reading improvements | Web Store package preparation; upload, submission and approval unconfirmed |
 | 1.3.2 | 2026-10-19 | Publication returns to SOP reading; graphic, movable screenshot marks; local step feedback | Local installation candidate; no GitHub/store upload |
 | 1.3.0 | 2026-10-19 | Read-only retained SOP history; post-release performance and compatibility hardening | Local candidate only; not published to GitHub or submitted to the store |
 | 1.2.0 | 2026-10-19 | Optional experimental team service and library; existing folder mode remains default | GitHub release; not submitted to the Chrome Web Store |
@@ -106,7 +113,7 @@ Privacy policy source: PRIVACY.md. Public repository link: https://github.com/mo
 
 ## Review notes and remaining manual gates
 
-- See docs/RELEASE-REVIEW-1.2.0.md for current test results and limitations.
+- See [the 2.0.0 release review](docs/RELEASE-REVIEW-2.0.0.md) for current checks. Earlier review records describe their historical candidates and do not validate the final 2.0.0 package.
 - Verify native OS folder/screen-sharing dialogs, permission renewal and actual shared-storage behavior on two computers. OPFS and isolated browser tests cannot prove these gates.
 - No claim of successful installation on all older hardware, every operating system or every Chrome version between tested endpoints.
 - A modern Skill is guidance, not an instruction to raise the browser floor, add permissions or introduce AI. Existing promise queues and transient locks are not mechanically rewritten when persistence and safety are already correct.
@@ -114,16 +121,20 @@ Privacy policy source: PRIVACY.md. Public repository link: https://github.com/mo
 
 Public documentation convention: GitHub README uses official release numbering only. The Chrome standards statement describes Manifest V3 implementation and developer self-review; it must not be presented as Google certification or store approval.
 
-## Unreleased compatibility hardening — 2026-10-18
+## Historical preparation notes
+
+The following entries describe earlier candidates and submissions; the 2.0.0 status above takes precedence.
+
+### Unreleased compatibility hardening — 2026-10-18
 
 The Windows stability branch corrects case-insensitive folder discovery, preserves hashed example bytes across Git checkouts, and bounds shared-storage reads. No permission, privacy disclosure, product description or screenshot change is required for these fixes. This work has not been submitted as a new store package. Automated results and outstanding native/real-device checks are recorded in docs/COMPATIBILITY-REVIEW.md.
 
 
-## Post-release development review notes
+### Post-release development review notes
 
 The development branch adds capability-gated separate-image reading to the team library and side panel. It retains complete reads for older team services and obtains a complete, hash-verified guide before editing. Screenshot reading guards cancel stale account/reading requests without changing recording capture behavior. No new permission, remote executable code, vendor analytics or collection purpose is added. Product listing descriptions above are unchanged; these implementation notes do not describe a newly submitted store package. Rebuild and inspect the next proposed package, and complete the deferred native-permission/deployment acceptance before making broader compatibility claims.
 
-## Local v1.3.0 candidate review
+### Local v1.3.0 candidate review
 
 The local candidate adds read-only historical SOP viewing in the team library and an explicitly authorized folder. The selected version retains its text, images and annotations, with a historical notice and return to latest action. Reading history grants no category, publishing, restore or other management permission and adds no roles or approval process. No arbitrary remote imports, executable resources, new permission or analytics purpose is introduced. Fresh installations still require explicit storage selection and do not connect or synchronize automatically. See [Version history](docs/VERSION-HISTORY.md) for retained-file and validation limits.
 

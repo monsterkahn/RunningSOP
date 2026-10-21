@@ -1,8 +1,11 @@
 # Privacy notice
 
-Last reviewed for v1.2.0 on 2026-10-19. A fresh installation has no preconfigured shared directory or team-service connection. Workflow drafts and recording work locally without shared storage. Existing folder-based statistics synchronization runs only when previously enabled explicitly; it is separate from the experimental team service. This project contains no vendor cloud analytics code.
+Last reviewed for the local v1.4.1 installation candidate on 2026-10-21. A fresh installation has no preconfigured shared directory or team-service connection. Workflow drafts and recording work locally without shared storage. Existing folder-based statistics synchronization runs only when previously enabled explicitly; it is separate from the experimental team service. This project contains no vendor cloud analytics code.
 
 ## Data processing and local storage
+
+- Folder relationships are stored separately in relations.json with SOP identifiers, node positions, connection labels and revision metadata. Saving retains prior relationship revisions in relation-history. Geometry does not determine workflow order. No relationship data is sent to a developer service.
+- A short OS-prefix and random suffix form a browser-local device display name. It is not a hardware hostname or Chrome account name, and adds no account access permission. Users can change the team display name.
 
 - Folder-based workflow matching runs locally, primarily using the current tab URL. In team-service mode, the extension sends the current work URL to the configured service in a `POST /v1/matches` request. HTTP(S) query strings and fragments are removed; a `file://` URL is sent in full. Neither mode reads page body text or form values for matching.
 - Recording reads visible text or `aria-label` from controls the user clicks, label text associated with input controls, active dialog/tab titles, page titles, and sanitized URLs. It does not read field values, passwords, or verification codes. Control names, titles, URL paths, and manually entered work URLs or notes may still contain business information.
@@ -13,6 +16,12 @@ Last reviewed for v1.2.0 on 2026-10-19. A fresh installation has no preconfigure
 - Screenshots use the browser's `getDisplayMedia` selection interface only when explicitly triggered by the user. The extension captures one frame and then stops. The image may include personal information, account identifiers, messages, or other page content. Screenshots and annotations may be saved in local drafts or the user-selected shared directory.
 
 Uninstalling the extension may clear Chrome extension local storage. Before clearing data or uninstalling, publish any SOPs you need to retain to a storage directory you control and verify their contents. The current recording interface has no backup export entry. The extension does not automatically delete history already written to shared directories.
+
+A user-initiated folder selection with write authorization can install missing
+index.html and relationships.html from the extension's trusted package-local
+bundle. These pages contain no embedded user SOPs or browser handles. Existing
+HTML files are preserved. Settings can retry explicitly; startup does not deploy
+files in the background. This operation does not edit SOP or relationship data.
 
 ## Folder-based shared directories and background activity
 
@@ -58,3 +67,9 @@ The optional service picker saves up to 20 service names and addresses in a sepa
 ## Per-step feedback
 
 Feedback on a published SOP passage is saved only in this browser under a separate, bounded local format. Each entry contains the SOP identifier, exact displayed folder revision hash or team revision, step identifier, passage kind, optional exception identifier, issue type, timestamp and an optional manually entered note (up to2,000 characters). A SHA-256 source fingerprint distinguishes libraries/accounts without storing their raw endpoint in the feedback record. The interface does not copy page inputs or surrounding page text into feedback. There is no automatic upload to the developer, folder or team service. Users may explicitly export these records to JSON and share them with the responsible person; notes and identifiers in that export can be sensitive. Historical versions and local drafts do not offer these passage controls.
+
+## Screenshot redaction
+
+The screenshot editor offers a user-drawn Mosaic tool. Selected regions are previewed with opaque, source-independent gray tiles. Saving burns these tiles into a replacement JPEG, preserving ordinary annotation geometry separately. The saved draft and subsequent publication use the replacement image, not an original image underneath a removable mask. This feature does not inspect input values or automatically detect sensitive text. Before Save, Undo and Exit may restore the original local editing image. After a successful edit, the current draft image is replaced; previously published revisions, shared history, backups, exports or copies on other devices are not purged. ISSUE edits require Save issue to commit their updated screenshot to the draft.
+
+The overview and relationship pages store an optional Light/Dark appearance preference in browser-local storage. System mode removes the override. This preference is not sent to a server or saved in the SOP library.

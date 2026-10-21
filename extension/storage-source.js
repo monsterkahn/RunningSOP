@@ -72,13 +72,19 @@ function create(options={}){
   const picking=win.showOpenFilePicker({multiple:false,types:[{description:'SOP catalog.json',accept:{'application/json':['.json']}}]});
   const handles=await picking,handle=handles?.[0];if(!handle)fail('没有选择文件。');if(handle.name!=='catalog.json')fail('请选择内容库中的 catalog.json 文件。');const raw=await readFile(handle,MAX_CATALOG),catalog=engine.validateCatalog(JSON.parse(raw));return {handle,name:handle.name,catalog};
  }
- async function chooseDirectory({expectedFile}={}){
+ async function chooseDirectory({expectedFile,mode='read'}={}){
+  if(!['read','readwrite'].includes(mode))fail('文件夹授权模式无效。');
   if(!win.showDirectoryPicker||(!idb&&!options.store)||!storage)fail('此浏览器不支持文件夹选择，请使用 Chrome 扩展设置。');
   // Must precede all awaits: permission UI is authorized by this click only.
-  const picking=win.showDirectoryPicker({mode:'read'}),chosen=await picking;
+  const picking=win.showDirectoryPicker({mode}),chosen=await picking;
   // Request access immediately after selection, before file reads or storage work.
   // Chrome may grant it in the picker itself, in which case no second prompt appears.
-  const granted=typeof chosen.requestPermission==='function'?await chosen.requestPermission({mode:'read'}):await permission(chosen,'read');
+  let granted=typeof chosen.requestPermission==='function'?await chosen.requestPermission({mode}):await permission(chosen,mode);
+  // Existing read-only libraries remain usable when optional page deployment is denied.
+  if(granted!=='granted'&&mode==='readwrite'){
+   granted=await permission(chosen,'read');
+   if(granted!=='granted'&&typeof chosen.requestPermission==='function')granted=await chosen.requestPermission({mode:'read'});
+  }
   if(granted!=='granted')fail('需要重新授权，请点击“选择 SOP 文件夹”。');
   const hit=await inspect(chosen,expectedFile,true);
   const task=queue.catch(()=>{}).then(async()=>{

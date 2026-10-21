@@ -27,11 +27,11 @@ async function saveShared(next,previous){
  // Permission/picker invocation stays in the initiating click's gesture, before storage awaits.
  let handle=config.getSource(),permission,picker;
  if(handle)permission=handle.requestPermission?handle.requestPermission({mode:'readwrite'}):handle.queryPermission({mode:'readwrite'});
- else{if(!root.showDirectoryPicker)throw Error(t('请使用支持文件夹授权的 Chrome 打开总表。'));picker=root.showDirectoryPicker({mode:'readwrite'});}
+ else{if(config.connected)throw Error(t('请先选择 存储器 的工作SOP或SOP文件夹。'));if(!root.showDirectoryPicker)throw Error(t('请使用支持文件夹授权的 Chrome 打开总表。'));picker=root.showDirectoryPicker({mode:'readwrite'});}
  if(picker){handle=await config.resolveSource(await picker);await config.bindSource(handle);permission=handle.queryPermission({mode:'readwrite'});}
  if(await permission!=='granted')throw Error(t('未获得分类文件写入授权，修改尚未保存。'));
  const known=new Set(config.getPayload().workflows.map(w=>w.workflow.id));for(const id of Object.keys(next.assignments)){if(!known.has(id)&&!Object.hasOwn(previous.assignments,id))throw Error(t('所选目录不包含待分类的 SOP，请连接正确目录后再保存。'));}const normalized=C.validate({...next,revision:previous.revision+1,updatedAt:new Date().toISOString()});
- const result=await Store.save(handle,normalized,previous.revision);config.onChange(result);return result;
+ const result=await Store.save(handle,normalized,previous.revision,{guard:async()=>{if(config.assertActive)await config.assertActive(handle);}});config.onChange(result);return result;
 }
 async function submit(event){event.preventDefault();if(saving)return;let pending;try{const name=$('category-name').value.trim();if(!name)throw Error(t('请填写分类名称。'));const parentId=$('category-parent').value||null;if(base.categories.some(c=>c.id!==editing&&c.parentId===parentId&&c.name===name))throw Error(t('同一目录下已存在这个分类名称。'));const next=C.upsert(base,{id:editing||crypto.randomUUID(),name,color,icon,parentId});pending=saveShared(next,base);setBusy(true);await pending;$('category-dialog').close();}catch(e){$('category-error').textContent=e.message;$('reload-categories').hidden=!/修订|更新|变化/.test(e.message);}finally{setBusy(false);}}
 async function saveAssignment(event){event.preventDefault();if(saving)return;const id=(()=>{try{return decodeURIComponent((location.hash.match(/^#sop=(.*)$/)||[])[1]||'');}catch(_){return '';}})();if(!config.getPayload().workflows.some(x=>x.workflow.id===id))return;const previous=state(),next=C.assign(previous,id,$('department-input').value||null),b=$('department-form').querySelector('button');try{const pending=saveShared(next,previous);b.disabled=true;await pending;$('department-status').textContent=t('已保存到存储器；同事刷新后即可看到分类。');}catch(e){$('department-status').textContent=e.message;}finally{b.disabled=false;}}

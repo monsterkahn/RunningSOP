@@ -3,24 +3,25 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="color-scheme" content="light">
-  <title>Running SOP · 存储器总表</title>
-  <link rel="icon" type="image/png" href="__SOP_LOGO__">
+  <meta name="color-scheme" content="light dark">
+  <title>Running SOP · SOP 总表</title>
+  <link rel="icon" type="image/png" href="assets/icons/icon-48.png">
+  <script src="appearance.js"></script>
   <link rel="stylesheet" href="dashboard.css">
 </head>
 <body>
   <div class="app-shell">
     <aside class="sidebar">
-      <a class="brand" href="#overview"><img class="brand-mark" src="__SOP_LOGO__" alt="SOP 标志"><span><strong>Running SOP</strong><small>存储器 总表</small></span></a>
+      <a class="brand" href="#overview"><img class="brand-mark" src="assets/icons/icon-48.png" alt="SOP 标志"><span><strong>Running SOP</strong><small>SOP 总表</small></span></a>
       <section class="sidebar-summary" aria-labelledby="sidebar-summary-title"><h2 id="sidebar-summary-title">数据摘要</h2><div class="summary-values"><div class="rail-stat"><span>目录内 SOP</span><strong id="rail-total">—</strong></div><div class="rail-stat"><span>已采集查看</span><strong id="rail-views">未采集</strong></div><div class="rail-stat"><span>文字反馈</span><strong id="rail-feedback">未采集</strong></div><div class="rail-stat"><span>发布记录</span><strong id="rail-updated">—</strong></div><div class="rail-stat"><span>已发送五档评价</span><strong id="rail-rated">—</strong></div><div class="rail-stat"><span>正式发布</span><strong id="rail-published">—</strong></div></div></section>
       <div class="nav-caption">工作区</div>
-      <nav aria-label="主导航"><a href="#overview" class="active"><span class="nav-icon" aria-hidden="true">◫</span>总览</a><a href="#sops"><span class="nav-icon" aria-hidden="true">▤</span>SOP 内容库</a></nav>
+      <nav aria-label="主导航"><a href="#overview" class="active"><span class="nav-icon" aria-hidden="true">◫</span>总览</a><a href="#sops"><span class="nav-icon" aria-hidden="true">▤</span>SOP 内容库</a><a href="relationships.html" class="relationship-link" data-relationship-link><span class="nav-icon" aria-hidden="true">◇</span><span>SOP 关系图</span></a></nav>
       <div class="sidebar-note"><span class="dot"></span><span id="source-label">内嵌验证快照</span></div>
       <div class="sidebar-foot"><a id="dashboard-help" href="#">使用说明</a><a id="dashboard-download" data-version="__PLUGIN_VERSION__" href="#">下载插件</a><span>数据以已验证来源为准</span></div>
     </aside>
     <main>
-      <header class="topbar"><div><p class="eyebrow">CONTENT OPERATIONS</p><h1 id="page-title">存储器 SOP 总览</h1><p id="page-description" class="welcome">内容库概况与已采集评价</p></div><div class="top-actions"><label class="dashboard-language"><select id="dashboard-language" aria-label="语言 / Language"><option value="zh">中文 🇨🇳</option><option value="en">English 🇬🇧</option><option value="es">Español 🇪🇸</option><option value="ru">Русский 🇷🇺</option><option value="ko">한국어 🇰🇷</option><option value="ja">日本語 🇯🇵</option></select></label><button id="choose-source" class="button secondary"><span aria-hidden="true">▱</span> 选择 存储器 文件夹</button><button id="refresh" class="button primary"><span aria-hidden="true">↻</span> 刷新数据</button></div></header>
-      <p id="status" class="status" role="status">正在核验内嵌内容…</p>
+      <header class="topbar"><div><p class="eyebrow">CONTENT OPERATIONS</p><h1 id="page-title">SOP 总表</h1><p id="page-description" class="welcome">内容库概况与已采集评价</p></div><div class="top-actions"><div class="appearance-toggle" role="group" aria-label="外观"><button type="button" data-theme-choice="light" aria-pressed="false" title="浅色样式">Light</button><button type="button" data-theme-choice="dark" aria-pressed="false" title="深色样式">Dark</button><button type="button" data-theme-choice="system" aria-pressed="true" title="跟随系统外观">System</button></div><a href="relationships.html" class="button secondary relationship-header-link" data-relationship-link><span aria-hidden="true">◇</span><span>打开 SOP 关系图</span></a><label class="dashboard-language"><select id="dashboard-language" aria-label="语言 / Language"><option value="zh">SC · 简体中文</option><option value="zh-TW">TC · 繁體中文</option><option value="en">EN · English</option><option value="es">ES · Español</option><option value="ru">RU · Русский</option><option value="ko">KO · 한국어</option><option value="ja">JA · 日本語</option></select></label><button id="choose-source" class="button secondary"><span aria-hidden="true">▱</span> 选择 存储器 文件夹</button><button id="refresh" class="button primary"><span aria-hidden="true">↻</span> 刷新数据</button></div></header>
+      <p id="status" class="status" role="status">正在核验内嵌内容…</p><p id="connected-recovery" hidden><a href="library.html?source=folder">打开内容库以恢复文件夹连接</a></p><p class="privacy-notice">截图和备注可能包含敏感信息，分享前请核对。</p>
       <section id="overview" class="kpis" aria-label="总览指标">
         <article class="kpi kpi-purple"><span class="kpi-icon" aria-hidden="true">▤</span><span>目录内 SOP</span><strong id="kpi-count">—</strong><small id="kpi-catalog">目录版本</small></article>
         <article class="kpi kpi-orange"><span class="kpi-icon" aria-hidden="true">◷</span><span>已采集查看次数</span><strong id="kpi-views">未采集</strong><small>缺少设备记录时显示“未采集”</small></article>
@@ -29,8 +30,8 @@
       <section id="ratings-overview" class="panel rating-panel"><div class="section-head"><div><p class="eyebrow">RECORDED RATINGS</p><h2>五档评价统计</h2></div><span class="quiet-tag">仅统计已发送评价</span></div><div id="rating-chart" class="rating-chart" role="img" aria-label="五档评价数量分布图"></div><div id="rating-summary" class="rating-summary"></div><p id="rating-definition" class="muted"></p></section>
       <section id="sops" class="panel">
         <div class="section-head"><div><p class="eyebrow">LIBRARY</p><h2>SOP 内容库</h2><p class="muted">查找流程名称，点击标题查看操作步骤、图片及异常处置。</p></div><button id="qr-all" class="button secondary" type="button">二维码标签</button><button id="export-csv" class="button secondary">导出筛选结果 CSV</button></div>
-        <div class="library-layout"><aside class="category-sidebar"><div class="category-heading"><strong>分类目录</strong><button id="new-category" class="icon-button" aria-label="新建分类" title="新建分类"><span data-ui-icon="folder"></span>＋</button></div><div id="department-directory" class="department-directory" aria-label="分类目录"></div><button id="import-local-categories" class="button secondary" hidden>导入本机旧分类</button><p id="category-sync-status" class="muted" role="status"></p></aside><div class="library-results"><div class="filters"><label class="search"><span>搜索</span><input id="search" type="search" placeholder="名称、说明或 ID"></label><label>状态<select id="status-filter"><option value="all">全部</option><option value="published">正式发布</option><option value="sample">样本</option></select></label><label>排序<select id="sort"><option value="title">名称</option><option value="updated">更新时间</option><option value="views">查看次数</option></select></label></div>
-        <div class="table-wrap" tabindex="0" aria-label="SOP 内容表，可横向滚动"><table><thead><tr><th>SOP</th><th>状态</th><th>版本 / 最近更新</th><th title="仅统计已记录的内容更新；更早历史未知">更新次数</th><th>查看次数</th><th class="rating-1">非常不满意</th><th class="rating-2">不满意</th><th class="rating-3">一般</th><th class="rating-4">满意</th><th class="rating-5">非常满意</th><th>反馈</th></tr></thead><tbody id="sop-rows"></tbody></table></div>
+        <div class="library-layout"><aside class="category-sidebar"><div class="category-heading"><strong>分类</strong><button id="new-category" class="icon-button" aria-label="分类设置" title="分类设置"><span data-ui-icon="settings"></span></button></div><div id="department-directory" class="department-directory" aria-label="分类目录"></div><button id="import-local-categories" class="button secondary" hidden>导入本机旧分类</button><p id="category-sync-status" class="muted" role="status"></p></aside><div class="library-results"><div class="filters"><label class="search"><span>搜索</span><input id="search" type="search" placeholder="名称、说明或 ID"></label><label>状态<select id="status-filter"><option value="all">全部</option><option value="published">正式发布</option><option value="sample">样本</option></select></label><label>排序<select id="sort"><option value="title">名称</option><option value="updated">更新时间</option><option value="views">查看次数</option></select></label></div>
+        <div class="table-wrap" tabindex="0" aria-label="SOP 内容表，可横向滚动"><table><thead><tr><th>SOP</th><th>步骤数量</th><th>状态</th><th>版本 / 最近更新</th><th title="仅统计已记录的内容更新；更早历史未知">更新次数</th><th>查看次数</th><th class="rating-1">非常不满意</th><th class="rating-2">不满意</th><th class="rating-3">一般</th><th class="rating-4">满意</th><th class="rating-5">非常满意</th><th>反馈</th></tr></thead><tbody id="sop-rows"></tbody></table></div>
         <p id="empty-table" class="empty" hidden>没有符合筛选条件的 SOP。</p></div></div>
       </section>
       <section id="detail" class="panel detail" hidden><div class="detail-back"><a class="button secondary" href="#sops">← 返回内容库</a></div><div class="section-head"><div><p class="eyebrow">SOP DETAIL</p><h2 id="detail-title"></h2><p id="detail-meta" class="muted"></p></div><button id="detail-qr" class="button primary" type="button">手机扫码</button><a id="detail-link" class="button secondary">打开此 SOP</a></div><p id="detail-summary"></p><form id="department-form" class="department-form"><label for="department-input">所属分类 <small>保存到存储器，与同事共用</small></label><div><select id="department-input" aria-label="所属分类"><option value="">未分类</option></select><button class="button secondary" type="submit">保存分类</button></div><p id="department-status" class="muted" role="status"></p></form><div id="detail-body"></div><div id="detail-feedback"></div></section>
@@ -43,6 +44,20 @@
   </div>
   <dialog id="category-dialog" aria-labelledby="category-dialog-title"><form id="category-form"><div class="category-dialog-heading"><h2 id="category-dialog-title">新建分类</h2><button id="close-category" type="button" class="icon-button" aria-label="关闭"><span data-ui-icon="close"></span></button></div><label for="category-name">分类名称</label><input id="category-name" maxlength="40" required placeholder="例如：财务部、设备维护"><label for="category-parent">上级分类</label><select id="category-parent"><option value="">无，作为一级分类</option></select><label>分类颜色</label><div id="category-colors" class="category-choices" role="group" aria-label="分类颜色"></div><label>分类图标</label><div id="category-icons" class="category-choices" role="group" aria-label="分类图标"></div><div id="category-preview" class="category-preview"></div><p id="category-error" class="status error" role="status"></p><div class="category-dialog-actions"><button id="delete-category" type="button" class="button secondary" hidden>删除空分类</button><button id="reload-categories" type="button" class="button secondary" hidden>读取最新分类</button><button id="cancel-category" type="button" class="button secondary">取消</button><button id="save-category" class="button primary" type="submit">创建分类</button></div></form></dialog>
   <dialog id="qr-dialog" aria-labelledby="qr-title"><div class="qr-heading"><h2 id="qr-title">SOP 二维码</h2><button id="qr-close" type="button" class="button secondary">关闭</button></div><label for="qr-reader-url">手机阅读页面地址</label><div class="qr-address"><input id="qr-reader-url" type="url" placeholder="https://storage.example/sop.html" autocomplete="off"><button id="qr-save" type="button" class="button secondary">保存地址</button></div><p class="muted">填写存储器上已部署的 sop.html 地址。手机需能访问该网站；file:/// 电脑路径不能用于手机扫码。二维码按 SOP 编号打开当前发布版本，更新内容无需重新贴码。</p><p id="qr-status" class="status" role="status"></p><div id="qr-preview"></div><label for="qr-link">本份 SOP 链接</label><input id="qr-link" type="text" readonly><div class="qr-actions"><a id="qr-open" class="button secondary" target="_blank" rel="noopener" hidden>测试打开</a><button id="qr-download" type="button" class="button secondary" disabled>下载此二维码 SVG</button><button id="qr-export" type="button" class="button primary" disabled>下载全部标签</button></div></dialog>
+  <script src="dashboard-i18n.js"></script>
+  <script src="qr-code.js"></script>
+  <script src="sop-sharing.js"></script>
+  <script src="image-marks.js"></script>
+  <script src="ui-icons.js"></script>
+  <script src="category-engine.js"></script>
+  <script src="category-store.js"></script>
+  <script src="dashboard-categories.js"></script>
+  <script src="catalog-engine.js"></script>
+  <script src="sop-assets.js"></script>
+  <script src="sync-engine.js"></script>
+  <script src="sync-runtime.js"></script>
+  <script src="stats-engine.js"></script>
+  <script src="storage-source.js"></script>
   <script src="dashboard.js"></script>
 </body>
 </html>
