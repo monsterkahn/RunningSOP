@@ -36,8 +36,8 @@ No Running SOP account is required. Screenshots are initiated by you using the b
 
 Requires desktop Chrome 116 or later. Some browser pages restrict extension access; file pages require Chrome's file URL permission. Folder permissions are local to each browser and may require reauthorization. Low-end hardware and organizational storage permissions should be tested in the intended environment.
 
-Source: https://github.com/monsterkahn/RunningSOP
-Support: https://github.com/monsterkahn/RunningSOP/issues
+Source: https://github.com/donkimxote/RunningSOP
+Support: https://github.com/donkimxote/RunningSOP/issues
 
 The approved English short description is retained exactly. The listing and 2.0.0 introduction are prepared materials; they do not establish that a store draft has been uploaded, submitted or approved. Removed backup/export controls must not be advertised.
 
@@ -88,11 +88,11 @@ Data is processed for the SOP function; "the developer does not receive data" mu
 - Selecting a library does not opt into statistics synchronization; new setup makes a single library check. Existing explicitly enabled settings are retained on update.
 - Current settings no longer expose statistics or background-check toggles. Stop extension activity through Chrome's extension controls if needed; historical shared files remain.
 
-Privacy policy source: PRIVACY.md. Public repository link: https://github.com/monsterkahn/RunningSOP/blob/main/PRIVACY.md . The policy source is published in this repository. Recheck the live URL and match its contents to the submitted package before any store submission.
+Privacy policy source: PRIVACY.md. Public repository link: https://github.com/donkimxote/RunningSOP/blob/main/PRIVACY.md . The policy source is published in this repository. Recheck the live URL and match its contents to the submitted package before any store submission.
 
 ## Distribution and developer
 
-- Repository: https://github.com/monsterkahn/RunningSOP
+- Repository: https://github.com/donkimxote/RunningSOP
 - Author: don Kimxote
 - Contact: gwangphug@gmail.com
 - License: MIT (LICENSE)

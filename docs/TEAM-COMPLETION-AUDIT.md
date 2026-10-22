@@ -9,7 +9,7 @@ The authorized automated development work is complete. This is a developer accep
 - Local source: `c37367331ffebfa8fb5b5b5469e06fa1ec307bd0`.
 - Remote development source: `019e0a12a2cf1d23ad770b8d178922cd757cc0e9`.
 - Identical complete source tree: `864d2041d6fb75d749e6bfe6d8295093a2c36b27`.
-- [Final GitHub verification](https://github.com/monsterkahn/RunningSOP/actions/runs/39202716289): 13 verification jobs passed, release skipped. Logs were inspected, not inferred from a status badge.
+- [Final GitHub verification](https://github.com/donkimxote/RunningSOP/actions/runs/39202716289): 13 verification jobs passed, release skipped. Logs were inspected, not inferred from a status badge.
 - Later documentation-only audit commits do not change those tested runtime bytes. Published main, tags, official assets and the submitted store package are preserved.
 
 ## Requirements and evidence
@@ -33,7 +33,7 @@ The authorized automated development work is complete. This is a developer accep
 
 ## Failure evidence was retained
 
-The previous [run39184422081](https://github.com/monsterkahn/RunningSOP/actions/runs/39184422081) had 12 passing jobs and a macOS team-browser language initialization failure, not a successful matrix. Private connection and language reads completed in different orders. The correction repaints status and captions after the language is applied; a deliberate held-preference regression reproduces the old failure without increasing timeouts. The final macOS log confirms29/29 and the exact formerly failing case passes.
+The previous [run39184422081](https://github.com/donkimxote/RunningSOP/actions/runs/39184422081) had 12 passing jobs and a macOS team-browser language initialization failure, not a successful matrix. Private connection and language reads completed in different orders. The correction repaints status and captions after the language is applied; a deliberate held-preference regression reproduces the old failure without increasing timeouts. The final macOS log confirms29/29 and the exact formerly failing case passes.
 
 The final Chrome116 package run also exposed a test harness navigating before genuine install onboarding finished. The guided fixture now waits for the actual options page and DOMContentLoaded before creating work tabs; onboarding is still enabled and asserted. The corrected extracted-package original suites pass10/10 in each browser.
 
@@ -43,4 +43,4 @@ Earlier complete-read and publication timeouts, partial Edit provenance, stale r
 
 The development branch contains the optimizations, isolated reproducible fixtures, regression tests, package tooling and English operations documentation. [Machine-readable final platform evidence](evidence/team-final-cross-platform-2026-10-19.json) records exact source, job IDs/counts and unchanged official asset digests.
 
-The published [official v1.2.0 release](https://github.com/monsterkahn/RunningSOP/releases/tag/v1.2.0) remains available. This development audit does not replace its binaries, merge main, change the submitted Chrome Web Store package or certify the deferred deployment work. A future formal version should package the reviewed development changes under a new version number rather than silently replacing already published v1.2.0 files.
+The published [official v1.2.0 release](https://github.com/donkimxote/RunningSOP/releases/tag/v1.2.0) remains available. This development audit does not replace its binaries, merge main, change the submitted Chrome Web Store package or certify the deferred deployment work. A future formal version should package the reviewed development changes under a new version number rather than silently replacing already published v1.2.0 files.

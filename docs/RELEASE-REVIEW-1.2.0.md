@@ -17,8 +17,8 @@ The service listener uses unencrypted HTTP. An administrator must configure a tr
 | Core tests | 153 passed | Synthetic local tests; no real SOPs or browser profile used. |
 | Team-service tests | 44 passed on Node.js 24 and 26 | Includes service API, lock/fence behavior, account isolation, history and backup/recovery cases. |
 | Browser scenarios | 14 passed on Chrome 116; 14 passed on the current tested Chromium | Isolated test profiles and synthetic data. Browser automation does not exercise native operating-system permission prompts or real two-device access. |
-| Team-service CI | All 10 team OS jobs passed in [run 39128728309](https://github.com/monsterkahn/RunningSOP/actions/runs/39128728309) | Runtime commit `fb70640f689e00c801d4d86c45fda36444119445`; includes Node 24/26 service checks, browser scenarios, extracted-package startup, and container startup in the listed runners. These results do not verify an HTTPS deployment or physical NAS. |
-| Windows package checks | Both passed in [run 39128728341](https://github.com/monsterkahn/RunningSOP/actions/runs/39128728341) | Automated package checks on Windows runners; not acceptance on every Windows desktop or older computer. |
+| Team-service CI | All 10 team OS jobs passed in [run 39128728309](https://github.com/donkimxote/RunningSOP/actions/runs/39128728309) | Runtime commit `fb70640f689e00c801d4d86c45fda36444119445`; includes Node 24/26 service checks, browser scenarios, extracted-package startup, and container startup in the listed runners. These results do not verify an HTTPS deployment or physical NAS. |
+| Windows package checks | Both passed in [run 39128728341](https://github.com/donkimxote/RunningSOP/actions/runs/39128728341) | Automated package checks on Windows runners; not acceptance on every Windows desktop or older computer. |
 
 The release workflow will rerun its configured checks for the release commit. A result from a different commit or workflow is not represented as that release run.
 

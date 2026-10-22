@@ -24,8 +24,8 @@ Runtime changes were tested from extracted store ZIP files, not only the source 
 | Windows Server 2025, Chromium 151.0.7922.34 | 114 passed, 1 skipped | 10 passed | Passed |
 | Ubuntu 24.04 CI | Passed | All existing browser jobs passed | Passed |
 
-Windows runtime evidence: https://github.com/monsterkahn/RunningSOP/actions/runs/39087590643
-Linux evidence: https://github.com/monsterkahn/RunningSOP/actions/runs/39087590641
+Windows runtime evidence: https://github.com/donkimxote/RunningSOP/actions/runs/39087590643
+Linux evidence: https://github.com/donkimxote/RunningSOP/actions/runs/39087590641
 
 The Windows skip is the Linux-only Bash release-description test, not an extension scenario. No browser scenarios were skipped. The subsequent foreground-input test adjustment was also verified on both local browser versions; runtime bytes did not change.
 

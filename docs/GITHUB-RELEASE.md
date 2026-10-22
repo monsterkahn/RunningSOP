@@ -13,7 +13,7 @@ Create step-by-step guides with screenshots, follow them beside your work, and s
 
 ## Verification and limits
 
-The [2.0.0 release review](https://github.com/monsterkahn/RunningSOP/blob/main/docs/RELEASE-REVIEW-2.0.0.md) records 241 passing core tests, 59 passing browser scenarios each on current Chromium and actual Chrome 116, and 20 passing Chrome 116 scenarios from the extracted flat Web Store ZIP. Build/public scanning, archive integrity, source-byte comparisons, bundled-page hashes and listing-media checks also passed.
+The [2.0.0 release review](https://github.com/donkimxote/RunningSOP/blob/main/docs/RELEASE-REVIEW-2.0.0.md) records 241 passing core tests, 59 passing browser scenarios each on current Chromium and actual Chrome 116, and 20 passing Chrome 116 scenarios from the extracted flat Web Store ZIP. Build/public scanning, archive integrity, source-byte comparisons, bundled-page hashes and listing-media checks also passed.
 
 Native operating-system permission dialogs, physical two-device NAS/shared-folder acceptance, HTTPS deployment and team statistics remain user-deferred. Synthetic storage and injected permission outcomes do not establish native or real-network acceptance. The optional team service remains experimental and uses HTTP unless an administrator separately configures HTTPS. Missing historical content cannot be reconstructed.
 

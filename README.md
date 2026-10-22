@@ -6,7 +6,7 @@
 
 ![Running SOP: Clear steps. Right where you work.](docs/assets/running-sop-social-preview.png)
 
-**Release: v2.0.0** · Download: [Chrome Web Store](https://chromewebstore.google.com/detail/running-sop/engibjmklgbincjahpmbijkekojgpbim) · [GitHub Releases](https://github.com/monsterkahn/RunningSOP/releases/latest)
+**Release: v2.0.0** · Download: [Chrome Web Store](https://chromewebstore.google.com/detail/running-sop/engibjmklgbincjahpmbijkekojgpbim) · [GitHub Releases](https://github.com/donkimxote/RunningSOP/releases/latest)
 
 Create step-by-step guides with screenshots, follow them beside your work, and share SOPs through a folder you choose.
 
@@ -28,7 +28,7 @@ SOP guidance does not verify that a business task has been completed, replace or
 
 ## Install and update
 
-Requires **desktop Chrome 116 or later**. Download the installation ZIP from [GitHub Releases](https://github.com/monsterkahn/RunningSOP/releases/latest).
+Requires **desktop Chrome 116 or later**. Download the installation ZIP from [GitHub Releases](https://github.com/donkimxote/RunningSOP/releases/latest).
 
 1. Extract the ZIP to a folder you will keep.
 2. Open `chrome://extensions` and enable **Developer mode**.
