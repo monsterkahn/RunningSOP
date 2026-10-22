@@ -6,7 +6,7 @@
 
 ![Running SOP: Clear steps. Right where you work.](docs/assets/running-sop-social-preview.png)
 
-**Release: v2.0.0** · [Download](https://github.com/monsterkahn/RunningSOP/releases/latest)
+**Release: v2.0.0** · Download: [Chrome Web Store](https://chromewebstore.google.com/detail/running-sop/engibjmklgbincjahpmbijkekojgpbim) · [GitHub Releases](https://github.com/monsterkahn/RunningSOP/releases/latest)
 
 Create step-by-step guides with screenshots, follow them beside your work, and share SOPs through a folder you choose.
 
